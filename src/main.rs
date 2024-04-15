@@ -1,26 +1,10 @@
-use std::net::{SocketAddr, UdpSocket};
-
-fn main() -> std::io::Result<()> {
-    {
-        let send = SocketAddr::from(([127, 0, 0, 1], 1080));
-
-        let socket = UdpSocket::bind(SocketAddr::from(([127, 0, 0, 1], 0)))?;//"127.0.0.1:0")?;
-        let buf = "asdasdasdasd".as_bytes();;
-        socket.send_to(&buf, &send)?;
-
-        /*
-        let mut buf = [0; 65535];
-        let (amt, src) = socket.recv_from(&mut buf)?;
-        */
-    }
-    Ok(())
-}
-
-/*
 mod utils;
+
+use std::net::SocketAddr;
 use crate::utils::hash::crc32c::CRC32c;
 use crate::utils::uid::UID;
-use rand::{Rng, thread_rng};
+use crate::utils::node::Node;
+//use rand::{Rng, thread_rng};
 
 fn main() {
     //e5af5f 5134c1e664b6f8260e9d99d7a871926b b8
@@ -28,6 +12,16 @@ fn main() {
     //11100101101011110101111101010001001101001100000111100110011001001011011011111000001001100000111010011101100110011101011110101000011100011001001001010100
     // 11111000
 
+    let uid = UID::new("e5af5f5134c1e664b6f8260e9d99d7a8719254c7").unwrap();
+    let addr = SocketAddr::from(([127, 0, 0, 1], 1080));
+    let node = Node::new(uid, addr);
+    println!("SECURE: {}", node.address().ip());
+    println!("SECURE: {}", node.address().port());
+    println!("SECURE: {}", node.uid().hex());
+
+
+
+    /*
     let my_local_ip = local_ip().unwrap();
 
     println!("This is my local IP address: {:?}", my_local_ip);
@@ -39,9 +33,10 @@ fn main() {
     let test = uid.generate_node_id_by_distance(10);
     println!("Test: {}", test.get_binary());
     println!("Test: {}", test.to_string());
+    */
 }
 
-
+/*
 
 const V4_MASK: [u8; 4] = [0x03, 0x0f, 0x3f, 0xff];
 const V6_MASK: [u8; 8] = [0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0xff];

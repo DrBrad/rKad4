@@ -1,6 +1,5 @@
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
 use std::time::{SystemTime, UNIX_EPOCH};
-//use crc::crc32;
 use super::uid::UID;
 use super::hash::crc32c::CRC32c;
 
@@ -8,7 +7,7 @@ const V4_MASK: [u8; 4] = [0x03, 0x0f, 0x3f, 0xff];
 const V6_MASK: [u8; 8] = [0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0xff];
 const QUERY_TIME: u64 = 3600000;
 
-struct Node {
+pub struct Node {
     uid: UID,
     address: SocketAddr,
     stale: u32,
@@ -17,8 +16,8 @@ struct Node {
 
 impl Node {
     // Constructor with UID and SocketAddr
-    fn new(uid: UID, address: SocketAddr) -> Self {
-        Node {
+    pub fn new(uid: UID, address: SocketAddr) -> Self {
+        Self {
             uid,
             address,
             stale: 0,
@@ -26,14 +25,10 @@ impl Node {
         }
     }
 
-    // Constructor with UID, IP address, and port number
-    fn new_with_ip(uid: UID, ip: IpAddr, port: u16) -> Self {
-        let address = SocketAddr::new(ip, port);
-        Node::new(uid, address)
-    }
-
     // Check if the node has a secure ID
-    fn has_secure_id(&self) -> bool {
+    pub fn has_secure_id(&self) -> bool {
+        false
+        /*
         let ip:[u8] = match self.address.ip() {
             IpAddr::V4(ipv4) => ipv4.octets(),
             IpAddr::V6(ipv6) => ipv6.octets(),
@@ -56,47 +51,48 @@ impl Node {
             ^ crc;
 
         (uid_crc & 0xff_ff_f8_00) == 0
+        */
     }
 
-    fn get_uid(&self) -> &UID {
+    pub fn uid(&self) -> &UID {
         &self.uid
     }
 
-    fn get_address(&self) -> &SocketAddr {
+    pub fn address(&self) -> &SocketAddr {
         &self.address
     }
 
-    fn get_host_address(&self) -> IpAddr {
+    pub fn host_address(&self) -> IpAddr {
         self.address.ip()
     }
 
-    fn get_port(&self) -> u16 {
+    pub fn port(&self) -> u16 {
         self.address.port()
     }
 
     //DETAILS
-    fn set_seen(&mut self) {
+    pub fn set_seen(&mut self) {
         self.stale = 0;
         self.last_seen = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
     }
 
-    fn mark_stale(&mut self) {
+    pub fn mark_stale(&mut self) {
         self.stale += 1;
     }
 
-    fn get_stale(&self) -> u32 {
+    pub fn get_stale(&self) -> u32 {
         self.stale
     }
 
-    fn get_last_seen(&self) -> u64 {
+    pub fn get_last_seen(&self) -> u64 {
         self.last_seen
     }
 
-    fn has_queried(&self, now: u64) -> bool {
+    pub fn has_queried(&self, now: u64) -> bool {
         self.last_seen > 0 && now - self.last_seen < QUERY_TIME
     }
 
-    fn verify(&self, other: &Node) -> bool {
+    pub fn verify(&self, other: &Node) -> bool {
         //self.uid == other.uid
         return false;
     }

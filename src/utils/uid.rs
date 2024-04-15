@@ -27,8 +27,8 @@ impl UID {
     }
     */
 
-    fn get_distance(&self, k: &UID) -> usize {
-        ID_LENGTH - self.xor(k).get_first_set_bit_index()
+    fn distance(&self, k: &UID) -> usize {
+        ID_LENGTH - self.xor(k).first_set_bit_index()
     }
 
     fn xor(&self, k: &UID) -> UID {
@@ -40,7 +40,7 @@ impl UID {
     }
 
 
-    fn get_first_set_bit_index(&self) -> usize {
+    fn first_set_bit_index(&self) -> usize {
         let mut prefix_length = 0;
         for &b in &self.bid {
             if b == 0 {
@@ -108,11 +108,11 @@ impl UID {
         self.xor(&UID { bid: result })
     }
 
-    pub fn get_bytes(&self) -> [u8; ID_LENGTH] {
+    pub fn bytes(&self) -> [u8; ID_LENGTH] {
         self.bid
     }
 
-    pub fn get_binary(&self) -> String {
+    pub fn binary(&self) -> String {
         let mut binary = String::new();
         for &b in &self.bid {
             binary.push_str(&format!("{:08b}", b));
@@ -120,7 +120,7 @@ impl UID {
         binary
     }
 
-    pub fn get_hex(&self) -> String {
+    pub fn hex(&self) -> String {
         let mut hex_string = String::with_capacity(ID_LENGTH * 2);
 
         for &byte in self.bid.iter().take(ID_LENGTH) {
