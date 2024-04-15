@@ -34,7 +34,7 @@ impl Node {
 
     // Check if the node has a secure ID
     fn has_secure_id(&self) -> bool {
-        let ip = match self.address.ip() {
+        let ip:[u8] = match self.address.ip() {
             IpAddr::V4(ipv4) => ipv4.octets(),
             IpAddr::V6(ipv6) => ipv6.octets(),
         };

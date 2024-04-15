@@ -526,84 +526,64 @@ pub struct CRC32c {
 }
 
 impl CRC32c {
-    const T8_0_START: usize = 0 * 256;
-    const T8_1_START: usize = 1 * 256;
-    const T8_2_START: usize = 2 * 256;
-    const T8_3_START: usize = 3 * 256;
-    const T8_4_START: usize = 4 * 256;
-    const T8_5_START: usize = 5 * 256;
-    const T8_6_START: usize = 6 * 256;
-    const T8_7_START: usize = 7 * 256;
 
-    fn get_value(&self) -> u32 {
+    pub const T8_0_START: usize = 0 * 256;
+    pub const T8_1_START: usize = 1 * 256;
+    pub const T8_2_START: usize = 2 * 256;
+    pub const T8_3_START: usize = 3 * 256;
+    pub const T8_4_START: usize = 4 * 256;
+    pub const T8_5_START: usize = 5 * 256;
+    pub const T8_6_START: usize = 6 * 256;
+    pub const T8_7_START: usize = 7 * 256;
+
+    pub fn get_value(&self) -> u32 {
         let ret = self.crc;
-        !ret & 0xffffffff
+        (!ret) & 0xffffffff
     }
 
-    fn update(&mut self, b: &[u8], mut off: usize, mut len: usize) {
+    pub fn update(&mut self, b: &[u8], mut off: usize, mut len: usize) {
         let mut local_crc = self.crc;
 
         while len > 7 {
-            let c0 = (b[off + 0] ^ local_crc) as usize & 0xff;
-            let c1 = (b[off + 1] ^ (local_crc >>= 8)) as usize & 0xff;
-            let c2 = (b[off + 2] ^ (local_crc >>= 8)) as usize & 0xff;
-            let c3 = (b[off + 3] ^ (local_crc >>= 8)) as usize & 0xff;
-            local_crc = (T[CRC32c::T8_7_START + c0] ^ T[CRC32c::T8_6_START + c1])
-                ^ (T[CRC32c::T8_5_START + c2] ^ T[CRC32c::T8_4_START + c3]);
+            let c0 = (b[off + 0] as u32 ^ local_crc) & 0xff;
+            let c1 = (b[off + 1] as u32 ^ (local_crc >> 8)) & 0xff;
+            let c2 = (b[off + 2] as u32 ^ (local_crc >> 16)) & 0xff;
+            let c3 = (b[off + 3] as u32 ^ (local_crc >> 24)) & 0xff;
+            local_crc = (T[Self::T8_7_START + c0 as usize] ^ T[Self::T8_6_START + c1 as usize])
+                ^ (T[Self::T8_5_START + c2 as usize] ^ T[Self::T8_4_START + c3 as usize]);
 
-            let c4 = b[off + 4] as usize & 0xff;
-            let c5 = b[off + 5] as usize & 0xff;
-            let c6 = b[off + 6] as usize & 0xff;
-            let c7 = b[off + 7] as usize & 0xff;
+            let c4 = b[off + 4] as u32 & 0xff;
+            let c5 = b[off + 5] as u32 & 0xff;
+            let c6 = b[off + 6] as u32 & 0xff;
+            let c7 = b[off + 7] as u32 & 0xff;
 
-            local_crc ^= (T[CRC32c::T8_3_START + c4] ^ T[CRC32c::T8_2_START + c5])
-                ^ (T[CRC32c::T8_1_START + c6] ^ T[CRC32c::T8_0_START + c7]);
+            local_crc ^= (T[Self::T8_3_START + c4 as usize] ^ T[Self::T8_2_START + c5 as usize])
+                ^ (T[Self::T8_1_START + c6 as usize] ^ T[Self::T8_0_START + c7 as usize]);
 
             off += 8;
             len -= 8;
         }
 
-        // loop unroll
         match len {
-            7 => {
-                local_crc = (local_crc >> 8) ^ T[CRC32c::T8_0_START + ((local_crc ^ b[off]) as usize & 0xff)];
-                off += 1;
-            }
-            6 => {
-                local_crc = (local_crc >> 8) ^ T[CRC32c::T8_0_START + ((local_crc ^ b[off]) as usize & 0xff)];
-                off += 1;
-            }
-            5 => {
-                local_crc = (local_crc >> 8) ^ T[CRC32c::T8_0_START + ((local_crc ^ b[off]) as usize & 0xff)];
-                off += 1;
-            }
-            4 => {
-                local_crc = (local_crc >> 8) ^ T[CRC32c::T8_0_START + ((local_crc ^ b[off]) as usize & 0xff)];
-                off += 1;
-            }
-            3 => {
-                local_crc = (local_crc >> 8) ^ T[CRC32c::T8_0_START + ((local_crc ^ b[off]) as usize & 0xff)];
-                off += 1;
-            }
-            2 => {
-                local_crc = (local_crc >> 8) ^ T[CRC32c::T8_0_START + ((local_crc ^ b[off]) as usize & 0xff)];
-                off += 1;
-            }
-            1 => {
-                local_crc = (local_crc >> 8) ^ T[CRC32c::T8_0_START + ((local_crc ^ b[off]) as usize & 0xff)];
-                off += 1;
-            }
-            _ => {}
+            7 => local_crc = (local_crc >> 8) ^ T[Self::T8_0_START + ((local_crc ^ b[off] as u32) as usize & 0xff)],
+            6 => local_crc = (local_crc >> 8) ^ T[Self::T8_0_START + ((local_crc ^ b[off] as u32) as usize & 0xff)],
+            5 => local_crc = (local_crc >> 8) ^ T[Self::T8_0_START + ((local_crc ^ b[off] as u32) as usize & 0xff)],
+            4 => local_crc = (local_crc >> 8) ^ T[Self::T8_0_START + ((local_crc ^ b[off] as u32) as usize & 0xff)],
+            3 => local_crc = (local_crc >> 8) ^ T[Self::T8_0_START + ((local_crc ^ b[off] as u32) as usize & 0xff)],
+            2 => local_crc = (local_crc >> 8) ^ T[Self::T8_0_START + ((local_crc ^ b[off] as u32) as usize & 0xff)],
+            1 => local_crc = (local_crc >> 8) ^ T[Self::T8_0_START + ((local_crc ^ b[off] as u32) as usize & 0xff)],
+            _ => {} // Nothing
         }
 
+        // Publish crc out to object
         self.crc = local_crc;
     }
 
-    fn reset(&mut self) {
+    pub fn reset(&mut self) {
         self.crc = 0xffffffff;
     }
 
-    fn new() -> CRC32c {
+    pub fn new() -> Self {
         CRC32c { crc: 0xffffffff }
     }
 }

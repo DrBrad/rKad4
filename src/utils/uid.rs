@@ -21,6 +21,12 @@ impl UID {
         Ok(Self { bid })
     }
 
+    /*
+    pub fn new(key: &usize) -> Result<Self, &'static str> {
+        Ok(Self { bid })
+    }
+    */
+
     fn get_distance(&self, k: &UID) -> usize {
         ID_LENGTH - self.xor(k).get_first_set_bit_index()
     }
