@@ -1,53 +1,20 @@
-use std::net::{UdpSocket, SocketAddr, AddrParseError};
+use std::net::UdpSocket;
 
-fn send_udp_message(addr: &str, message: &[u8]) -> std::io::Result<()> {
-    // Create a UDP socket bound to any available local port
-    let socket = UdpSocket::bind("0.0.0.0:0")?;
+fn main() -> std::io::Result<()> {
+    {
+        let socket = UdpSocket::bind("127.0.0.1:34254")?;
 
-    // Parse the destination address
-    let dest_addr: SocketAddr = match addr.parse() {
-        Ok(addr) => addr,
-        Err(e) => return Err(std::io::Error::new(std::io::ErrorKind::Other, e)),
-    };
+        // Receives a single datagram message on the socket. If `buf` is too small to hold
+        // the message, it will be cut off.
+        let mut buf = [0; 65535];
+        let (amt, src) = socket.recv_from(&mut buf)?;
 
-    // Send the UDP message to the destination address
-    socket.send_to(message, &dest_addr)?;
-
+        // Redeclare `buf` as slice of the received data and send reverse data back to origin.
+        let buf = &mut buf[..amt];
+        buf.reverse();
+        socket.send_to(buf, &src)?;
+    } // the socket is closed here
     Ok(())
-}
-
-fn receive_udp_message(port: u16) -> std::io::Result<()> {
-    // Create a UDP socket bound to the specified port
-    let socket = UdpSocket::bind(format!("0.0.0.0:{}", port))?;
-
-    // Buffer to store received data
-    let mut buf = [0; 1024];
-
-    // Receive a UDP message
-    let (amt, src_addr) = socket.recv_from(&mut buf)?;
-
-    // Print the received message and the source address
-    println!("Received message from {}: {}", src_addr, String::from_utf8_lossy(&buf[..amt]));
-
-    Ok(())
-}
-
-fn main() {
-    let dest_addr = "127.0.0.1:8080";
-    let message = b"Hello, UDP!";
-
-    // Send a UDP message to the specified destination address
-    match send_udp_message(dest_addr, message) {
-        Ok(_) => println!("Sent message to {}", dest_addr),
-        Err(e) => eprintln!("Error sending message: {}", e),
-    }
-
-    // Receive UDP messages on the specified port
-    let port = 8080;
-    match receive_udp_message(port) {
-        Ok(_) => println!("Received UDP message on port {}", port),
-        Err(e) => eprintln!("Error receiving message: {}", e),
-    }
 }
 
 /*
