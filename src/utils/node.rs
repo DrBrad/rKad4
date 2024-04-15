@@ -96,4 +96,12 @@ impl Node {
         //self.uid == other.uid
         return false;
     }
+
+    pub fn to_string(&self) -> String {
+        return format!("{{ UID: {}, ADDRESS: {}, PORT: {}, SECURE: {} }}",
+            self.uid.to_string(),
+            self.address.ip(),
+            self.address.port(),
+            false);
+    }
 }

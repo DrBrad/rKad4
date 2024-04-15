@@ -1,4 +1,4 @@
-const ID_LENGTH: usize = 20;
+pub const ID_LENGTH: usize = 20;
 
 pub struct UID {
     pub(crate) bid: [u8; ID_LENGTH],

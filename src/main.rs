@@ -15,9 +15,7 @@ fn main() {
     let uid = UID::new("e5af5f5134c1e664b6f8260e9d99d7a8719254c7").unwrap();
     let addr = SocketAddr::from(([127, 0, 0, 1], 1080));
     let node = Node::new(uid, addr);
-    println!("SECURE: {}", node.address().ip());
-    println!("SECURE: {}", node.address().port());
-    println!("SECURE: {}", node.uid().hex());
+    println!("{}", node.to_string());
 
 
 
