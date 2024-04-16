@@ -6,7 +6,7 @@ use crate::messages::inter::message_type;
 pub struct MessageBase {
     pub(crate) uid: Option<UID>,
     pub(crate) tid: [u8; 6],
-    pub(crate) typ: MessageType,
+    pub(crate) type_: MessageType,
     pub(crate) destination: Option<SocketAddr>,
     pub(crate) origin: Option<SocketAddr>,
     pub(crate) public_address: Option<SocketAddr>,
@@ -14,11 +14,11 @@ pub struct MessageBase {
 
 impl MessageBase {
 
-    pub fn new(tid: [u8; 6], typ: MessageType) -> Self {
+    pub fn new(tid: [u8; 6], type_: MessageType) -> Self {
         Self {
             uid: None,
             tid,
-            typ,
+            type_,
             destination: None,
             origin: None,
             public_address: None
