@@ -37,14 +37,9 @@ pub fn is_bogon(addr: SocketAddr) -> bool {
 }
 
 pub fn is_teredo(addr: IpAddr) -> bool {
-    if addr.is_ipv6() {
-        /*
-        byte[] buf = address.getAddress();
-        return buf[0] == 0x20 &&
-            buf[1] == 0x01 &&
-            buf[2] == 0x00 &&
-            buf[3] == 0x00;
-        */
+    if let IpAddr::V6(v6) = addr {
+        let octets = v6.octets();
+        return octets[0] == 0x20 && octets[1] == 0x01 && octets[2] == 0x00 && octets[3] == 0x00;
     }
 
     false
