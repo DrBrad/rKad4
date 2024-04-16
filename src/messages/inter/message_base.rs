@@ -3,8 +3,6 @@ use message_type::MessageType;
 use std::net::SocketAddr;
 use crate::messages::inter::message_type;
 
-/*
-
 pub struct MessageBaseStruct {
     uid: UID,
     tid: [u8; 6],
@@ -13,7 +11,6 @@ pub struct MessageBaseStruct {
     origin: SocketAddr,
     public_address: SocketAddr,
 }
-*/
 
 pub trait MessageBase {
 

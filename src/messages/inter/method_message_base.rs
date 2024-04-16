@@ -3,9 +3,13 @@ use crate::messages::inter::message_type::MessageType;
 use crate::utils::uid::UID;
 use super::message_base::MessageBase;//{MessageBase, MessageBaseStruct};
 
-trait MethodMessageBase {
+pub trait MethodMessageBase {
 
     //HOW CAN WE ENCODE...
+
+    fn encode() -> Vec<u8>;
+
+    fn decode(buf: Vec<u8>);
 }
 
 
