@@ -4,28 +4,39 @@ pub struct UID {
     pub(crate) bid: [u8; ID_LENGTH],
 }
 
-impl UID {
+impl From<[u8; ID_LENGTH]> for UID {
 
-    pub fn new(key: &str) -> Result<Self, &'static str> {
+    fn from(bid: [u8; ID_LENGTH]) -> Self {
+        Self {
+            bid
+        }
+    }
+}
+
+impl From<&str> for UID {
+
+    fn from(key: &str) -> Self {
         if key.len() != ID_LENGTH * 2 {
-            return Err("Node ID is not correct length");
+            panic!("Node ID is not correct length");
+            //return Err("Node ID is not correct length");
         }
 
         let mut bid = [0u8; ID_LENGTH];
         for (i, chunk) in key.as_bytes().chunks(2).enumerate() {
-            let byte = u8::from_str_radix(std::str::from_utf8(chunk).unwrap(), 16)
-                .map_err(|_| "Invalid hex string")?;
+            let byte = match u8::from_str_radix(std::str::from_utf8(chunk).unwrap(), 16) {
+                Ok(byte) => byte,
+                Err(_) => panic!("Invalid hex string"),
+            };
             bid[i] = byte;
         }
 
-        Ok(Self { bid })
+        Self {
+            bid
+        }
     }
+}
 
-    /*
-    pub fn new(key: &usize) -> Result<Self, &'static str> {
-        Ok(Self { bid })
-    }
-    */
+impl UID {
 
     fn distance(&self, k: &UID) -> usize {
         ID_LENGTH - self.xor(k).first_set_bit_index()

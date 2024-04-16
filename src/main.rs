@@ -1,7 +1,7 @@
 mod utils;
 mod messages;
 
-use std::net::SocketAddr;
+use std::net::{IpAddr, SocketAddr};
 use crate::messages::inter::message_base::MessageBase;
 use crate::messages::inter::method_message_base::MethodMessageBase;
 use crate::messages::ping_request::PingRequest;
@@ -18,8 +18,8 @@ fn main() {
     //11100101101011110101111101010001001101001100000111100110011001001011011011111000001001100000111010011101100110011101011110101000011100011001001001010100
     // 11111000
 
-    let node = Node::new(UID::new("e5af5f5134c1e664b6f8260e9d99d7a8719254c7").unwrap(),
-                         SocketAddr::from(([127, 0, 0, 1], 1080)));
+
+    let node = Node::new(UID::from("e5af5f5134c1e664b6f8260e9d99d7a8719254c7"), SocketAddr::from(([127, 0, 0, 1], 1080)));
     println!("{}", node.to_string());
 
     let nodes = vec![ node ];
@@ -28,7 +28,8 @@ fn main() {
 
     println!("{}", vec_u8_to_hex_string(&buf));
 
-    let message = PingRequest::new([0, 0, 0, 0, 0, 0]);
+    //let message = PingRequest::new([0, 0, 0, 1, 0, 1]);
+    //IpAddr::f
 
     //let message = MethodMessageBase::new();
     //message
