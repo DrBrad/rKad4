@@ -8,10 +8,10 @@ const V6_MASK: [u8; 8] = [0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0xff];
 const QUERY_TIME: u64 = 3600000;
 
 pub struct Node {
-    uid: UID,
-    address: SocketAddr,
-    stale: u32,
-    last_seen: u64,
+    pub(crate) uid: UID,
+    pub(crate) address: SocketAddr,
+    pub(crate) stale: u32,
+    pub(crate) last_seen: u64,
 }
 
 impl Node {
@@ -54,38 +54,14 @@ impl Node {
         */
     }
 
-    pub fn uid(&self) -> &UID {
-        &self.uid
-    }
-
-    pub fn address(&self) -> &SocketAddr {
-        &self.address
-    }
-
-    pub fn host_address(&self) -> IpAddr {
-        self.address.ip()
-    }
-
-    pub fn port(&self) -> u16 {
-        self.address.port()
-    }
-
     //DETAILS
-    pub fn set_seen(&mut self) {
+    pub fn seen(&mut self) {
         self.stale = 0;
         self.last_seen = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
     }
 
     pub fn mark_stale(&mut self) {
         self.stale += 1;
-    }
-
-    pub fn get_stale(&self) -> u32 {
-        self.stale
-    }
-
-    pub fn get_last_seen(&self) -> u64 {
-        self.last_seen
     }
 
     pub fn has_queried(&self, now: u64) -> bool {

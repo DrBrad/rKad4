@@ -2,8 +2,10 @@ mod utils;
 
 use std::net::SocketAddr;
 use crate::utils::hash::crc32c::CRC32c;
+use crate::utils::net::address_type::AddressType;
 use crate::utils::uid::UID;
 use crate::utils::node::Node;
+use crate::utils::node_utils::pack_nodes;
 //use rand::{Rng, thread_rng};
 
 fn main() {
@@ -12,10 +14,15 @@ fn main() {
     //11100101101011110101111101010001001101001100000111100110011001001011011011111000001001100000111010011101100110011101011110101000011100011001001001010100
     // 11111000
 
-    let uid = UID::new("e5af5f5134c1e664b6f8260e9d99d7a8719254c7").unwrap();
-    let addr = SocketAddr::from(([127, 0, 0, 1], 1080));
-    let node = Node::new(uid, addr);
+    let node = Node::new(UID::new("e5af5f5134c1e664b6f8260e9d99d7a8719254c7").unwrap(),
+                         SocketAddr::from(([127, 0, 0, 1], 1080)));
     println!("{}", node.to_string());
+
+    let nodes = vec![ node ];
+
+    let buf = pack_nodes(&nodes, AddressType::IPv4);
+
+    println!("{}", vec_u8_to_hex_string(&buf));
 
 
 
@@ -32,6 +39,14 @@ fn main() {
     println!("Test: {}", test.get_binary());
     println!("Test: {}", test.to_string());
     */
+}
+
+fn vec_u8_to_hex_string(data: &[u8]) -> String {
+    let hex_chars: Vec<String> = data.iter()
+        .map(|byte| format!("{:02X}", byte)) // Format each byte as a two-digit hexadecimal string
+        .collect();
+
+    hex_chars.join("") // Concatenate all hexadecimal strings into one string
 }
 
 /*
