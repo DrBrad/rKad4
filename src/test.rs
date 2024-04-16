@@ -5,7 +5,7 @@ fn main() -> std::io::Result<()> {
         let send = SocketAddr::from(([127, 0, 0, 1], 1080));
 
         let socket = UdpSocket::bind(SocketAddr::from(([127, 0, 0, 1], 0)))?;//"127.0.0.1:0")?;
-        let buf = "asdasdasdasd".as_bytes();;
+        let buf = vec![0, 0, 5, 5, 0];
         socket.send_to(&buf, &send)?;
 
         /*
