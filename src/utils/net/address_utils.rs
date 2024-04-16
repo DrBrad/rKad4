@@ -1,36 +1,11 @@
 use std::net::{IpAddr, SocketAddr};
+use super::net_mask::NetMask;
 
 const LOCAL_BROADCAST: [u8; 4] = [0xff, 0xff, 0xff, 0xff];
-
-/*
-private static final NetMask V4_MAPPED;
-
-static {
-    try{
-        // ::ffff:0:0/96
-        V4_MAPPED = new NetMask(Inet6Address.getByAddress(null, new byte[]{
-                0x00,
-                0x00,
-                0x00,
-                0x00,
-                0x00,
-                0x00,
-                0x00,
-                0x00,
-                0x00,
-                0x00,
-                (byte) 0xff,
-                (byte) 0xff,
-                0x00,
-                0x00,
-                0x00,
-                0x00
-        }, null), 96);
-    }catch(UnknownHostException e){
-        throw new Error("Unable to set Global Unicast IPv4 static variable.");
-    }
-}
-*/
+const V4_MAPPED: NetMask = NetMask {
+    address: [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00],
+    mask: 96,
+};
 
 pub fn is_bogon(addr: SocketAddr) -> bool {
     !(addr.port() > 0 && is_global_unicast(addr.ip()))
@@ -53,8 +28,7 @@ pub fn is_global_unicast(addr: IpAddr) -> bool {
             }
         }
         IpAddr::V6(v6) => {
-            if (v6.segments()[0] & 0xfe) == 0xfc /*|| v4_mapped_contains(address) || v6.is_ipv4_compatible()*/ {
-                //(V4_MAPPED.contains(address)
+            if (v6.segments()[0] & 0xfe) == 0xfc || V4_MAPPED.contains(addr)/* || v6.is_ipv4_compatible()*/ {
                 // || ((Inet6Address) address).isIPv4CompatibleAddress())
                 return false;
             }
