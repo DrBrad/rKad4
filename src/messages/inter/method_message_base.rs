@@ -11,9 +11,9 @@ pub struct MethodMessageBase {
 
 impl MethodMessageBase {
 
-    pub fn new(tid: [u8; 6], method: String) -> Self {
+    pub fn new(tid: [u8; 6], method: String, typ: MessageType) -> Self {
         Self {
-            base: MessageBase::new(tid, MessageType::REQ_MSG),
+            base: MessageBase::new(tid, typ),
             method //FIGURE OUT WHY WE CANT JUST USE "BLANK"
         }
     }

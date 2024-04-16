@@ -2,6 +2,7 @@ pub enum MessageType {
 
     REQ_MSG,
     RSP_MSG,
+    ERR_MSG
 }
 /*
 impl MessageType {
