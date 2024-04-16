@@ -1,7 +1,7 @@
 pub enum MessageType {
 
-    IPv4,
-    IPv6
+    REQ_MSG,
+    RSP_MSG,
 }
 /*
 impl MessageType {

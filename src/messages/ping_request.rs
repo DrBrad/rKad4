@@ -1,26 +1,30 @@
-use super::inter::message_base::MessageBaseStruct;
+use super::inter::message_base::MessageBase;
 use super::inter::method_message_base::MethodMessageBase;
 
-
-struct PingRequest {
-    //inner: MessageBaseStruct
+pub struct PingRequest {
+    pub base: MethodMessageBase
 }
 
 impl PingRequest {
 
-    fn new(&self) -> Self {
+    //WE DONT ALWAYS NEED THE TID...
+    pub fn new(tid: [u8; 6]) -> Self {
         Self {
+            base: MethodMessageBase::new(tid, "ping".to_string())
         }
     }
-}
 
-impl MethodMessageBase for PingRequest {
-
+    /*
     fn encode() -> Vec<u8> {
-        todo!()
+
     }
 
     fn decode(buf: Vec<u8>) {
-        todo!()
+
     }
+
+    fn to_string() -> String {
+        None
+    }
+    */
 }

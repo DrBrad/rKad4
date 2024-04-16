@@ -4,6 +4,7 @@ mod messages;
 use std::net::SocketAddr;
 use crate::messages::inter::message_base::MessageBase;
 use crate::messages::inter::method_message_base::MethodMessageBase;
+use crate::messages::ping_request::PingRequest;
 use crate::utils::hash::crc32c::CRC32c;
 use crate::utils::net::address_type::AddressType;
 use crate::utils::uid::UID;
@@ -26,6 +27,8 @@ fn main() {
     let buf = pack_nodes(&nodes, AddressType::IPv4);
 
     println!("{}", vec_u8_to_hex_string(&buf));
+
+    let message = PingRequest::new([0, 0, 0, 0, 0, 0]);
 
     //let message = MethodMessageBase::new();
     //message
