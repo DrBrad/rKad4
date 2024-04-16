@@ -2,8 +2,10 @@ use crate::utils::uid::UID;
 use message_type::MessageType;
 use std::net::SocketAddr;
 use crate::messages::inter::message_type;
+
 /*
-struct MessageBase {
+
+pub struct MessageBaseStruct {
     uid: UID,
     tid: [u8; 6],
     typ: MessageType,
@@ -12,6 +14,7 @@ struct MessageBase {
     public_address: SocketAddr,
 }
 */
+
 pub trait MessageBase {
 
     /*
@@ -31,4 +34,3 @@ pub trait MessageBase {
 
     fn to_string() -> String;
 }
-
