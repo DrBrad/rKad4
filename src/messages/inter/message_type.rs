@@ -1,16 +1,24 @@
 pub enum MessageType {
-
     REQ_MSG,
     RSP_MSG,
     ERR_MSG
 }
-/*
+
 impl MessageType {
-    fn address_length(&self) -> u32 {
+
+    pub fn inner_key(&self) -> char {
         match self {
-            AddressType::IPv4 => 4,
-            AddressType::IPv6 => 16,
+            MessageType::REQ_MSG => 'a',
+            MessageType::RSP_MSG => 'r',
+            MessageType::ERR_MSG => 'e'
+        }
+    }
+
+    pub fn rpc_type_name(&self) -> char {
+        match self {
+            MessageType::REQ_MSG => 'q',
+            MessageType::RSP_MSG => 'r',
+            MessageType::ERR_MSG => 'e'
         }
     }
 }
-*/
