@@ -4,21 +4,21 @@ use crate::utils::node::Node;
 const MAX_BUCKET_SIZE: usize = 5;
 const MAX_STALE_COUNT: u32 = 1;
 
-struct KBucket { //CHANGE TO HASH CODE SYSTEM...
-    nodes: Vec<Node>,
-    cache: Vec<Node>
+pub struct KBucket { //CHANGE TO HASH CODE SYSTEM...
+    pub(crate) nodes: Vec<Node>,
+    pub(crate) cache: Vec<Node>
 }
 
 impl KBucket {
 
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             nodes: Vec::new(),
             cache: Vec::new()
         }
     }
 
-    fn insert(&mut self, n: Node) {
+    pub fn insert(&mut self, n: Node) {
         if self.nodes.contains(&n) {
             self.nodes.get(self.cache.index(&n)).unwrap().seen();
             //RE-SORT THE LIST
@@ -54,15 +54,15 @@ impl KBucket {
         }
     }
 
-    fn contains_ip(&self, n: Node) -> bool {
+    pub fn contains_ip(&self, n: Node) -> bool {
         self.nodes.contains(&n) || self.cache.contains(&n)
     }
 
-    fn contains_uid(&self, n: Node) -> bool {
+    pub fn contains_uid(&self, n: Node) -> bool {
         self.nodes.iter().any(|c| c.verify(&n)) || self.cache.iter().any(|c| c.verify(&n))
     }
 
-    fn has_queried(&self, n: Node, now: u64) -> bool {
+    pub fn has_queried(&self, n: Node, now: u64) -> bool {
         for c in self.nodes {
             if c.eq(&n) {
                 return c.has_queried(now);

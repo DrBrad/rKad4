@@ -8,7 +8,7 @@ pub trait RoutingTable {
 
     fn consensus_external_address() -> IpAddr;
 
-    fn insert(n: Node);
+    fn insert(&self, n: Node);
 
     fn derive_uid();
 
@@ -19,7 +19,7 @@ pub trait RoutingTable {
 
     //fn is_secure_only() -> bool; - NOT NEEDED
 
-    fn has_queried(n: Node, now: u64) -> bool;
+    fn has_queried(&self, n: Node, now: u64) -> bool;
 
     fn bucked_uid(k: UID) -> usize;
 
@@ -27,7 +27,7 @@ pub trait RoutingTable {
 
     fn find_closest(k: UID, r: u32) -> Vec(Node);
 
-    fn bucked_size(i: u32) -> usize;
+    fn bucked_size(&self, i: u32) -> usize;
 
     fn all_unqueried_nodes() -> Vec(Node);
 

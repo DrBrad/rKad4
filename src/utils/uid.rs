@@ -162,3 +162,9 @@ impl UID {
         hex_string
     }
 }
+
+impl PartialEq for UID {
+    fn eq(&self, other: &Self) -> bool {
+        self.bid == other.bid
+    }
+}
