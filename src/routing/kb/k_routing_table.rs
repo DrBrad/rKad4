@@ -74,8 +74,12 @@ impl RoutingTable for KRoutingTable {
         self.k_buckets[id].hasQueried(n, now);
     }
 
-    fn bucked_uid(k: UID) -> usize {
-        todo!()
+    fn bucked_uid(&self, k: UID) -> usize {
+        let id = self.uid.distance(k)-1;
+        if id < 0 {
+            0
+        }
+        id
     }
 
     fn all_nodes() -> Vec(Node) {

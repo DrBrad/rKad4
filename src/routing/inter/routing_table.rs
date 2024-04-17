@@ -21,7 +21,7 @@ pub trait RoutingTable {
 
     fn has_queried(&self, n: Node, now: u64) -> bool;
 
-    fn bucked_uid(k: UID) -> usize;
+    fn bucked_uid(&self, k: UID) -> usize;
 
     fn all_nodes() -> Vec(Node);
 
