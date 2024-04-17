@@ -38,6 +38,7 @@ impl RoutingTable for KRoutingTable {
     }
 
     fn insert(&mut self, n: Node) {
+        /*
         if self.secure_only && !n.has_secure_id() {
             return
         }
@@ -61,6 +62,7 @@ impl RoutingTable for KRoutingTable {
                 }
             }
         }
+        */
     }
 
     fn derive_uid() {

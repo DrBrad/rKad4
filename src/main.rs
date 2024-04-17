@@ -32,9 +32,9 @@ fn main() {
     println!("{}", vec_u8_to_hex_string(&buf));
 
 
-    let routing_table: KRoutingTable = KRoutingTable::new();
-    let size: usize = routing_table.bucket_size(3);
-    println!("{}", size);
+    //let routing_table: KRoutingTable = KRoutingTable::new();
+    //let size: usize = routing_table.bucket_size(3);
+    //println!("{}", size);
 
 
     //let message = PingRequest::new([0, 0, 0, 1, 0, 1]);

@@ -35,6 +35,8 @@ impl KBucket {
 
     pub fn insert(&mut self, n: Node) {
         //if self.nodes.contains(&n) {
+
+        /*
         if let Some(node) = self.nodes.iter().find(|item| n.eq(item)) {//*item == *n
             //node.seen();
         }
@@ -66,7 +68,6 @@ impl KBucket {
                     //if let Some(ref mut existing_stale) = stale {
                     //    self.cache.remove(existing_stale);
                     //}
-                    /*
                     if let Some(element) = self.cache.remove(self.cache.index(stale)) {
                         self.cache.push(element);
                     }
@@ -80,6 +81,7 @@ impl KBucket {
             self.nodes.push(n);
             //RE-SORT THE LIST
         }
+        */
     }
 
     pub fn contains_ip(&self, n: &Node) -> bool {
@@ -91,12 +93,15 @@ impl KBucket {
     }
 
     pub fn has_queried(&self, n: &Node, now: u64) -> bool {
+        /*
         for c in self.nodes {
             if c.eq(&n) {
                 return c.has_queried(now);
             }
         }
 
+        false
+        */
         false
     }
 
