@@ -45,6 +45,9 @@ fn main() {
     println!("{}", bucket.nodes.len());
     bucket.insert(Node::new(UID::from("e5af5f5134c1e664b6f8260e9d99d7a8719254c8"), SocketAddr::from(([127, 0, 1, 1], 1080))));
     println!("{}", bucket.nodes.len());
+    println!("{}", bucket.contains_ip(&Node::new(UID::from("e5af5f5134c1e664b6f8260e9d99d7a8719254c8"), SocketAddr::from(([127, 0, 1, 1], 1080)))));
+    println!("{}", bucket.contains_uid(&Node::new(UID::from("e5af5f5134c1e664b6f8260e9d99d7a871925458"), SocketAddr::from(([127, 0, 1, 1], 1080)))));
+    println!("{}", bucket.contains_uid(&Node::new(UID::from("e5af5f5134c1e664b6f8260e9d99d7a8719254c8"), SocketAddr::from(([127, 0, 1, 1], 1080)))));
 
     //let message = PingRequest::new([0, 0, 0, 1, 0, 1]);
     //IpAddr::f

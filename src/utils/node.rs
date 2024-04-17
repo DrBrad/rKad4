@@ -70,8 +70,7 @@ impl Node {
     }
 
     pub fn verify(&self, other: &Self) -> bool {
-        //self.uid == other.uid
-        false
+        self.uid == other.uid
     }
 
     pub fn to_string(&self) -> String {
