@@ -1,4 +1,5 @@
 use std::net::IpAddr;
+use core::array::from_fn;
 use crate::routing::inter::routing_table::RoutingTable;
 use super::k_bucket::KBucket;
 use crate::utils::node::Node;
@@ -7,22 +8,24 @@ use crate::utils::uid::{ UID, ID_LENGTH };
 pub struct KRoutingTable {
     uid: Option<UID>,
     secure_only: bool,
-    k_buckets: Vec<KBucket>//[KBucket; ID_LENGTH*8]
+    k_buckets: [KBucket; ID_LENGTH*8]
 }
 
 //UNCERTAIN HOW WE COULD EVEN USE A REGULAR ARRAY - NOT VEC IN THIS CASE DUE TO INITIALIZATION
 impl KRoutingTable {
 
     pub fn new() -> Self {
+        /*
         let mut k_buckets = Vec::with_capacity(ID_LENGTH * 8);
         for i in 0..=ID_LENGTH {
             k_buckets[i] = KBucket::new();
         }
+        */
 
         Self {
             uid: None,
             secure_only: true,
-            k_buckets
+            k_buckets: from_fn(|_| KBucket::new())
         }
     }
 }
