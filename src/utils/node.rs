@@ -7,6 +7,7 @@ const V4_MASK: [u8; 4] = [0x03, 0x0f, 0x3f, 0xff];
 const V6_MASK: [u8; 8] = [0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0xff];
 const QUERY_TIME: u64 = 3600000;
 
+#[derive(Copy, Clone)]
 pub struct Node {
     pub(crate) uid: UID,
     pub(crate) address: SocketAddr,
@@ -83,7 +84,7 @@ impl Node {
 }
 
 impl PartialEq for Node {
-    fn eq(&self, other: &Self) -> bool {
+    fn eq(&self, other: &Node) -> bool {
         self.address == other.address
     }
 }

@@ -1,13 +1,28 @@
 use std::ops::Index;
+use crate::routing::kb::k_routing_table::KRoutingTable;
 use crate::utils::node::Node;
+use crate::utils::uid::ID_LENGTH;
 
 const MAX_BUCKET_SIZE: usize = 5;
 const MAX_STALE_COUNT: u32 = 1;
 
+#[derive(Clone)]
 pub struct KBucket { //CHANGE TO HASH CODE SYSTEM...
     pub(crate) nodes: Vec<Node>,
     pub(crate) cache: Vec<Node>
 }
+
+/*
+impl Default for KBucket {
+
+    fn default() -> Self {
+        Self {
+            nodes: Vec::new(),
+            cache: Vec::new()
+        }
+    }
+}
+*/
 
 impl KBucket {
 
@@ -19,37 +34,50 @@ impl KBucket {
     }
 
     pub fn insert(&mut self, n: Node) {
-        if self.nodes.contains(&n) {
-            self.nodes.get(self.cache.index(&n)).unwrap().seen();
+        //if self.nodes.contains(&n) {
+        if let Some(node) = self.nodes.iter().find(|item| n.eq(item)) {//*item == *n
+            //node.seen();
+        }
+            //self.nodes.get(self.nodes.index(n)).unwrap().seen();
             //RE-SORT THE LIST
 
-        } else if self.nodes.len() >= MAX_BUCKET_SIZE {
-            if self.cache.contains(&n) {
-                self.cache.get(self.cache.index(&n)).unwrap().seen();
+        /*}*/ else if self.nodes.len() >= MAX_BUCKET_SIZE {
+            if let Some(node) = self.cache.iter_mut().find(|item| n.eq(item)) {
+            //if self.cache.contains(&n) {
+                //self.cache.get(self.cache.index(n)).unwrap().seen();
+                node.seen();
 
             } else if self.cache.len() >= MAX_BUCKET_SIZE {
-                let mut stale: Node = None;
+                //let mut stale: Option<Node> = None;
+                let mut index = MAX_BUCKET_SIZE+1;
 
-                for s in self.cache {
-                    if s.stale >= MAX_STALE_COUNT {
-                        if stale == None || s.stale > stale.stale {
-                            stale = s;
+                for i in 0..=self.cache.len() {
+                    if self.cache.get(i).unwrap().stale >= MAX_STALE_COUNT {
+                        if index < MAX_BUCKET_SIZE && self.cache.get(i).unwrap().stale > self.cache.get(index).unwrap().stale {
+                            index = i;
                         }
                     }
                 }
 
 
-                if(stale != None){
+                if(index < MAX_BUCKET_SIZE){
+                    let n = self.cache.remove(index);
+                    self.cache.push(n);
+                    //if let Some(ref mut existing_stale) = stale {
+                    //    self.cache.remove(existing_stale);
+                    //}
+                    /*
                     if let Some(element) = self.cache.remove(self.cache.index(stale)) {
                         self.cache.push(element);
                     }
+                    */
                 }
 
             }else{
-                self.cache.push(&n);
+                self.cache.push(n);
             }
         }else{
-            self.nodes.push(&n);
+            self.nodes.push(n);
             //RE-SORT THE LIST
         }
     }

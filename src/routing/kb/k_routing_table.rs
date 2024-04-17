@@ -5,18 +5,19 @@ use crate::utils::node::Node;
 use crate::utils::uid::{ UID, ID_LENGTH };
 
 pub struct KRoutingTable {
-    uid: UID,
+    uid: Option<UID>,
     secure_only: bool,
-    k_buckets: [KBucket; ID_LENGTH*8]
+    k_buckets: Vec<KBucket>//[KBucket; ID_LENGTH*8]
 }
 
+//UNCERTAIN HOW WE COULD EVEN USE A REGULAR ARRAY - NOT VEC IN THIS CASE DUE TO INITIALIZATION
 impl KRoutingTable {
 
     pub fn new() -> Self {
-        let mut k_buckets: [KBucket; ID_LENGTH*8] = [KBucket::new(); ID_LENGTH*8];//Default::default();
-        //for i in 0..=ID_LENGTH {
-        //    k_buckets[i] = KBucket::new();
-        //}
+        let mut k_buckets = Vec::with_capacity(ID_LENGTH * 8);
+        for i in 0..=ID_LENGTH {
+            k_buckets[i] = KBucket::new();
+        }
 
         Self {
             uid: None,
@@ -41,21 +42,23 @@ impl RoutingTable for KRoutingTable {
             return
         }
 
-        if !self.uid.eq(&n.uid) {
-            let id = self.bucket_uid(&n.uid);
+        if let Some(uid) = &self.uid {
+            if *uid != n.uid {
+                let id = self.bucket_uid(&n.uid);
 
-            let mut contains_ip = false;
-            for b in self.k_buckets {
-                if b.contains_ip(&n) {
-                    contains_ip = true;
-                    break;
+                let mut contains_ip = false;
+                for b in self.k_buckets {
+                    if b.contains_ip(&n) {
+                        contains_ip = true;
+                        break;
+                    }
                 }
-            }
 
-            let contains_uid = self.k_buckets[id].contains_uid(&n);
+                let contains_uid = self.k_buckets[id].contains_uid(&n);
 
-            if contains_ip == contains_uid {
-                self.k_buckets[id].insert(n);
+                if contains_ip == contains_uid {
+                    self.k_buckets[id].insert(n);
+                }
             }
         }
     }
@@ -65,17 +68,17 @@ impl RoutingTable for KRoutingTable {
     }
 
     fn has_queried(&self, n: &Node, now: u64) -> bool {
-        let mut id = self.bucked_uid(&n.uid);
+        let id = self.bucket_uid(&n.uid);
 
         if !self.k_buckets[id].contains_uid(n) {
             return false;
         }
 
-        self.k_buckets[id].hasQueried(n, now);
+        self.k_buckets[id].has_queried(n, now)
     }
 
     fn bucket_uid(&self, k: &UID) -> usize {
-        let id = self.uid.distance(k)-1;
+        let id = self.uid.unwrap().distance(k)-1;
         if id < 0 {
             return 0;
         }
@@ -90,7 +93,7 @@ impl RoutingTable for KRoutingTable {
         todo!()
     }
 
-    fn bucket_size(&self, i: u32) -> usize {
+    fn bucket_size(&self, i: usize) -> usize {
         self.k_buckets[i].nodes.len()
     }
 
