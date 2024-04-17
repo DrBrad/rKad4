@@ -8,6 +8,7 @@ use crate::messages::inter::method_message_base::MethodMessageBase;
 use crate::messages::ping_request::PingRequest;
 use crate::utils::hash::crc32c::CRC32c;
 use crate::routing::inter::routing_table::RoutingTable;
+use crate::routing::kb::k_bucket::KBucket;
 use crate::routing::kb::k_routing_table::KRoutingTable;
 use crate::utils::net::address_type::AddressType;
 use crate::utils::uid::UID;
@@ -36,6 +37,14 @@ fn main() {
     //let size: usize = routing_table.bucket_size(3);
     //println!("{}", size);
 
+    let mut bucket = KBucket::new();
+
+    bucket.insert(Node::new(UID::from("e5af5f5134c1e664b6f8260e9d99d7a8719254c7"), SocketAddr::from(([127, 0, 0, 1], 1080))));
+
+    bucket.insert(Node::new(UID::from("e5af5f5134c1e664b6f8260e9d99d7a8719254c7"), SocketAddr::from(([127, 0, 0, 1], 1080))));
+    println!("{}", bucket.nodes.len());
+    bucket.insert(Node::new(UID::from("e5af5f5134c1e664b6f8260e9d99d7a8719254c8"), SocketAddr::from(([127, 0, 1, 1], 1080))));
+    println!("{}", bucket.nodes.len());
 
     //let message = PingRequest::new([0, 0, 0, 1, 0, 1]);
     //IpAddr::f

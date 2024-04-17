@@ -1,7 +1,4 @@
-use std::ops::Index;
-use crate::routing::kb::k_routing_table::KRoutingTable;
 use crate::utils::node::Node;
-use crate::utils::uid::ID_LENGTH;
 
 const MAX_BUCKET_SIZE: usize = 5;
 const MAX_STALE_COUNT: u32 = 1;
@@ -11,18 +8,6 @@ pub struct KBucket { //CHANGE TO HASH CODE SYSTEM...
     pub(crate) nodes: Vec<Node>,
     pub(crate) cache: Vec<Node>
 }
-
-/*
-impl Default for KBucket {
-
-    fn default() -> Self {
-        Self {
-            nodes: Vec::new(),
-            cache: Vec::new()
-        }
-    }
-}
-*/
 
 impl KBucket {
 
@@ -34,19 +19,12 @@ impl KBucket {
     }
 
     pub fn insert(&mut self, n: Node) {
-        //if self.nodes.contains(&n) {
-
-        /*
-        if let Some(node) = self.nodes.iter().find(|item| n.eq(item)) {//*item == *n
-            //node.seen();
-        }
-            //self.nodes.get(self.nodes.index(n)).unwrap().seen();
+        if let Some(node) = self.nodes.iter_mut().find(|c| n.eq(c)) {
+            node.seen();
             //RE-SORT THE LIST
 
-        /*}*/ else if self.nodes.len() >= MAX_BUCKET_SIZE {
-            if let Some(node) = self.cache.iter_mut().find(|item| n.eq(item)) {
-            //if self.cache.contains(&n) {
-                //self.cache.get(self.cache.index(n)).unwrap().seen();
+        } else if self.nodes.len() >= MAX_BUCKET_SIZE {
+            if let Some(node) = self.cache.iter_mut().find(|c| n.eq(c)) {
                 node.seen();
 
             } else if self.cache.len() >= MAX_BUCKET_SIZE {
@@ -68,6 +46,7 @@ impl KBucket {
                     //if let Some(ref mut existing_stale) = stale {
                     //    self.cache.remove(existing_stale);
                     //}
+                    /*
                     if let Some(element) = self.cache.remove(self.cache.index(stale)) {
                         self.cache.push(element);
                     }
@@ -81,7 +60,6 @@ impl KBucket {
             self.nodes.push(n);
             //RE-SORT THE LIST
         }
-        */
     }
 
     pub fn contains_ip(&self, n: &Node) -> bool {
@@ -106,14 +84,16 @@ impl KBucket {
     }
 
     /*
-    fn all_nodes() -> Vec<Node> {
+    fn all_nodes(&self) -> Vec<Node> {
+        self.nodes.clone()
+    }
+    */
 
+    fn unqueried_nodes(&self, now: u64) -> Vec<Node> {
+        self.nodes.iter().filter(|&n| !n.has_queried(now)).cloned().collect()
     }
 
-    fn unqueried_nodes(now: u64) -> Vec<Node> {
-
-    }
-
+    /*
     fn size(&self) -> usize {
         self.nodes.len()
     }
