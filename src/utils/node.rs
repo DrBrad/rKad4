@@ -68,9 +68,9 @@ impl Node {
         self.last_seen > 0 && now - self.last_seen < QUERY_TIME
     }
 
-    pub fn verify(&self, other: &Node) -> bool {
+    pub fn verify(&self, other: &Self) -> bool {
         //self.uid == other.uid
-        return false;
+        false
     }
 
     pub fn to_string(&self) -> String {

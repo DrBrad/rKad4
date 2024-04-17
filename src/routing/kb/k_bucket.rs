@@ -18,7 +18,7 @@ impl KBucket {
         }
     }
 
-    fn insert(&self, n: Node) { //&mut self
+    fn insert(&mut self, n: Node) {
         if self.nodes.contains(&n) {
             self.nodes.get(self.cache.index(&n)).unwrap().seen();
             //RE-SORT THE LIST
@@ -28,28 +28,51 @@ impl KBucket {
                 self.cache.get(self.cache.index(&n)).unwrap().seen();
 
             } else if self.cache.len() >= MAX_BUCKET_SIZE {
-                let mut stale: Node;
+                let mut stale: Node = None;
+
+                for s in self.cache {
+                    if s.stale >= MAX_STALE_COUNT {
+                        if stale == None || s.stale > stale.stale {
+                            stale = s;
+                        }
+                    }
+                }
 
 
+                if(stale != None){
+                    if let Some(element) = self.cache.remove(self.cache.index(stale)) {
+                        self.cache.push(element);
+                    }
+                }
+
+            }else{
+                self.cache.push(&n);
             }
+        }else{
+            self.nodes.push(&n);
+            //RE-SORT THE LIST
+        }
+    }
 
+    fn contains_ip(&self, n: Node) -> bool {
+        self.nodes.contains(&n) || self.cache.contains(&n)
+    }
+
+    fn contains_uid(&self, n: Node) -> bool {
+        self.nodes.iter().any(|c| c.verify(&n)) || self.cache.iter().any(|c| c.verify(&n))
+    }
+
+    fn has_queried(&self, n: Node, now: u64) -> bool {
+        for c in self.nodes {
+            if c.eq(&n) {
+                return c.has_queried(now);
+            }
         }
 
-
-    }
-
-    fn contains_ip(n: Node) -> bool {
         false
     }
 
-    fn contains_uid(n: Node) -> bool {
-        false
-    }
-
-    fn has_queried(n: Node, now: u64) -> bool {
-        false
-    }
-
+    /*
     fn all_nodes() -> Vec<Node> {
 
     }
@@ -58,7 +81,6 @@ impl KBucket {
 
     }
 
-    /*
     fn size(&self) -> usize {
         self.nodes.len()
     }
