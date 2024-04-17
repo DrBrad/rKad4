@@ -11,19 +11,11 @@ pub struct KRoutingTable {
     k_buckets: [KBucket; ID_LENGTH*8]
 }
 
-//UNCERTAIN HOW WE COULD EVEN USE A REGULAR ARRAY - NOT VEC IN THIS CASE DUE TO INITIALIZATION
 impl KRoutingTable {
 
     pub fn new() -> Self {
-        /*
-        let mut k_buckets = Vec::with_capacity(ID_LENGTH * 8);
-        for i in 0..=ID_LENGTH {
-            k_buckets[i] = KBucket::new();
-        }
-        */
-
         Self {
-            uid: None,
+            uid: Some(UID::from("e5af5f5134c1e664b6f8260e9d99d7a8719254c7")),//None,
             secure_only: true,
             k_buckets: from_fn(|_| KBucket::new())
         }
@@ -41,7 +33,6 @@ impl RoutingTable for KRoutingTable {
     }
 
     fn insert(&mut self, n: Node) {
-        /*
         if self.secure_only && !n.has_secure_id() {
             return
         }
@@ -51,7 +42,7 @@ impl RoutingTable for KRoutingTable {
                 let id = self.bucket_uid(&n.uid);
 
                 let mut contains_ip = false;
-                for b in self.k_buckets {
+                for b in &self.k_buckets {
                     if b.contains_ip(&n) {
                         contains_ip = true;
                         break;
@@ -65,7 +56,6 @@ impl RoutingTable for KRoutingTable {
                 }
             }
         }
-        */
     }
 
     fn derive_uid() {
@@ -88,6 +78,16 @@ impl RoutingTable for KRoutingTable {
             return 0;
         }
         id
+        /*
+        if let Some(uid) = self.uid {
+            let id = uid.distance(k)-1;
+            if id < 0 {
+                return 0;
+            }
+            return id;
+        }
+        0
+        */
     }
 
     fn all_nodes() -> Vec<Node> {
