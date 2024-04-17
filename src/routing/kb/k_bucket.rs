@@ -54,15 +54,15 @@ impl KBucket {
         }
     }
 
-    pub fn contains_ip(&self, n: Node) -> bool {
+    pub fn contains_ip(&self, n: &Node) -> bool {
         self.nodes.contains(&n) || self.cache.contains(&n)
     }
 
-    pub fn contains_uid(&self, n: Node) -> bool {
+    pub fn contains_uid(&self, n: &Node) -> bool {
         self.nodes.iter().any(|c| c.verify(&n)) || self.cache.iter().any(|c| c.verify(&n))
     }
 
-    pub fn has_queried(&self, n: Node, now: u64) -> bool {
+    pub fn has_queried(&self, n: &Node, now: u64) -> bool {
         for c in self.nodes {
             if c.eq(&n) {
                 return c.has_queried(now);

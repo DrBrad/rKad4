@@ -36,13 +36,13 @@ impl RoutingTable for KRoutingTable {
         todo!()
     }
 
-    fn insert(&self, n: Node) {
+    fn insert(&self, n: &Node) {
         if self.secure_only && !n.has_secure_id() {
             return
         }
 
         if !self.uid.eq(n.uid) {
-            let id = self.bucket_uid(n.uid);
+            let id = self.bucket_uid(&n.uid);
 
             let mut contains_ip = false;
             for b in self.k_buckets {
@@ -64,8 +64,8 @@ impl RoutingTable for KRoutingTable {
         todo!()
     }
 
-    fn has_queried(&self, n: Node, now: u64) -> bool {
-        let mut id = self.bucked_uid(n.uid);
+    fn has_queried(&self, n: &Node, now: u64) -> bool {
+        let mut id = self.bucked_uid(&n.uid);
 
         if !self.k_buckets[id].contains_uid(n) {
             return false;
@@ -74,7 +74,7 @@ impl RoutingTable for KRoutingTable {
         self.k_buckets[id].hasQueried(n, now);
     }
 
-    fn bucked_uid(&self, k: UID) -> usize {
+    fn bucked_uid(&self, k: &UID) -> usize {
         let id = self.uid.distance(k)-1;
         if id < 0 {
             0
@@ -86,7 +86,7 @@ impl RoutingTable for KRoutingTable {
         todo!()
     }
 
-    fn find_closest(k: UID, r: u32) -> Vec(Node) {
+    fn find_closest(k: &UID, r: u32) -> Vec(Node) {
         todo!()
     }
 
