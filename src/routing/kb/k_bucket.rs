@@ -1,6 +1,7 @@
+use std::ops::Index;
 use crate::utils::node::Node;
 
-const MAX_BUCKET_SIZE: u32 = 5;
+const MAX_BUCKET_SIZE: usize = 5;
 const MAX_STALE_COUNT: u32 = 1;
 
 struct KBucket { //CHANGE TO HASH CODE SYSTEM...
@@ -17,10 +18,24 @@ impl KBucket {
         }
     }
 
-    fn insert(&self, n: Node) {
-        if self.nodes.contains(n) {
+    fn insert(&self, n: Node) { //&mut self
+        if self.nodes.contains(&n) {
+            self.nodes.get(self.cache.index(&n)).unwrap().seen();
+            //RE-SORT THE LIST
+
+        } else if self.nodes.len() >= MAX_BUCKET_SIZE {
+            if self.cache.contains(&n) {
+                self.cache.get(self.cache.index(&n)).unwrap().seen();
+
+            } else if self.cache.len() >= MAX_BUCKET_SIZE {
+                let mut stale: Node;
+
+
+            }
 
         }
+
+
     }
 
     fn contains_ip(n: Node) -> bool {
@@ -44,12 +59,12 @@ impl KBucket {
     }
 
     /*
-    fn size(&self) -> u32 {
+    fn size(&self) -> usize {
         self.nodes.len()
     }
 
-    fn csize() -> u32 {
-        0
+    fn csize(&self) -> usize {
+        self.cache.len()
     }
     */
 }

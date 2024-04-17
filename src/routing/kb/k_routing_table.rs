@@ -29,7 +29,7 @@ impl RoutingTable for KRoutingTable {
         todo!()
     }
 
-    fn bucked_uid(k: UID) -> u32 {
+    fn bucked_uid(k: UID) -> usize {
         todo!()
     }
 
@@ -41,7 +41,7 @@ impl RoutingTable for KRoutingTable {
         todo!()
     }
 
-    fn bucked_size(i: u32) -> u32 {
+    fn bucked_size(i: u32) -> usize {
         todo!()
     }
 

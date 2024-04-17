@@ -81,3 +81,9 @@ impl Node {
             false);
     }
 }
+
+impl PartialEq for Node {
+    fn eq(&self, other: &Self) -> bool {
+        self.address == other.address
+    }
+}

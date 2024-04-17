@@ -21,13 +21,13 @@ pub trait RoutingTable {
 
     fn has_queried(n: Node, now: u64) -> bool;
 
-    fn bucked_uid(k: UID) -> u32;
+    fn bucked_uid(k: UID) -> usize;
 
     fn all_nodes() -> Vec(Node);
 
     fn find_closest(k: UID, r: u32) -> Vec(Node);
 
-    fn bucked_size(i: u32) -> u32;
+    fn bucked_size(i: u32) -> usize;
 
     fn all_unqueried_nodes() -> Vec(Node);
 
