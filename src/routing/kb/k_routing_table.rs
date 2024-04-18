@@ -38,10 +38,6 @@ impl RoutingTable for KRoutingTable {
         todo!()
     }
 
-    fn consensus_external_address() -> IpAddr {
-        IpAddr::from([0, 0, 0, 0])
-    }
-
     fn insert(&mut self, n: Node) {
         if self.secure_only && !n.has_secure_id() {
             return

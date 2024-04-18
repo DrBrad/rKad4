@@ -6,8 +6,6 @@ pub trait RoutingTable {
 
     fn update_public_ip_consensus(source: IpAddr, addr: IpAddr);
 
-    fn consensus_external_address() -> IpAddr;
-
     fn insert(&mut self, n: Node);
 
     fn derive_uid(&mut self);
