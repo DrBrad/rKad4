@@ -19,7 +19,7 @@ impl MethodMessageBase {
     }
 
     pub fn encode(&self) -> Vec<u8> {
-        self.base.encode();
+        self.base.encode()
     }
 
     pub fn decode(&self, buf: &Vec<u8>) {

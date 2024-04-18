@@ -119,7 +119,7 @@ impl RoutingTable for KRoutingTable {
     }
 
     fn all_nodes(&self) -> Vec<Node> {
-        let mut nodes = vec![];
+        let mut nodes = Vec::new();
 
         for b in &self.k_buckets {
             nodes.extend(&b.nodes);
@@ -153,7 +153,7 @@ impl RoutingTable for KRoutingTable {
     }
 
     fn all_unqueried_nodes(&self) -> Vec<Node> {
-        let mut nodes = vec![];
+        let mut nodes = Vec::new();
 
         let time = SystemTime::now().duration_since(UNIX_EPOCH).expect("Time went backwards");
         let now = time.as_secs() * 1000 + time.subsec_millis() as u64;
