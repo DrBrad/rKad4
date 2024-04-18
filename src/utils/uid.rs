@@ -94,6 +94,7 @@ impl UID {
         self.xor(&UID { bid: result })
     }
     */
+    /*
     pub fn generate_node_id_by_distance(&self, distance: usize) -> UID {
         let mut result = [0u8; ID_LENGTH];
 
@@ -119,6 +120,7 @@ impl UID {
 
         self.xor(&UID { bid: result })
     }
+    */
 
     pub fn bytes(&self) -> [u8; ID_LENGTH] {
         self.bid
