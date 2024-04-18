@@ -51,7 +51,6 @@ impl UID {
         UID { bid: distance }
     }
 
-
     fn first_set_bit_index(&self) -> usize {
         let mut prefix_length = 0;
         for &b in &self.bid {
@@ -66,11 +65,8 @@ impl UID {
         prefix_length
     }
 
-    //PRODUCING INCORRECT NUMBERS...
-    /*
     pub fn generate_node_id_by_distance(&self, distance: usize) -> UID {
-        let mut result = [0u8; ID_LENGTH];
-
+        let mut result = [0; ID_LENGTH];
         let num_byte_zeroes = ((ID_LENGTH * 8) - distance) / 8;
         let num_bit_zeroes = 8 - (distance % 8);
 
@@ -78,49 +74,23 @@ impl UID {
             result[i] = 0;
         }
 
-        let mut bits = BitVec::from_elem(8, true);
+        let mut bits = [true; 8];
         for i in 0..num_bit_zeroes {
-            bits.set(i, false);
+            bits[i] = false;
         }
 
-        //bits.flip();
-        let byte = bits.to_bytes()[0];
-        result[num_byte_zeroes] = byte;
+        for i in 0..8 {
+            if bits[i] {
+                result[num_byte_zeroes] |= 1 << (7 - i);
+            }
+        }
 
-        for i in num_byte_zeroes + 1..result.len() {
-            result[i] = u8::MAX;
+        for i in (num_byte_zeroes + 1)..ID_LENGTH {
+            result[i] = std::u8::MAX;
         }
 
         self.xor(&UID { bid: result })
     }
-    */
-    /*
-    pub fn generate_node_id_by_distance(&self, distance: usize) -> UID {
-        let mut result = [0u8; ID_LENGTH];
-
-        let num_byte_zeroes = ((ID_LENGTH * 8) - distance) / 8;
-        let num_bit_zeroes = 8 - (distance % 8);
-
-        // Set the first `num_byte_zeroes` bytes to 0
-        for i in 0..num_byte_zeroes {
-            result[i] = 0;
-        }
-
-        // Set the bits in the next byte based on `num_bit_zeroes`
-        let mut byte = 0u8;
-        for i in 0..num_bit_zeroes {
-            byte |= 1 << (7 - i); // Set the bit at position 7 - i to 1
-        }
-        result[num_byte_zeroes] = byte;
-
-        // Set the remaining bytes to u8::MAX
-        for i in num_byte_zeroes + 1..ID_LENGTH {
-            result[i] = u8::MAX;
-        }
-
-        self.xor(&UID { bid: result })
-    }
-    */
 
     pub fn bytes(&self) -> [u8; ID_LENGTH] {
         self.bid

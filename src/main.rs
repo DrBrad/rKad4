@@ -22,6 +22,17 @@ fn main() {
     //11100101101011110101111101010001001101001100000111100110011001001011011011111000001001100000111010011101100110011101011110101000011100011001001001010100
     // 11111000
 
+    let uid = UID::from("e5af5f5134c1e664b6f8260e9d99d7a8719254c7");
+    let gen = uid.generate_node_id_by_distance(2);
+
+    println!("{}", uid.binary());
+    println!("{}", gen.binary());
+    println!("{}", uid.to_string());
+    println!("{}", gen.to_string());
+    println!("{}", uid.distance(&gen));
+
+
+    /*
     let mut routing_table: KRoutingTable = KRoutingTable::new();
 
     //let node = Node::new(UID::from("e5af5f5134c1e664b6f8260e9d99d7a8719254c7"), SocketAddr::from(([127, 0, 0, 1], 1080)));
@@ -38,6 +49,7 @@ fn main() {
     //let size: usize = routing_table.bucket_size(3);
     println!("{}", routing_table.bucket_uid(&node.uid));
     //println!("{}", node.uid.distance(&node2.uid));
+    */
 
     //let mut bucket = KBucket::new();
 
