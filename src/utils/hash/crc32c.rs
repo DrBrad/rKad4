@@ -521,69 +521,64 @@ const T: [u32; 256 * 8] = [
     0xC451B7CC, 0x8D6DCAEB, 0x56294D82, 0x1F1530A5
 ];
 
+const T8_0_START: usize = 0 * 256;
+const T8_1_START: usize = 1 * 256;
+const T8_2_START: usize = 2 * 256;
+const T8_3_START: usize = 3 * 256;
+const T8_4_START: usize = 4 * 256;
+const T8_5_START: usize = 5 * 256;
+const T8_6_START: usize = 6 * 256;
+const T8_7_START: usize = 7 * 256;
+
 pub struct CRC32c {
     crc: u32,
 }
 
 impl CRC32c {
 
-    pub const T8_0_START: usize = 0 * 256;
-    pub const T8_1_START: usize = 1 * 256;
-    pub const T8_2_START: usize = 2 * 256;
-    pub const T8_3_START: usize = 3 * 256;
-    pub const T8_4_START: usize = 4 * 256;
-    pub const T8_5_START: usize = 5 * 256;
-    pub const T8_6_START: usize = 6 * 256;
-    pub const T8_7_START: usize = 7 * 256;
-
-    pub fn get_value(&self) -> u32 {
-        let ret = self.crc;
-        (!ret) & 0xffffffff
+    pub fn new() -> CRC32c {
+        CRC32c { crc: 0xffffffff }
     }
 
-    pub fn update(&mut self, b: &[u8], mut off: usize, mut len: usize) {
-        let mut local_crc = self.crc;
-
-        while len > 7 {
-            let c0 = (b[off + 0] as u32 ^ local_crc) & 0xff;
-            let c1 = (b[off + 1] as u32 ^ (local_crc >> 8)) & 0xff;
-            let c2 = (b[off + 2] as u32 ^ (local_crc >> 16)) & 0xff;
-            let c3 = (b[off + 3] as u32 ^ (local_crc >> 24)) & 0xff;
-            local_crc = (T[Self::T8_7_START + c0 as usize] ^ T[Self::T8_6_START + c1 as usize])
-                ^ (T[Self::T8_5_START + c2 as usize] ^ T[Self::T8_4_START + c3 as usize]);
-
-            let c4 = b[off + 4] as u32 & 0xff;
-            let c5 = b[off + 5] as u32 & 0xff;
-            let c6 = b[off + 6] as u32 & 0xff;
-            let c7 = b[off + 7] as u32 & 0xff;
-
-            local_crc ^= (T[Self::T8_3_START + c4 as usize] ^ T[Self::T8_2_START + c5 as usize])
-                ^ (T[Self::T8_1_START + c6 as usize] ^ T[Self::T8_0_START + c7 as usize]);
-
-            off += 8;
-            len -= 8;
-        }
-
-        match len {
-            7 => local_crc = (local_crc >> 8) ^ T[Self::T8_0_START + ((local_crc ^ b[off] as u32) as usize & 0xff)],
-            6 => local_crc = (local_crc >> 8) ^ T[Self::T8_0_START + ((local_crc ^ b[off] as u32) as usize & 0xff)],
-            5 => local_crc = (local_crc >> 8) ^ T[Self::T8_0_START + ((local_crc ^ b[off] as u32) as usize & 0xff)],
-            4 => local_crc = (local_crc >> 8) ^ T[Self::T8_0_START + ((local_crc ^ b[off] as u32) as usize & 0xff)],
-            3 => local_crc = (local_crc >> 8) ^ T[Self::T8_0_START + ((local_crc ^ b[off] as u32) as usize & 0xff)],
-            2 => local_crc = (local_crc >> 8) ^ T[Self::T8_0_START + ((local_crc ^ b[off] as u32) as usize & 0xff)],
-            1 => local_crc = (local_crc >> 8) ^ T[Self::T8_0_START + ((local_crc ^ b[off] as u32) as usize & 0xff)],
-            _ => {} // Nothing
-        }
-
-        // Publish crc out to object
-        self.crc = local_crc;
+    pub fn get_value(&self) -> u32 {
+        !(self.crc) & 0xffffffff
     }
 
     pub fn reset(&mut self) {
         self.crc = 0xffffffff;
     }
 
-    pub fn new() -> Self {
-        CRC32c { crc: 0xffffffff }
+    pub fn update(&mut self, data: &[u8], off: usize, len: usize) {
+        let mut local_crc = self.crc;
+
+        let mut off = off;
+        let mut len = len;
+
+        while len > 7 {
+            let c0 = (data[off + 0] as u32 ^ local_crc) & 0xff;
+            let c1 = (data[off + 1] as u32 ^ (local_crc >> 8)) & 0xff;
+            let c2 = (data[off + 2] as u32 ^ (local_crc >> 16)) & 0xff;
+            let c3 = (data[off + 3] as u32 ^ (local_crc >> 24)) & 0xff;
+
+            local_crc = (T[T8_7_START + c0 as usize] ^ T[T8_6_START + c1 as usize])
+                ^ (T[T8_5_START + c2 as usize] ^ T[T8_4_START + c3 as usize]);
+
+            let c4 = data[off + 4] as u32 & 0xff;
+            let c5 = data[off + 5] as u32 & 0xff;
+            let c6 = data[off + 6] as u32 & 0xff;
+            let c7 = data[off + 7] as u32 & 0xff;
+
+            local_crc ^= (T[T8_3_START + c4 as usize] ^ T[T8_2_START + c5 as usize])
+                ^ (T[T8_1_START + c6 as usize] ^ T[T8_0_START + c7 as usize]);
+
+            off += 8;
+            len -= 8;
+        }
+
+        for i in 0..len {
+            local_crc = (local_crc >> 8) ^ T[T8_0_START + ((local_crc ^ data[off + i] as u32) & 0xff) as usize];
+        }
+
+        self.crc = local_crc;
     }
 }

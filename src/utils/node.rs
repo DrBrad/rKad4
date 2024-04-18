@@ -1,5 +1,6 @@
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
 use std::time::{SystemTime, UNIX_EPOCH};
+use std::cmp;
 use super::uid::UID;
 use super::hash::crc32c::CRC32c;
 
@@ -28,7 +29,37 @@ impl Node {
 
     // Check if the node has a secure ID
     pub fn has_secure_id(&self) -> bool {
-        false
+        let mut ip: Vec<u8> = match self.address.ip() {
+            IpAddr::V4(v4) => v4.octets().to_vec(),
+            IpAddr::V6(v6) => v6.octets().to_vec(),
+        };
+
+        let mask: Vec<u8> = if ip.len() == 4 {
+            V4_MASK.to_vec()
+        } else {
+            V6_MASK.to_vec()
+        };
+
+        for i in 0..mask.len() {
+            ip[i] &= mask[i];
+        }
+
+        let r = self.uid.bid[19] & 0x7;
+        ip[0] |= r << 5;
+
+        let mut c = CRC32c::new();
+        c.update(&ip, 0, cmp::min(ip.len(), 8));
+
+        let crc = c.get_value();
+
+        let uid_crc = ((u32::from(self.uid.bid[0]) << 24)
+            | (u32::from(self.uid.bid[1]) << 16)
+            | (u32::from(self.uid.bid[2]) << 8)
+            | u32::from(self.uid.bid[3]))
+            ^ crc;
+
+        (uid_crc & 0xff_ff_f8_00) == 0
+
         /*
         let ip:[u8] = match self.address.ip() {
             IpAddr::V4(ipv4) => ipv4.octets(),
