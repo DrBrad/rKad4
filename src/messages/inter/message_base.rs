@@ -25,14 +25,31 @@ impl MessageBase {
         }
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+
+        /*
+        BencodeObject ben = new BencodeObject();
+
+        ben.put(TID_KEY, tid); //TRANSACTION ID
+        ben.put("v", VERSION_CODE); //VERSION
+
+        ben.put(MessageType.TYPE_KEY, type.getRPCTypeName());
+        */
+
+        vec![]
+    }
+
+    pub fn decode(&self, buf: &Vec<u8>) {
+
+        /*
+        if(!ben.containsKey(type.innerKey())){
+            throw new MessageException("Protocol Error, such as a malformed packet.", 203);
+        }
+        */
+
+    }
+
     /*
-    fn encode() -> Vec<u8> {
-
-    }
-
-    fn decode(buf: Vec<u8>) {
-
-    }
 
     fn to_string() -> String {
         None

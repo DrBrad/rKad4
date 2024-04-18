@@ -18,15 +18,15 @@ impl MethodMessageBase {
         }
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        self.base.encode();
+    }
+
+    pub fn decode(&self, buf: &Vec<u8>) {
+        self.base.decode(&buf);
+    }
+
     /*
-    fn encode() -> Vec<u8> {
-
-    }
-
-    fn decode(buf: Vec<u8>) {
-
-    }
-
     fn to_string() -> String {
         None
     }
