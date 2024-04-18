@@ -70,15 +70,12 @@ impl KBucket {
     }
 
     pub fn has_queried(&self, n: &Node, now: u64) -> bool {
-        /*
-        for c in self.nodes {
+        for c in &self.nodes {
             if c.eq(&n) {
                 return c.has_queried(now);
             }
         }
 
-        false
-        */
         false
     }
 
