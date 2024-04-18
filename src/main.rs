@@ -16,6 +16,7 @@ use crate::utils::node::Node;
 use crate::utils::node_utils::pack_nodes;
 //use rand::{Rng, thread_rng};
 
+//MAYBE MAKE ROUTING TABLE A BASE SET - IE ABSTRACT - NOT TRAIT
 
 fn main() {
     //e5af5f 5134c1e664b6f8260e9d99d7a871926b b8
