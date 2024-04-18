@@ -33,7 +33,8 @@ fn main() {
     let node2 = Node::new(UID::from("e5af5f5134c1e664b6f8260e9d99d7a8719254c8"), SocketAddr::from(([127, 0, 2, 1], 1080)));
     routing_table.insert(node2);
 
-    println!("{}", routing_table.all_nodes().len());
+    let nodes = routing_table.all_nodes();
+    println!("{}", nodes.len());
     
     //let closest = routing_table.find_closest(&UID::from("e5af5f5134c1e664b6f8260e9d99d7a8719254c8"), 3);
 
