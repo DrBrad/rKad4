@@ -1,4 +1,4 @@
-[![GitHub release](https://img.shields.io/github/v/release/DrBrad/Kad4.svg)](https://github.com/DrBrad/Kad4/releases)
+[![GitHub release](https://img.shields.io/github/v/release/DrBrad/rKad4.svg)](https://github.com/DrBrad/Kad4/releases)
 ![](https://img.shields.io/badge/platform-win%20%7C%20macos%20%7C%20linux-pass.svg)
 
 # rKad4
