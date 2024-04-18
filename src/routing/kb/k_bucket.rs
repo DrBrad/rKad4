@@ -1,9 +1,10 @@
+use crate::routing::kb::ls_comparator::ls_compare;
 use crate::utils::node::Node;
 
 const MAX_BUCKET_SIZE: usize = 5;
 const MAX_STALE_COUNT: u32 = 1;
 
-pub struct KBucket { //CHANGE TO HASH CODE SYSTEM...
+pub struct KBucket {
     pub(crate) nodes: Vec<Node>,
     pub(crate) cache: Vec<Node>
 }
@@ -20,7 +21,7 @@ impl KBucket {
     pub fn insert(&mut self, n: Node) {
         if let Some(node) = self.nodes.iter_mut().find(|c| n.eq(c)) {
             node.seen();
-            //RE-SORT THE LIST
+            self.nodes.sort_by(|a, b| ls_compare(a, b));
 
         } else if self.nodes.len() >= MAX_BUCKET_SIZE {
             if let Some(node) = self.cache.iter_mut().find(|c| n.eq(c)) {
@@ -57,7 +58,7 @@ impl KBucket {
             }
         }else{
             self.nodes.push(n);
-            //RE-SORT THE LIST
+            self.nodes.sort_by(|a, b| ls_compare(a, b));
         }
     }
 

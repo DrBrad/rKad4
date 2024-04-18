@@ -1,6 +1,6 @@
 use std::cmp::Ordering;
 use crate::utils::node::Node;
-use crate::utils::uid::{ UID, ID_LENGTH };
+use crate::utils::uid::UID;
 
 pub struct KComparator {
     key: UID
