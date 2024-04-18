@@ -23,7 +23,7 @@ fn main() {
     // 11111000
 
     let uid = UID::from("e5af5f5134c1e664b6f8260e9d99d7a8719254c7");
-    let gen = uid.generate_node_id_by_distance(2);
+    let gen = uid.generate_node_id_by_distance(8);
 
     println!("{}", uid.binary());
     println!("{}", gen.binary());
