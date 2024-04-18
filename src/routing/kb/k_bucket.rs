@@ -3,7 +3,6 @@ use crate::utils::node::Node;
 const MAX_BUCKET_SIZE: usize = 5;
 const MAX_STALE_COUNT: u32 = 1;
 
-#[derive(Clone)]
 pub struct KBucket { //CHANGE TO HASH CODE SYSTEM...
     pub(crate) nodes: Vec<Node>,
     pub(crate) cache: Vec<Node>
