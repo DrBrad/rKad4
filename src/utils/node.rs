@@ -4,8 +4,8 @@ use std::cmp;
 use super::uid::UID;
 use super::hash::crc32c::CRC32c;
 
-const V4_MASK: [u8; 4] = [0x03, 0x0f, 0x3f, 0xff];
-const V6_MASK: [u8; 8] = [0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0xff];
+pub const V4_MASK: [u8; 4] = [0x03, 0x0f, 0x3f, 0xff];
+pub const V6_MASK: [u8; 8] = [0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0xff];
 const QUERY_TIME: u64 = 3600000;
 
 #[derive(Copy, Clone)]
@@ -48,7 +48,6 @@ impl Node {
 
         let mut c = CRC32c::new();
         c.update(&ip, 0, cmp::min(ip.len(), 8));
-
         let crc = c.get_value();
 
         let uid_crc = ((u32::from(self.uid.bid[0]) << 24)

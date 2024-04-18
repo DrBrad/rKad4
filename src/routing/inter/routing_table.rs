@@ -10,7 +10,7 @@ pub trait RoutingTable {
 
     fn insert(&mut self, n: Node);
 
-    fn derive_uid();
+    fn derive_uid(&mut self);
 
     //getDerivedUID - NOT NEEDED
 

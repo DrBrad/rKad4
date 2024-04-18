@@ -16,11 +16,13 @@ use crate::utils::node::Node;
 use crate::utils::node_utils::pack_nodes;
 //use rand::{Rng, thread_rng};
 
+
 fn main() {
     //e5af5f 5134c1e664b6f8260e9d99d7a871926b b8
     //e5af5f 5134c1e664b6f8260e9d99d7a8719254 f8
     //11100101101011110101111101010001001101001100000111100110011001001011011011111000001001100000111010011101100110011101011110101000011100011001001001010100
     // 11111000
+
     let mut routing_table: KRoutingTable = KRoutingTable::new();
     routing_table.secure_only = false;
 
@@ -39,6 +41,10 @@ fn main() {
 
     let nodes = routing_table.find_closest(&node3.uid, 0);
     println!("{}", nodes.len());
+
+    routing_table.derive_uid();
+    println!("{}", routing_table.uid.unwrap().to_string());
+
 
     //let closest = routing_table.find_closest(&UID::from("e5af5f5134c1e664b6f8260e9d99d7a8719254c8"), 3);
 

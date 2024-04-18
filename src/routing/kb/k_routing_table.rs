@@ -1,14 +1,18 @@
 use std::net::IpAddr;
 use std::time::{SystemTime, UNIX_EPOCH};
 use core::array::from_fn;
+//use rand::Rng;
 use crate::routing::inter::routing_table::RoutingTable;
+use crate::utils;
+use crate::utils::hash::crc32c::CRC32c;
 use super::k_bucket::KBucket;
 use super::k_comparator::KComparator;
-use crate::utils::node::Node;
+use crate::utils::node::{Node, V4_MASK, V6_MASK};
 use crate::utils::uid::{ UID, ID_LENGTH };
 
 pub struct KRoutingTable {
     pub(crate) uid: Option<UID>,
+    pub(crate) consensus_external_address: IpAddr,
     pub(crate) secure_only: bool,
     pub(crate) k_buckets: [KBucket; ID_LENGTH*8]
 }
@@ -18,6 +22,7 @@ impl KRoutingTable {
     pub fn new() -> Self {
         Self {
             uid: Some(UID::from("e5af5f5134c1e664b6f8260e9d99d7a8719254c7")),//None,
+            consensus_external_address: IpAddr::from([127, 0, 1, 1]),
             secure_only: true,
             k_buckets: from_fn(|_| KBucket::new())
         }
@@ -60,8 +65,44 @@ impl RoutingTable for KRoutingTable {
         }
     }
 
-    fn derive_uid() {
-        todo!()
+    fn derive_uid(&mut self) {
+        let mut ip: Vec<u8> = match self.consensus_external_address {
+            IpAddr::V4(v4) => v4.octets().to_vec(),
+            IpAddr::V6(v6) => v6.octets().to_vec(),
+        };
+
+        let mask: Vec<u8> = if ip.len() == 4 {
+            V4_MASK.to_vec()
+        } else {
+            V6_MASK.to_vec()
+        };
+
+        for i in 0..mask.len() {
+            ip[i] &= mask[i];
+        }
+
+        //let mut rng = rand::thread_rng();
+        let rand: u8 = /*rng.gen::<u8>()*/utils::random::generate() & 0xFF;
+        let r = rand & 0x7;
+
+        ip[0] |= r << 5;
+
+        let mut c = CRC32c::new();
+        c.update(&ip, 0, ip.len());
+        let crc = c.get_value();
+
+        let mut bid = [0u8; ID_LENGTH];
+        bid[0] = (crc >> 24) as u8;
+        bid[1] = (crc >> 16) as u8;
+        bid[2] = ((crc >> 8) as u8 & 0xF8) | (/*rng.gen::<u8>()*/utils::random::generate() & 0x7);
+
+        for i in 3..19 {
+            bid[i] = /*rng.gen::<u8>()*/utils::random::generate() & 0xFF;
+        }
+
+        bid[19] = rand & 0xFF;
+
+        self.uid = Some(UID::from(bid));
     }
 
     fn has_queried(&self, n: &Node, now: u64) -> bool {

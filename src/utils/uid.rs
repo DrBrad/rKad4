@@ -68,9 +68,7 @@ impl UID {
     pub fn generate_node_id_by_distance(&self, distance: usize) -> UID {
         let mut result = [0; ID_LENGTH];
         let num_byte_zeroes = ((ID_LENGTH * 8) - distance) / 8;
-        //let num_bit_zeroes = 8 - (distance % 8);
         let num_bit_zeroes = (8 - distance % 8) % 8;
-        println!("{}", num_bit_zeroes);
 
         for i in 0..num_byte_zeroes {
             result[i] = 0;
