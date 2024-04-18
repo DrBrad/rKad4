@@ -73,7 +73,7 @@ impl RoutingTable for KRoutingTable {
     }
 
     fn bucket_uid(&self, k: &UID) -> usize {
-        self.uid.unwrap().distance(k)
+        self.uid.unwrap().distance(k)-1
     }
 
     fn all_nodes() -> Vec<Node> {

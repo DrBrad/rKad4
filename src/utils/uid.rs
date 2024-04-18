@@ -40,7 +40,7 @@ impl From<&str> for UID {
 impl UID {
 
     pub fn distance(&self, k: &UID) -> usize {
-        ID_LENGTH*8 - self.xor(k).first_set_bit_index()
+        ID_LENGTH*8-self.xor(k).first_set_bit_index()
     }
 
     fn xor(&self, k: &UID) -> UID {
