@@ -42,7 +42,6 @@ fn main() {
     let nodes = routing_table.find_closest(&node3.uid, 0);
     println!("{}", nodes.len());
 
-    routing_table.derive_uid();
     println!("{}", routing_table.uid.unwrap().to_string());
 
 

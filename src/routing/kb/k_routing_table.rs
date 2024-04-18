@@ -20,12 +20,15 @@ pub struct KRoutingTable {
 impl KRoutingTable {
 
     pub fn new() -> Self {
-        Self {
-            uid: Some(UID::from("e5af5f5134c1e664b6f8260e9d99d7a8719254c7")),//None,
+        let mut routing_table = Self {
+            uid: None,
             consensus_external_address: IpAddr::from([127, 0, 1, 1]),
             secure_only: true,
             k_buckets: from_fn(|_| KBucket::new())
-        }
+        };
+
+        routing_table.derive_uid();
+        routing_table
     }
 }
 
