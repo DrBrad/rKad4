@@ -85,7 +85,7 @@ impl KBucket {
     }
     */
 
-    fn unqueried_nodes(&self, now: u64) -> Vec<Node> {
+    pub fn unqueried_nodes(&self, now: u64) -> Vec<Node> {
         self.nodes.iter().filter(|&n| !n.has_queried(now)).cloned().collect()
     }
 

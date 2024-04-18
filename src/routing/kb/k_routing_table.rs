@@ -1,7 +1,9 @@
 use std::net::IpAddr;
+use std::time::{SystemTime, UNIX_EPOCH};
 use core::array::from_fn;
 use crate::routing::inter::routing_table::RoutingTable;
 use super::k_bucket::KBucket;
+use super::k_comparator::KComparator;
 use crate::utils::node::Node;
 use crate::utils::uid::{ UID, ID_LENGTH };
 
@@ -86,17 +88,41 @@ impl RoutingTable for KRoutingTable {
         nodes
     }
 
-    fn find_closest(&self, k: &UID, r: u32) -> Vec<Node> {
+    fn find_closest(&self, k: &UID, r: usize) -> Vec<Node> {
+        let mut sorted_set = self.all_nodes();
+        let comparator = KComparator::new(k);
+        sorted_set.sort_by(|a, b| comparator.compare(a, b));
 
-        todo!()
+        let mut closest = Vec::with_capacity(r);
+        let mut count = 0;
+
+        for &n in &sorted_set {
+            closest.push(n);
+            count += 1;
+
+            if count == r {
+                break;
+            }
+        }
+
+        closest
     }
 
     fn bucket_size(&self, i: usize) -> usize {
         self.k_buckets[i].nodes.len()
     }
 
-    fn all_unqueried_nodes() -> Vec<Node> {
-        todo!()
+    fn all_unqueried_nodes(&self) -> Vec<Node> {
+        let mut nodes = vec![];
+
+        let time = SystemTime::now().duration_since(UNIX_EPOCH).expect("Time went backwards");
+        let now = time.as_secs() * 1000 + time.subsec_millis() as u64;
+
+        for b in &self.k_buckets {
+            nodes.extend(&b.unqueried_nodes(now));
+        }
+
+        nodes
     }
 
     fn restart() {

@@ -25,11 +25,11 @@ pub trait RoutingTable {
 
     fn all_nodes(&self) -> Vec<Node>;
 
-    fn find_closest(&self, k: &UID, r: u32) -> Vec<Node>;
+    fn find_closest(&self, k: &UID, r: usize) -> Vec<Node>;
 
     fn bucket_size(&self, i: usize) -> usize;
 
-    fn all_unqueried_nodes() -> Vec<Node>;
+    fn all_unqueried_nodes(&self) -> Vec<Node>;
 
     fn restart();
 
