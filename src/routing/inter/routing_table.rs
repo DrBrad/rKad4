@@ -23,9 +23,9 @@ pub trait RoutingTable {
 
     fn bucket_uid(&self, k: &UID) -> usize;
 
-    fn all_nodes() -> Vec<Node>;
+    fn all_nodes(&self) -> Vec<Node>;
 
-    fn find_closest(k: &UID, r: u32) -> Vec<Node>;
+    fn find_closest(&self, k: &UID, r: u32) -> Vec<Node>;
 
     fn bucket_size(&self, i: usize) -> usize;
 

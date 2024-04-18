@@ -21,19 +21,27 @@ fn main() {
     //e5af5f 5134c1e664b6f8260e9d99d7a8719254 f8
     //11100101101011110101111101010001001101001100000111100110011001001011011011111000001001100000111010011101100110011101011110101000011100011001001001010100
     // 11111000
+    let mut routing_table: KRoutingTable = KRoutingTable::new();
+    routing_table.secure_only = false;
 
-    let uid = UID::from("e5af5f5134c1e664b6f8260e9d99d7a8719254c7");
-    let gen = uid.generate_node_id_by_distance(0);
+    let node = Node::new(UID::from("e5af5f5134c1e664b6f8260e9d99d7a8719254c3"), SocketAddr::from(([127, 2, 0, 1], 1080)));
+    routing_table.insert(node);
 
-    println!("{}", uid.binary());
-    println!("{}", gen.binary());
-    println!("{}", uid.to_string());
-    println!("{}", gen.to_string());
-    println!("{}", uid.distance(&gen));
+    let node2 = Node::new(UID::from("e5af5f5134c1e664b6f8260e9d99d7a8719254c8"), SocketAddr::from(([127, 0, 1, 1], 1080)));
+    routing_table.insert(node2);
+
+    let node2 = Node::new(UID::from("e5af5f5134c1e664b6f8260e9d99d7a8719254c8"), SocketAddr::from(([127, 0, 2, 1], 1080)));
+    routing_table.insert(node2);
+
+    println!("{}", routing_table.all_nodes().len());
+    
+    //let closest = routing_table.find_closest(&UID::from("e5af5f5134c1e664b6f8260e9d99d7a8719254c8"), 3);
+
+    //println!("{}", closest.len());
+    //println!("{}", closest.len());
 
 
     /*
-    let mut routing_table: KRoutingTable = KRoutingTable::new();
 
     //let node = Node::new(UID::from("e5af5f5134c1e664b6f8260e9d99d7a8719254c7"), SocketAddr::from(([127, 0, 0, 1], 1080)));
     //println!("{}", node.to_string());

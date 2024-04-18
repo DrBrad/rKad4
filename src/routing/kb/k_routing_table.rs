@@ -6,9 +6,9 @@ use crate::utils::node::Node;
 use crate::utils::uid::{ UID, ID_LENGTH };
 
 pub struct KRoutingTable {
-    uid: Option<UID>,
-    secure_only: bool,
-    k_buckets: [KBucket; ID_LENGTH*8]
+    pub(crate) uid: Option<UID>,
+    pub(crate) secure_only: bool,
+    pub(crate) k_buckets: [KBucket; ID_LENGTH*8]
 }
 
 impl KRoutingTable {
@@ -76,11 +76,18 @@ impl RoutingTable for KRoutingTable {
         self.uid.unwrap().distance(k)-1
     }
 
-    fn all_nodes() -> Vec<Node> {
-        todo!()
+    fn all_nodes(&self) -> Vec<Node> {
+        let mut nodes = vec![];
+
+        for b in &self.k_buckets {
+            nodes.extend(&b.nodes);
+        }
+
+        nodes
     }
 
-    fn find_closest(k: &UID, r: u32) -> Vec<Node> {
+    fn find_closest(&self, k: &UID, r: u32) -> Vec<Node> {
+
         todo!()
     }
 
