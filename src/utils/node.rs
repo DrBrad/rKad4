@@ -1,4 +1,4 @@
-use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
+use std::net::{IpAddr, SocketAddr};
 use std::time::{SystemTime, UNIX_EPOCH};
 use std::cmp;
 use super::uid::UID;
@@ -17,7 +17,7 @@ pub struct Node {
 }
 
 impl Node {
-    // Constructor with UID and SocketAddr
+
     pub fn new(uid: UID, address: SocketAddr) -> Self {
         Self {
             uid,
@@ -27,7 +27,6 @@ impl Node {
         }
     }
 
-    // Check if the node has a secure ID
     pub fn has_secure_id(&self) -> bool {
         let mut ip: Vec<u8> = match self.address.ip() {
             IpAddr::V4(v4) => v4.octets().to_vec(),
@@ -59,34 +58,8 @@ impl Node {
             ^ crc;
 
         (uid_crc & 0xff_ff_f8_00) == 0
-
-        /*
-        let ip:[u8] = match self.address.ip() {
-            IpAddr::V4(ipv4) => ipv4.octets(),
-            IpAddr::V6(ipv6) => ipv6.octets(),
-        };
-        let mask = if ip.len() == 4 { &V4_MASK } else { &V6_MASK };
-
-        let mut masked_ip = ip;
-        for i in 0..mask.len() {
-            masked_ip[i] &= mask[i];
-        }
-
-        let r = self.uid.bid[19] & 0x7;
-        masked_ip[0] |= r << 5;
-
-        let crc = CRC32c::checksum_ieee(&masked_ip[..8]);
-        let uid_crc = ((u32::from(self.uid.bid[0]) << 24)
-            | (u32::from(self.uid.bid[1]) << 16)
-            | (u32::from(self.uid.bid[2]) << 8)
-            | u32::from(self.uid.bid[3]))
-            ^ crc;
-
-        (uid_crc & 0xff_ff_f8_00) == 0
-        */
     }
 
-    //DETAILS
     pub fn seen(&mut self) {
         self.stale = 0;
         self.last_seen = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
