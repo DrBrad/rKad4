@@ -3,5 +3,12 @@
 version = 3
 
 [[package]]
+name = "bencode"
+version = "0.1.0"
+
+[[package]]
 name = "kad4"
 version = "0.1.0"
+dependencies = [
+ "bencode",
+]

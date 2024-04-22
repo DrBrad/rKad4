@@ -3,6 +3,7 @@ mod messages;
 mod routing;
 
 use std::net::{IpAddr, SocketAddr};
+use bencode::variables::to_bencode::ToBencode;
 use crate::messages::inter::message_base::MessageBase;
 use crate::messages::inter::method_message_base::MethodMessageBase;
 use crate::messages::ping_request::PingRequest;
@@ -15,6 +16,7 @@ use crate::utils::uid::UID;
 use crate::utils::node::Node;
 use crate::utils::node_utils::pack_nodes;
 //use rand::{Rng, thread_rng};
+extern crate bencode;
 
 //MAYBE MAKE ROUTING TABLE A BASE SET - IE ABSTRACT - NOT TRAIT
 
@@ -23,6 +25,8 @@ fn main() {
     //e5af5f 5134c1e664b6f8260e9d99d7a8719254 f8
     //11100101101011110101111101010001001101001100000111100110011001001011011011111000001001100000111010011101100110011101011110101000011100011001001001010100
     // 11111000
+    let encode = "test".to_bencode();
+    println!("{:?}", encode);
 
     let mut routing_table: KRoutingTable = KRoutingTable::new();
     routing_table.secure_only = false;
