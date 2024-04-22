@@ -36,7 +36,7 @@ impl MessageBase {
         ben.put(MessageType.TYPE_KEY, type.getRPCTypeName());
         */
 
-        vec![]
+        Vec::new()
     }
 
     pub fn decode(&self, buf: &Vec<u8>) {
