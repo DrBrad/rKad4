@@ -3,6 +3,7 @@ mod messages;
 mod routing;
 
 use std::net::{IpAddr, SocketAddr};
+use bencode::variables::from_bencode::FromBencode;
 use bencode::variables::to_bencode::ToBencode;
 use crate::messages::inter::message_base::MessageBase;
 use crate::messages::inter::method_message_base::MethodMessageBase;
@@ -27,6 +28,8 @@ fn main() {
     // 11111000
     let encode = "test".to_bencode();
     println!("{:?}", encode);
+    let decode = String::from_bencode(&encode, &mut 0);
+    println!("{}", decode);
 
     let mut routing_table: KRoutingTable = KRoutingTable::new();
     routing_table.secure_only = false;
