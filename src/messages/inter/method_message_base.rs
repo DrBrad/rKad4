@@ -21,20 +21,19 @@ impl MethodMessageBase {
 
     pub fn encode(&self) -> BencodeObject {
         let mut ben = self.base.encode();
-        let bid = self.base.uid.unwrap().bid;
-        println!("{:?}", bid);
+        //println!("{:?}", bid);
 
         match self.base.type_ {
             MessageType::REQ_MSG => {
                 let mut inner = BencodeObject::new();
-                inner.put("id", &bid);
+                inner.put("id", self.base.uid.unwrap().bid.clone());
                 ben.put(self.base.type_.inner_key(), inner);
                 //ben.put(self.base.type_.inner_key(), BencodeObject::new());
                 //ben.get_object(self.base.type_.inner_key()).unwrap().put("id", &self.base.uid.unwrap().bid);
             },
             MessageType::RSP_MSG => {
                 let mut inner = BencodeObject::new();
-                inner.put("id", &bid);
+                inner.put("id", self.base.uid.unwrap().bid.clone());
                 ben.put(self.base.type_.inner_key(), inner);
                 //ben.put(self.base.type_.inner_key(), BencodeObject::new());
                 //ben.get_object(self.base.type_.inner_key()).unwrap().put("id", &self.base.uid.unwrap().bid);
