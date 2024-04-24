@@ -21,26 +21,30 @@ impl MethodMessageBase {
 
     pub fn encode(&self) -> BencodeObject {
         let mut ben = self.base.encode();
-        let bid = self.base.uid.unwrap();
-        println!("{:?}", bid.bid);
+        let bid = self.base.uid.unwrap().bid;
+        println!("{:?}", bid);
 
         match self.base.type_ {
             MessageType::REQ_MSG => {
                 let mut inner = BencodeObject::new();
-                inner.put("id", &bid.bid);
+                inner.put("id", &bid);
                 ben.put(self.base.type_.inner_key(), inner);
                 //ben.put(self.base.type_.inner_key(), BencodeObject::new());
                 //ben.get_object(self.base.type_.inner_key()).unwrap().put("id", &self.base.uid.unwrap().bid);
             },
             MessageType::RSP_MSG => {
                 let mut inner = BencodeObject::new();
-                inner.put("id", &bid.bid);
+                inner.put("id", &bid);
                 ben.put(self.base.type_.inner_key(), inner);
                 //ben.put(self.base.type_.inner_key(), BencodeObject::new());
                 //ben.get_object(self.base.type_.inner_key()).unwrap().put("id", &self.base.uid.unwrap().bid);
             },
             _ => unimplemented!()
         }
+
+        println!("{}", ben.to_string());
+
+        ben
 
         /*
         switch(type){
@@ -61,7 +65,7 @@ impl MethodMessageBase {
         }
         */
 
-        ben
+        //BencodeObject::new()
     }
 
     pub fn decode(&self, buf: &Vec<u8>) {

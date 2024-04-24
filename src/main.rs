@@ -29,7 +29,9 @@ fn main() {
     request.base.base.destination = Some(SocketAddr::from(([127, 2, 0, 1], 1080)));
     request.base.base.uid = Some(UID::from("6a677a188b9c209021eb185ed0c9d44a1347f1bb"));
 
-    println!("{}", request.encode().to_string());
+    let encoded = request.encode();
+
+    //println!("{}", request.encode().to_string());
 
 
 
