@@ -1,3 +1,4 @@
+use bencode::variables::bencode_object::BencodeObject;
 use crate::messages::inter::message_type::MessageType;
 use crate::utils::uid::UID;
 use super::inter::message_base::MessageBase;
@@ -18,7 +19,7 @@ impl FindNodeRequest {
         }
     }
 
-    pub fn encode(&self) -> Vec<u8> {
+    pub fn encode(&self) -> BencodeObject {
         self.base.encode()
     }
 

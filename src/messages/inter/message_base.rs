@@ -1,7 +1,7 @@
 use crate::utils::uid::UID;
-use message_type::MessageType;
 use std::net::SocketAddr;
-use crate::messages::inter::message_type;
+use bencode::variables::bencode_object::{BencodeObject, PutObject};
+use crate::messages::inter::message_type::{MessageType, TYPE_KEY};
 
 pub struct MessageBase {
     pub(crate) uid: Option<UID>,
@@ -11,6 +11,8 @@ pub struct MessageBase {
     pub(crate) origin: Option<SocketAddr>,
     pub(crate) public_address: Option<SocketAddr>,
 }
+
+pub const TID_KEY: &str = "t";
 
 impl MessageBase {
 
@@ -25,18 +27,13 @@ impl MessageBase {
         }
     }
 
-    pub fn encode(&self) -> Vec<u8> {
+    pub fn encode(&self) -> BencodeObject {
+        let mut ben = BencodeObject::new();
+        ben.put(TID_KEY, "");
+        ben.put("v", "1.0");
+        ben.put(TYPE_KEY, self.type_.rpc_type_name());
 
-        /*
-        BencodeObject ben = new BencodeObject();
-
-        ben.put(TID_KEY, tid); //TRANSACTION ID
-        ben.put("v", VERSION_CODE); //VERSION
-
-        ben.put(MessageType.TYPE_KEY, type.getRPCTypeName());
-        */
-
-        Vec::new()
+        ben
     }
 
     pub fn decode(&self, buf: &Vec<u8>) {
