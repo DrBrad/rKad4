@@ -29,7 +29,7 @@ impl MessageBase {
 
     pub fn encode(&self) -> BencodeObject {
         let mut ben = BencodeObject::new();
-        ben.put(TID_KEY, "");
+        ben.put(TID_KEY, self.tid.clone());
         ben.put("v", "1.0");
         ben.put(TYPE_KEY, self.type_.rpc_type_name());
 
