@@ -34,9 +34,11 @@ fn main() {
     println!("{}", ben.to_string());
 
     //DECODE CHECK
+    /*
     let encoded = ben.encode();
     let decoded = BencodeObject::decode(encoded.as_slice());
     println!("{}", decoded.to_string());
+    */
 
     //println!("{}", request.encode().to_string());
 
