@@ -21,7 +21,11 @@ impl FindNodeRequest {
 
     pub fn encode(&self) -> BencodeObject {
         let mut ben = self.base.encode();
-        ben.get_object(self.base.base.type_.inner_key()).unwrap().put("target", "TEST");
+
+        if let Some(target) = self.target {
+            ben.get_object(self.base.base.type_.inner_key()).unwrap().put("target", target.bid.clone());
+        }
+
         ben
     }
 
