@@ -36,14 +36,10 @@ impl MessageBase {
         ben
     }
 
-    pub fn decode(&self, buf: &Vec<u8>) {
-
-        /*
-        if(!ben.containsKey(type.innerKey())){
-            throw new MessageException("Protocol Error, such as a malformed packet.", 203);
+    pub fn decode(&mut self, ben: &BencodeObject) {
+        if !ben.contains_key(self.type_.inner_key()) {
+            //throw new MessageException("Protocol Error, such as a malformed packet.", 203);
         }
-        */
-
     }
 
     /*

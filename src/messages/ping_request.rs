@@ -12,7 +12,7 @@ impl PingRequest {
     //WE DONT ALWAYS NEED THE TID...
     pub fn new(tid: [u8; 6]) -> Self {
         Self {
-            base: MethodMessageBase::new(tid, "ping".to_string(), MessageType::REQ_MSG)
+            base: MethodMessageBase::new(tid, "ping".to_string(), MessageType::ReqMsg)
         }
     }
 
@@ -20,8 +20,8 @@ impl PingRequest {
         self.base.encode()
     }
 
-    pub fn decode(buf: Vec<u8>) {
-
+    pub fn decode(&mut self, ben: &BencodeObject) {
+        self.base.decode(&ben);
     }
 
     /*

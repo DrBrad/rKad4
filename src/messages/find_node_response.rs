@@ -11,7 +11,7 @@ impl FindNodeResponse {
     //WE DONT ALWAYS NEED THE TID...
     pub fn new(tid: [u8; 6]) -> Self {
         Self {
-            base: MethodMessageBase::new(tid, "find_node".to_string(), MessageType::RSP_MSG)
+            base: MethodMessageBase::new(tid, "find_node".to_string(), MessageType::RspMsg)
         }
     }
 
@@ -19,8 +19,8 @@ impl FindNodeResponse {
         self.base.encode()
     }
 
-    pub fn decode(buf: Vec<u8>) {
-
+    pub fn decode(&mut self, ben: &BencodeObject) {
+        self.base.decode(&ben);
     }
 
     /*

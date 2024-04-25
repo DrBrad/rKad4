@@ -14,7 +14,7 @@ impl FindNodeRequest {
     //WE DONT ALWAYS NEED THE TID...
     pub fn new(tid: [u8; 6]) -> Self {
         Self {
-            base: MethodMessageBase::new(tid, "find_node".to_string(), MessageType::REQ_MSG),
+            base: MethodMessageBase::new(tid, "find_node".to_string(), MessageType::ReqMsg),
             target: None
         }
     }
@@ -23,13 +23,15 @@ impl FindNodeRequest {
         let mut ben = self.base.encode();
 
         if let Some(target) = self.target {
-            ben.get_object(self.base.base.type_.inner_key()).unwrap().put("target", target.bid.clone());
+            ben.get_object_mut(self.base.base.type_.inner_key()).unwrap().put("target", target.bid.clone());
         }
 
         ben
     }
 
-    pub fn decode(buf: Vec<u8>) {
+    pub fn decode(&mut self, ben: &BencodeObject) {
+        self.base.decode(&ben);
+
 
     }
 

@@ -3,6 +3,7 @@ mod messages;
 mod routing;
 
 use std::net::{IpAddr, SocketAddr};
+use bencode::variables::bencode_object::BencodeObject;
 use bencode::variables::inter::bencode_variable::Bencode;
 use crate::messages::find_node_request::FindNodeRequest;
 use crate::messages::inter::message_base::MessageBase;
@@ -29,8 +30,13 @@ fn main() {
     request.base.base.destination = Some(SocketAddr::from(([127, 2, 0, 1], 1080)));
     request.base.base.uid = Some(UID::from("6a677a188b9c209021eb185ed0c9d44a1347f1bb"));
 
-    let encoded = request.encode();
-    println!("{}", encoded.to_string());
+    let ben = request.encode();
+    println!("{}", ben.to_string());
+
+    //DECODE CHECK
+    let encoded = ben.encode();
+    let decoded = BencodeObject::decode(encoded.as_slice());
+    println!("{}", decoded.to_string());
 
     //println!("{}", request.encode().to_string());
 

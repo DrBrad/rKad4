@@ -1,7 +1,7 @@
 use std::net::SocketAddr;
 use bencode::variables::bencode_object::{BencodeObject, PutObject};
 use crate::messages::inter::message_type::MessageType;
-use crate::utils::uid::UID;
+use crate::utils::uid::{ID_LENGTH, UID};
 use super::message_base::MessageBase;//{MessageBase, MessageBaseStruct};
 
 
@@ -24,13 +24,13 @@ impl MethodMessageBase {
         //println!("{:?}", bid);
 
         match self.base.type_ {
-            MessageType::REQ_MSG => {
+            MessageType::ReqMsg => {
                 ben.put(self.base.type_.inner_key(), BencodeObject::new());
-                ben.get_object(self.base.type_.inner_key()).unwrap().put("id", self.base.uid.unwrap().bid.clone());
+                ben.get_object_mut(self.base.type_.inner_key()).unwrap().put("id", self.base.uid.unwrap().bid.clone());
             },
-            MessageType::RSP_MSG => {
+            MessageType::RspMsg => {
                 ben.put(self.base.type_.inner_key(), BencodeObject::new());
-                ben.get_object(self.base.type_.inner_key()).unwrap().put("id", self.base.uid.unwrap().bid.clone());
+                ben.get_object_mut(self.base.type_.inner_key()).unwrap().put("id", self.base.uid.unwrap().bid.clone());
             },
             _ => unimplemented!()
         }
@@ -59,8 +59,25 @@ impl MethodMessageBase {
         //BencodeObject::new()
     }
 
-    pub fn decode(&self, buf: &Vec<u8>) {
-        self.base.decode(&buf);
+    pub fn decode(&mut self, ben: &BencodeObject) {
+        self.base.decode(&ben);
+
+        if !ben.get_object(self.base.type_.inner_key()).unwrap().contains_key("id") {
+            //throw new MessageException("Protocol Error, such as a malformed packet.", 203);
+        }
+
+        //: &[u8; ID_LENGTH]
+        //let bid = ben.get_object(self.base.type_.inner_key()).unwrap().get_bytes("id").unwrap();
+        //self.base.uid = Some(UID::from(bid));
+
+        match self.base.type_ {
+            MessageType::RspMsg => {
+                if ben.contains_key("ip") {
+                    //self.base.public_address = AddressUtils.unpackAddress(ben.getBytes("ip"));
+                }
+            },
+            _ => unimplemented!()
+        };
     }
 
     /*
