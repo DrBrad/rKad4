@@ -30,6 +30,7 @@ fn main() {
     request.base.base.uid = Some(UID::from("6a677a188b9c209021eb185ed0c9d44a1347f1bb"));
 
     let encoded = request.encode();
+    println!("{}", encoded.to_string());
 
     //println!("{}", request.encode().to_string());
 

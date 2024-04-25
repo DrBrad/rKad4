@@ -1,3 +1,4 @@
+use bencode::variables::bencode_object::BencodeObject;
 use crate::messages::inter::message_type::MessageType;
 use super::inter::method_message_base::MethodMessageBase;
 
@@ -14,15 +15,15 @@ impl PingResponse {
         }
     }
 
+    pub fn encode(&self) -> BencodeObject {
+        self.base.encode()
+    }
+
+    pub fn decode(buf: Vec<u8>) {
+
+    }
+
     /*
-    fn encode() -> Vec<u8> {
-
-    }
-
-    fn decode(buf: Vec<u8>) {
-
-    }
-
     fn to_string() -> String {
         None
     }

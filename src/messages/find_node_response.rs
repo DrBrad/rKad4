@@ -15,12 +15,12 @@ impl FindNodeResponse {
         }
     }
 
-    fn encode(&self) -> BencodeObject {
+    pub fn encode(&self) -> BencodeObject {
         self.base.encode()
     }
 
-    fn decode(&self, buf: Vec<u8>) {
-        self.base.decode(&buf);
+    pub fn decode(buf: Vec<u8>) {
+
     }
 
     /*

@@ -25,23 +25,15 @@ impl MethodMessageBase {
 
         match self.base.type_ {
             MessageType::REQ_MSG => {
-                let mut inner = BencodeObject::new();
-                inner.put("id", self.base.uid.unwrap().bid.clone());
-                ben.put(self.base.type_.inner_key(), inner);
-                //ben.put(self.base.type_.inner_key(), BencodeObject::new());
-                //ben.get_object(self.base.type_.inner_key()).unwrap().put("id", &self.base.uid.unwrap().bid);
+                ben.put(self.base.type_.inner_key(), BencodeObject::new());
+                ben.get_object(self.base.type_.inner_key()).unwrap().put("id", self.base.uid.unwrap().bid.clone());
             },
             MessageType::RSP_MSG => {
-                let mut inner = BencodeObject::new();
-                inner.put("id", self.base.uid.unwrap().bid.clone());
-                ben.put(self.base.type_.inner_key(), inner);
-                //ben.put(self.base.type_.inner_key(), BencodeObject::new());
-                //ben.get_object(self.base.type_.inner_key()).unwrap().put("id", &self.base.uid.unwrap().bid);
+                ben.put(self.base.type_.inner_key(), BencodeObject::new());
+                ben.get_object(self.base.type_.inner_key()).unwrap().put("id", self.base.uid.unwrap().bid.clone());
             },
             _ => unimplemented!()
         }
-
-        println!("{}", ben.to_string());
 
         ben
 
