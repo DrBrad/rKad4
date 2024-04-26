@@ -1,6 +1,8 @@
 mod utils;
 mod messages;
 mod routing;
+mod kad;
+mod kademlia;
 
 use std::net::{IpAddr, SocketAddr};
 use bencode::variables::bencode_object::BencodeObject;
