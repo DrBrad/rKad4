@@ -45,14 +45,13 @@ pub fn is_global_unicast(addr: IpAddr) -> bool {
     }
 }
 
-pub fn pack_address() -> Vec<u8> {
-    let mut buf = vec![0; 2];
+pub fn pack_address(addr: &SocketAddr) -> &[u8] {
+    //let mut buf = vec![0; 2];
 
-    buf
+    //buf
+    &[0u8; 10]
 }
 
-/*
-pub fn unpack_addr() -> SocketAddr {
-
+pub fn unpack_addr(buf: &[u8]) -> SocketAddr {
+    SocketAddr::from(([127, 2, 0, 1], 1080))
 }
-*/

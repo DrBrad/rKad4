@@ -6,6 +6,7 @@ use std::net::{IpAddr, SocketAddr};
 use bencode::variables::bencode_object::BencodeObject;
 use bencode::variables::inter::bencode_variable::Bencode;
 use crate::messages::find_node_request::FindNodeRequest;
+use crate::messages::find_node_response::FindNodeResponse;
 use crate::messages::inter::message_base::MessageBase;
 use crate::messages::inter::method_message_base::MethodMessageBase;
 use crate::messages::ping_request::PingRequest;
@@ -25,18 +26,37 @@ extern crate bencode;
 fn main() {
 
     let tid = [ 0u8, 0u8, 0u8, 0u8, 0u8, 0u8 ];
+    let mut response = FindNodeResponse::new(tid);
+    //response.target = Some(UID::from("e5af5f5134c1e664b6f8260e9d99d7a8719254c3"));
+    response.base.base.destination = Some(SocketAddr::from(([127, 2, 0, 1], 1080)));
+    response.base.base.public_address = Some(SocketAddr::from(([127, 2, 0, 1], 1080)));
+    response.base.base.uid = Some(UID::from("6a677a188b9c209021eb185ed0c9d44a1347f1bb"));
+
+    let ben = response.encode();
+    println!("{}", ben.to_string());
+
+
+    let mut res = FindNodeResponse::new(tid);
+    res.decode(&ben);
+
+    println!("{}", res.encode().to_string());
+
+
+
+
+    let tid = [ 0u8, 0u8, 0u8, 0u8, 0u8, 0u8 ];
     let mut request = FindNodeRequest::new(tid);
     request.target = Some(UID::from("e5af5f5134c1e664b6f8260e9d99d7a8719254c3"));
     request.base.base.destination = Some(SocketAddr::from(([127, 2, 0, 1], 1080)));
+    request.base.base.public_address = Some(SocketAddr::from(([127, 2, 0, 1], 1080)));
     request.base.base.uid = Some(UID::from("6a677a188b9c209021eb185ed0c9d44a1347f1bb"));
 
     let ben = request.encode();
     println!("{}", ben.to_string());
 
 
-    let mut req = FindNodeRequest::new(tid);//ben.get_bytes("t").unwrap().clone());
+    let mut req = FindNodeRequest::new(tid);
     req.decode(&ben);
-    //req.base.base.uid = Some(UID::from("6a677a188b9c209021eb185ed0c9d44a1347f1bb"));
 
     println!("{}", req.encode().to_string());
 

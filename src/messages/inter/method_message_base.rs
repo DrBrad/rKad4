@@ -1,6 +1,9 @@
 use std::net::SocketAddr;
 use bencode::variables::bencode_object::{BencodeObject, PutObject};
 use crate::messages::inter::message_type::MessageType;
+use crate::utils::net::address_utils;
+use crate::utils::net::address_utils::{pack_address, unpack_addr}
+;
 use crate::utils::uid::{ID_LENGTH, UID};
 use super::message_base::MessageBase;//{MessageBase, MessageBaseStruct};
 
@@ -21,42 +24,25 @@ impl MethodMessageBase {
 
     pub fn encode(&self) -> BencodeObject {
         let mut ben = self.base.encode();
-        //println!("{:?}", bid);
 
         match self.base.type_ {
             MessageType::ReqMsg => {
+                ben.put(self.base.type_.rpc_type_name(), self.method.clone());
                 ben.put(self.base.type_.inner_key(), BencodeObject::new());
                 ben.get_object_mut(self.base.type_.inner_key()).unwrap().put("id", self.base.uid.unwrap().bid.clone());
             },
             MessageType::RspMsg => {
                 ben.put(self.base.type_.inner_key(), BencodeObject::new());
                 ben.get_object_mut(self.base.type_.inner_key()).unwrap().put("id", self.base.uid.unwrap().bid.clone());
+
+                if let Some(public_address) = self.base.public_address {
+                    ben.put("ip", [0u8; 20]);//pack_address(&public_address).to_vec());
+                }
             },
             _ => unimplemented!()
         }
 
         ben
-
-        /*
-        switch(type){
-            case REQ_MSG:
-                ben.put(type.getRPCTypeName(), method);
-            ben.put(type.innerKey(), new BencodeObject());
-            ben.getBencodeObject(type.innerKey()).put("id", uid.getBytes());
-            break;
-
-            case RSP_MSG:
-                ben.put(type.innerKey(), new BencodeObject());
-            ben.getBencodeObject(type.innerKey()).put("id", uid.getBytes());
-
-            if(publicAddress != null){
-                ben.put("ip", AddressUtils.packAddress(publicAddress)); //PACK MY IP ADDRESS
-            }
-            break;
-        }
-        */
-
-        //BencodeObject::new()
     }
 
     pub fn decode(&mut self, ben: &BencodeObject) {
@@ -73,7 +59,7 @@ impl MethodMessageBase {
         match self.base.type_ {
             MessageType::RspMsg => {
                 if ben.contains_key("ip") {
-                    //self.base.public_address = AddressUtils.unpackAddress(ben.getBytes("ip"));
+                    //self.base.public_address = Some(unpack_addr(ben.get_bytes("ip").unwrap()));
                 }
             },
             _ => ()

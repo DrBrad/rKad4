@@ -1,6 +1,6 @@
 pub const ID_LENGTH: usize = 20;
 
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct UID {
     pub(crate) bid: [u8; ID_LENGTH],
 }
