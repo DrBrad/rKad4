@@ -1,15 +1,16 @@
 use crate::kad::kademlia_base::KademliaBase;
 use crate::routing::inter::routing_table::RoutingTable;
+use crate::routing::kb::k_routing_table::KRoutingTable;
 
 pub struct Kademlia {
-    //routing_table: RoutingTable
+    pub(crate) routing_table: Box<dyn RoutingTable>
 }
 
 impl Kademlia {
 
     pub fn new() -> Self {
         Self {
-
+            routing_table: Box::new(KRoutingTable::new())
         }
     }
 }

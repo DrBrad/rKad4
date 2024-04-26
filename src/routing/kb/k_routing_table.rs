@@ -34,7 +34,7 @@ impl KRoutingTable {
 
 impl RoutingTable for KRoutingTable {
 
-    fn update_public_ip_consensus(source: IpAddr, addr: IpAddr) {
+    fn update_public_ip_consensus(&self, source: IpAddr, addr: IpAddr) {
         todo!()
     }
 
@@ -165,7 +165,7 @@ impl RoutingTable for KRoutingTable {
         nodes
     }
 
-    fn restart() {
+    fn restart(&self) {
         todo!()
     }
 }

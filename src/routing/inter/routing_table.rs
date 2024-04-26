@@ -4,7 +4,7 @@ use crate::utils::uid::UID;
 
 pub trait RoutingTable {
 
-    fn update_public_ip_consensus(source: IpAddr, addr: IpAddr);
+    fn update_public_ip_consensus(&self, source: IpAddr, addr: IpAddr);
 
     fn insert(&mut self, n: Node);
 
@@ -29,7 +29,7 @@ pub trait RoutingTable {
 
     fn all_unqueried_nodes(&self) -> Vec<Node>;
 
-    fn restart();
+    fn restart(&self);
 
     //RESTART LISTENER
 }
