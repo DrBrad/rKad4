@@ -61,13 +61,6 @@ fn main() {
 
     println!("{}", req.encode().to_string());
 
-
-    let ad = pack_address(&SocketAddr::from(([127, 2, 0, 1], 1080)));
-
-    println!("{:?}", ad);
-
-    println!("{:?}", unpack_addr(ad.as_slice()));
-
     //DECODE CHECK
     /*
     let encoded = ben.encode();

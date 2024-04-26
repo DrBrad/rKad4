@@ -3,7 +3,7 @@ use crate::utils::uid::ID_LENGTH;
 use super::net::address_type::AddressType;
 use super::node::Node;
 
-pub fn pack_nodes(nodes: &[Node], addr_type: AddressType) -> Vec<u8> {
+pub fn pack_nodes(nodes: Vec<Node>, addr_type: AddressType) -> Vec<u8> {
     let addr_length = match addr_type {
         AddressType::IPv4 => 4,
         AddressType::IPv6 => 16,

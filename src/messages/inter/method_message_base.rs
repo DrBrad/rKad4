@@ -36,7 +36,7 @@ impl MethodMessageBase {
                 ben.get_object_mut(self.base.type_.inner_key()).unwrap().put("id", self.base.uid.unwrap().bid.clone());
 
                 if let Some(public_address) = self.base.public_address {
-                    ben.put("ip", [0u8; 20]);//pack_address(&public_address).to_vec());
+                    ben.put("ip", pack_address(&public_address));
                 }
             },
             _ => unimplemented!()
@@ -59,7 +59,7 @@ impl MethodMessageBase {
         match self.base.type_ {
             MessageType::RspMsg => {
                 if ben.contains_key("ip") {
-                    //self.base.public_address = Some(unpack_addr(ben.get_bytes("ip").unwrap()));
+                    self.base.public_address = unpack_addr(ben.get_bytes("ip").unwrap());
                 }
             },
             _ => ()
