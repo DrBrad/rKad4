@@ -13,7 +13,7 @@ impl From<[u8; ID_LENGTH]> for UID {
         }
     }
 }
-
+/*
 impl From<Vec<u8>> for UID {
 
     fn from(bid: Vec<u8>) -> Self {
@@ -32,7 +32,7 @@ impl From<Vec<u8>> for UID {
         }
     }
 }
-
+*/
 impl From<&str> for UID {
 
     fn from(key: &str) -> Self {

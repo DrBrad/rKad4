@@ -66,9 +66,9 @@ impl MethodMessageBase {
             //throw new MessageException("Protocol Error, such as a malformed packet.", 203);
         }
 
-        //: &[u8; ID_LENGTH]
-        //let bid = ben.get_object(self.base.type_.inner_key()).unwrap().get_bytes("id").unwrap();
-        //self.base.uid = Some(UID::from(bid.to_vec()));
+        let mut bid = [0u8; ID_LENGTH];
+        bid.copy_from_slice(&ben.get_object(self.base.type_.inner_key()).unwrap().get_bytes("id").unwrap()[..ID_LENGTH]);
+        self.base.uid = Some(UID::from(bid));
 
         match self.base.type_ {
             MessageType::RspMsg => {
