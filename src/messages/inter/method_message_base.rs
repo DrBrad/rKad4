@@ -68,7 +68,7 @@ impl MethodMessageBase {
 
         //: &[u8; ID_LENGTH]
         //let bid = ben.get_object(self.base.type_.inner_key()).unwrap().get_bytes("id").unwrap();
-        //self.base.uid = Some(UID::from(bid));
+        //self.base.uid = Some(UID::from(bid.to_vec()));
 
         match self.base.type_ {
             MessageType::RspMsg => {
@@ -76,7 +76,7 @@ impl MethodMessageBase {
                     //self.base.public_address = AddressUtils.unpackAddress(ben.getBytes("ip"));
                 }
             },
-            _ => unimplemented!()
+            _ => ()
         };
     }
 

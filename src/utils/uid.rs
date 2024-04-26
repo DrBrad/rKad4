@@ -14,6 +14,25 @@ impl From<[u8; ID_LENGTH]> for UID {
     }
 }
 
+impl From<Vec<u8>> for UID {
+
+    fn from(bid: Vec<u8>) -> Self {
+        let bid: [u8; ID_LENGTH] = match bid.as_slice() {
+            [x @ _, rest @ ..] if rest.len() == ID_LENGTH - 1 => {
+                let mut array = [0; ID_LENGTH];
+                array[0] = *x;
+                array.copy_from_slice(&rest);
+                array
+            }
+            _ => panic!("Vector size is not equal to array size"),
+        };
+
+        Self {
+            bid
+        }
+    }
+}
+
 impl From<&str> for UID {
 
     fn from(key: &str) -> Self {

@@ -33,6 +33,13 @@ fn main() {
     let ben = request.encode();
     println!("{}", ben.to_string());
 
+
+    let mut req = FindNodeRequest::new(tid);//ben.get_bytes("t").unwrap().clone());
+    req.decode(&ben);
+    req.base.base.uid = Some(UID::from("6a677a188b9c209021eb185ed0c9d44a1347f1bb"));
+
+    println!("{}", req.encode().to_string());
+
     //DECODE CHECK
     /*
     let encoded = ben.encode();
