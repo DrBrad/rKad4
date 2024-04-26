@@ -49,7 +49,6 @@ fn main() {
     let mut request = FindNodeRequest::new(tid);
     request.target = Some(UID::from("e5af5f5134c1e664b6f8260e9d99d7a8719254c3"));
     request.base.base.destination = Some(SocketAddr::from(([127, 2, 0, 1], 1080)));
-    request.base.base.public_address = Some(SocketAddr::from(([127, 2, 0, 1], 1080)));
     request.base.base.uid = Some(UID::from("6a677a188b9c209021eb185ed0c9d44a1347f1bb"));
 
     let ben = request.encode();
