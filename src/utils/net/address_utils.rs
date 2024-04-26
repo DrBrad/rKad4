@@ -1,4 +1,4 @@
-use std::net::{IpAddr, SocketAddr};
+use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6};
 use super::net_mask::NetMask;
 
 const LOCAL_BROADCAST: [u8; 4] = [0xff, 0xff, 0xff, 0xff];
@@ -45,13 +45,36 @@ pub fn is_global_unicast(addr: IpAddr) -> bool {
     }
 }
 
-pub fn pack_address(addr: &SocketAddr) -> &[u8] {
-    //let mut buf = vec![0; 2];
-
-    //buf
-    &[0u8; 10]
+pub fn pack_address(addr: &SocketAddr) -> Vec<u8> {
+    let mut buf = vec![];
+    match addr {
+        SocketAddr::V4(v4_addr) => {
+            buf.extend_from_slice(&v4_addr.ip().octets());
+            buf.extend_from_slice(&v4_addr.port().to_be_bytes());
+            buf
+        }
+        SocketAddr::V6(v6_addr) => {
+            buf.extend_from_slice(&v6_addr.ip().octets());
+            buf.extend_from_slice(&v6_addr.port().to_be_bytes());
+            buf
+        }
+    }
 }
 
-pub fn unpack_addr(buf: &[u8]) -> SocketAddr {
-    SocketAddr::from(([127, 2, 0, 1], 1080))
+pub fn unpack_addr(buf: &[u8]) -> Option<SocketAddr> {
+    match buf.len() {
+        6 => {
+            let address = Ipv4Addr::new(buf[0], buf[1], buf[2], buf[3]);
+            let port = u16::from_be_bytes([buf[4], buf[5]]);
+            Some(SocketAddr::new(address.into(), port))
+        }
+        18 => {
+            let mut addr_bytes = [0u8; 16];
+            addr_bytes.copy_from_slice(&buf[..16]);
+            let address = Ipv6Addr::from(addr_bytes);
+            let port = u16::from_be_bytes([buf[16], buf[17]]);
+            Some(SocketAddr::new(address.into(), port))
+        }
+        _ => None,
+    }
 }

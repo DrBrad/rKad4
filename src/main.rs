@@ -15,6 +15,7 @@ use crate::routing::inter::routing_table::RoutingTable;
 use crate::routing::kb::k_bucket::KBucket;
 use crate::routing::kb::k_routing_table::KRoutingTable;
 use crate::utils::net::address_type::AddressType;
+use crate::utils::net::address_utils::{pack_address, unpack_addr};
 use crate::utils::uid::UID;
 use crate::utils::node::Node;
 use crate::utils::node_utils::pack_nodes;
@@ -59,6 +60,13 @@ fn main() {
     req.decode(&ben);
 
     println!("{}", req.encode().to_string());
+
+
+    let ad = pack_address(&SocketAddr::from(([127, 2, 0, 1], 1080)));
+
+    println!("{:?}", ad);
+
+    println!("{:?}", unpack_addr(ad.as_slice()));
 
     //DECODE CHECK
     /*
