@@ -50,7 +50,7 @@ impl Server {
             while let Ok(packet) = receiver_processor.recv() {
                 // Process the received packet
                 println!("Received packet: {:?}", packet);
-                //self.on_receive(packet);
+                //cloned_self.on_receive(packet);
             }
         });
 

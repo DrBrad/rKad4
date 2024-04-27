@@ -1,3 +1,4 @@
+use std::net::SocketAddr;
 use crate::kad::kademlia_base::KademliaBase;
 use crate::kad::server::Server;
 use crate::routing::bucket_types::BucketTypes;
@@ -32,7 +33,7 @@ impl KademliaBase for Kademlia {
         server.start(8080);
     }
 
-    fn join(&self) {
+    fn join(&self, local_port: u16, addr: SocketAddr) {
         todo!()
     }
 
