@@ -2,19 +2,22 @@ use std::net::{SocketAddr, UdpSocket};
 use std::thread;
 use std::sync::mpsc::{channel, Sender};
 use std::time::Duration;
+use crate::kad::kademlia_base::KademliaBase;
 
-pub struct Server {
+pub struct Server<'a> {
+    kademlia: Box<&'a dyn KademliaBase>,
     server: Option<UdpSocket>
 }
 
-impl Server {
+impl<'a> Server<'a> {
 
     const TID_LENGTH: usize = 6;
 
     //WE CANNOT HOLD THE KADEMLIA... THIS SHOULD BE FUN TO DEAL WITH...
 
-    pub fn new() -> Self {
+    pub fn new(kademlia: Box<&'a dyn KademliaBase>) -> Self {
         Self {
+            kademlia,
             server: None
         }
     }
