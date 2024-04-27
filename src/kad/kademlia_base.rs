@@ -1,9 +1,9 @@
 
 pub trait KademliaBase {
 
-    fn bind(port: u16);
+    fn bind(&self, port: u16);
 
-    fn join();
+    fn join(&self);
 
-    fn stop();
+    fn stop(&self);
 }

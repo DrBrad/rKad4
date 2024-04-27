@@ -1,7 +1,9 @@
 use std::net::{SocketAddr, UdpSocket};
+use std::thread;
+use std::time::Duration;
 
 pub struct Server {
-
+    server: Option<UdpSocket>
 }
 
 impl Server {
@@ -12,17 +14,23 @@ impl Server {
 
     pub fn new() -> Self {
         Self {
-
+            server: None
         }
     }
 
-    pub fn start(&self, port: u16) {
+    pub fn start(&mut self, port: u16) {
         //START 2 THREADS - A will be packet receiver - B will be packet poller - Update Java one back to this method...
-        let socket = UdpSocket::bind(SocketAddr::from(([0, 0, 0, 0], 0)))?;
+        self.server = Some(UdpSocket::bind(SocketAddr::from(([127, 0, 0, 1], 0))).unwrap());
+        println!("Socket bound to {:?}", self.server.as_ref().unwrap().local_addr());
 
+        let handle = thread::spawn(|| {
+            for i in 1..=5 {
+                println!("Hello from spawned thread! Count: {}", i);
+                thread::sleep(Duration::from_secs(1));
+            }
+        });
 
-
-
+        handle.join().unwrap();
     }
 
     pub fn stop(&self) {

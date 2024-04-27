@@ -1,4 +1,5 @@
 use crate::kad::kademlia_base::KademliaBase;
+use crate::kad::server::Server;
 use crate::routing::bucket_types::BucketTypes;
 use crate::routing::inter::routing_table::RoutingTable;
 
@@ -26,15 +27,16 @@ impl From<String> for Kademlia {
 
 impl KademliaBase for Kademlia {
 
-    fn bind(port: u16) {
+    fn bind(&self, port: u16) {
+        let mut server = Server::new();
+        server.start(8080);
+    }
+
+    fn join(&self) {
         todo!()
     }
 
-    fn join() {
-        todo!()
-    }
-
-    fn stop() {
+    fn stop(&self) {
         todo!()
     }
 }
