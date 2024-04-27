@@ -24,19 +24,23 @@ impl Server {
         self.server = Some(UdpSocket::bind(SocketAddr::from(([127, 0, 0, 1], 0))).unwrap());
         println!("Socket bound to {:?}", self.server.as_ref().unwrap().local_addr());
 
-        /*
         // Create a channel for communication between threads
         let (sender, receiver) = channel::<Vec<u8>>();
 
         // Spawn the receiver thread
-        let receiver_server = self.server.as_ref().unwrap().try_clone();
+        let receiver_server = self.server.as_ref().unwrap().try_clone().unwrap();
         thread::spawn(move || {
-            while let Ok(mut buf) = receiver_server.unwrap().recv_from(&mut [0u8; 65535]) {
-                if let Some(packet) = buf {
-                    if sender.send(packet).is_err() {
+            let buf = &mut [0u8; 65535];
+            while let Ok(buf) = receiver_server.recv_from(buf) {
+                /*
+                if let Some((size, addr)) = buf {
+                    let mut packet_data = vec![0u8; size];
+                    packet_data.copy_from_slice(&buf[0..size]);
+                    if sender.send(packet_data).is_err() {
                         break;
                     }
                 }
+                */
             }
         });
 
@@ -46,10 +50,9 @@ impl Server {
             while let Ok(packet) = receiver_processor.recv() {
                 // Process the received packet
                 println!("Received packet: {:?}", packet);
-                self.on_receive(packet);
+                //self.on_receive(packet);
             }
         });
-        */
 
         //drop(server);
         //drop(receiver_sender);
