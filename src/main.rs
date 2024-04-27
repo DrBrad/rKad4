@@ -6,7 +6,7 @@ mod kademlia;
 
 use std::net::{IpAddr, SocketAddr};
 use bencode::variables::bencode_object::BencodeObject;
-use bencode::variables::inter::bencode_variable::Bencode;
+use bencode::variables::inter::bencode_variable::BencodeVariable;
 use crate::kademlia::Kademlia;
 use crate::messages::find_node_request::FindNodeRequest;
 use crate::messages::find_node_response::FindNodeResponse;
@@ -35,7 +35,6 @@ fn main() {
 
     println!("{}", kad.routing_table.all_nodes().len());
 
-    /*
     let tid = [ 0u8, 0u8, 0u8, 0u8, 0u8, 0u8 ];
     let mut response = FindNodeResponse::new(tid);
     //response.target = Some(UID::from("e5af5f5134c1e664b6f8260e9d99d7a8719254c3"));
@@ -69,7 +68,6 @@ fn main() {
     req.decode(&ben);
 
     println!("{}", req.encode().to_string());
-    */
 
 
 
