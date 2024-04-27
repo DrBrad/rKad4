@@ -1,7 +1,6 @@
 use bencode::variables::bencode_object::{BencodeObject, PutObject};
 use crate::messages::inter::message_type::MessageType;
 use crate::utils::uid::{ID_LENGTH, UID};
-use super::inter::message_base::MessageBase;
 use super::inter::method_message_base::MethodMessageBase;
 
 pub struct FindNodeRequest {

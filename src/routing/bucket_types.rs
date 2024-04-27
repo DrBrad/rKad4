@@ -8,16 +8,15 @@ pub enum BucketTypes {
 
 impl BucketTypes {
 
-    /*
-    public static BucketTypes fromString(String name){
-        for(BucketTypes value : values()){
-            if(value.name().equalsIgnoreCase(name)){
-                return value;
+    pub fn from_string(name: String) -> Result<Self, String> {
+        for value in [BucketTypes::MainLine, BucketTypes::Kademlia] {
+            if value.value() == name {
+                return Ok(value);
             }
         }
-        throw new IllegalArgumentException("No enum constant "+BucketTypes.class.getName()+"."+name);
+
+        Err(format!("No enum constant {}", name))
     }
-    */
 
     pub fn value(&self) -> String {
         match self {
