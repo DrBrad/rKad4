@@ -1,5 +1,6 @@
 use std::net::{SocketAddr, UdpSocket};
 use std::thread;
+use std::sync::mpsc::{channel, Sender};
 use std::time::Duration;
 
 pub struct Server {
@@ -23,18 +24,41 @@ impl Server {
         self.server = Some(UdpSocket::bind(SocketAddr::from(([127, 0, 0, 1], 0))).unwrap());
         println!("Socket bound to {:?}", self.server.as_ref().unwrap().local_addr());
 
-        let handle = thread::spawn(|| {
-            for i in 1..=5 {
-                println!("Hello from spawned thread! Count: {}", i);
-                thread::sleep(Duration::from_secs(1));
+        /*
+        // Create a channel for communication between threads
+        let (sender, receiver) = channel::<Vec<u8>>();
+
+        // Spawn the receiver thread
+        let receiver_server = self.server.as_ref().unwrap().try_clone();
+        thread::spawn(move || {
+            while let Ok(mut buf) = receiver_server.unwrap().recv_from(&mut [0u8; 65535]) {
+                if let Some(packet) = buf {
+                    if sender.send(packet).is_err() {
+                        break;
+                    }
+                }
             }
         });
 
-        handle.join().unwrap();
+        // Spawn the processor thread
+        let (sender_processor, receiver_processor) = channel::<Vec<u8>>();
+        thread::spawn(move || {
+            while let Ok(packet) = receiver_processor.recv() {
+                // Process the received packet
+                println!("Received packet: {:?}", packet);
+                self.on_receive(packet);
+            }
+        });
+        */
+
+        //drop(server);
+        //drop(receiver_sender);
+        //drop(processor_sender);
+        //handle.join().unwrap();
     }
 
     pub fn stop(&self) {
-
+        //self.server.as_ref().unwrap().drop();
     }
 
     //REGISTER MESSAGES...
@@ -43,12 +67,12 @@ impl Server {
         false
     }
 
-    pub fn on_receive(&self) {
+    pub fn on_receive(&self, packet: Vec<u8>) {
 
     }
 
-    pub fn send(&self) {
-
+    pub fn send(&self) { //Message.... - needs to be a trait...
+        //self.server.as_ref().unwrap().send_to()
     }
 
     pub fn generate_transaction_id(&self) {
