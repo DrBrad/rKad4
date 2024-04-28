@@ -104,6 +104,10 @@ impl RoutingTable for KRoutingTable {
         self.uid = Some(UID::from(bid));
     }
 
+    fn get_derived_uid(&self) -> UID {
+        return self.uid.unwrap()
+    }
+
     fn has_queried(&self, n: &Node, now: u64) -> bool {
         let id = self.bucket_uid(&n.uid);
 

@@ -12,5 +12,5 @@ pub trait KademliaBase {
 
     fn get_server(&self) -> &Server;
 
-    fn get_routing_table(&self) -> Box<&dyn RoutingTable>;
+    fn get_routing_table(&self) -> &Box<dyn RoutingTable>;
 }

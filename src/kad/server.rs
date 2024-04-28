@@ -27,6 +27,8 @@ impl<'a> Server<'a> {
         self.server = Some(UdpSocket::bind(SocketAddr::from(([127, 0, 0, 1], 0))).unwrap());
         println!("Socket bound to {:?}", self.server.as_ref().unwrap().local_addr());
 
+        println!("{:?}", self.kademlia.get_routing_table().as_ref().get_derived_uid());
+
         // Create a channel for communication between threads
         let (sender, receiver) = channel::<Vec<u8>>();
 

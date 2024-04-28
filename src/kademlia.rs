@@ -49,7 +49,7 @@ impl KademliaBase for Kademlia {
         unimplemented!()
     }
 
-    fn get_routing_table(&self) -> Box<&dyn RoutingTable> {
-        unimplemented!()
+    fn get_routing_table(&self) -> &Box<dyn RoutingTable> {
+        &self.routing_table
     }
 }

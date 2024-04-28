@@ -10,6 +10,8 @@ pub trait RoutingTable {
 
     fn derive_uid(&mut self);
 
+    fn get_derived_uid(&self) -> UID;
+
     //getDerivedUID - NOT NEEDED
 
     //fn add_restart_listener()
