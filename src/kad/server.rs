@@ -3,6 +3,7 @@ use std::thread;
 use std::sync::mpsc::{channel, Sender};
 use std::time::Duration;
 use crate::kad::kademlia_base::KademliaBase;
+use crate::messages::inter::message_base::MessageBase;
 
 pub struct Server<'a> {
     kademlia: Box<&'a dyn KademliaBase>,
@@ -79,8 +80,11 @@ impl<'a> Server<'a> {
 
     }
 
-    pub fn send(&self) { //Message.... - needs to be a trait...
-        //self.server.as_ref().unwrap().send_to()
+    pub fn send(&self, message: MessageBase) { //Message.... - needs to be a trait...
+        let buf = vec![0, 0, 5, 5, 0];
+        if let Some(server) = &self.server {
+            server.send_to(&buf, &message.destination.unwrap()).unwrap();
+        }
     }
 
     pub fn generate_transaction_id(&self) {
