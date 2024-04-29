@@ -27,7 +27,7 @@ impl Server {
 
     pub fn start(&mut self, kademlia: Box<&dyn KademliaBase>, port: u16) {
         //START 2 THREADS - A will be packet receiver - B will be packet poller - Update Java one back to this method...
-        self.server = Some(UdpSocket::bind(SocketAddr::from(([127, 0, 0, 1], 0))).unwrap());
+        self.server = Some(UdpSocket::bind(SocketAddr::from(([127, 0, 0, 1], port))).unwrap());
         println!("Socket bound to {:?}", self.server.as_ref().unwrap().local_addr());
 
         println!("{:?}", kademlia.get_routing_table().as_ref().get_derived_uid());
@@ -54,13 +54,15 @@ impl Server {
 
         // Spawn the processor thread
         let (sender_processor, receiver_processor) = channel::<Vec<u8>>();
-        thread::spawn(move || {
+        let handle = thread::spawn(move || {
             while let Ok(packet) = receiver_processor.recv() {
                 // Process the received packet
                 println!("Received packet: {:?}", packet);
                 //cloned_self.on_receive(packet);
             }
         });
+
+        handle.join().unwrap();
 
         //drop(server);
         //drop(receiver_sender);

@@ -30,9 +30,8 @@ extern crate bencode;
 
 fn main() {
     let mut kad = Kademlia::new();
-    kad.bind(1080 as u16);
-
-    //kad.stop();
+    kad.bind(1080);
+    kad.stop();
 
 
     /*

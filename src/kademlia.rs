@@ -35,7 +35,7 @@ impl KademliaBase for Kademlia {
     fn bind(&mut self, port: u16) {
         //let mut server = Server::new();//Box::new(self));
         //let b: Box<&mut dyn KademliaBase> = Box::new(self);
-        self.server.borrow_mut().start(Box::new(self), 8080);
+        self.server.borrow_mut().start(Box::new(self), port);
     }
 
     fn join(&self, local_port: u16, addr: SocketAddr) {
@@ -43,7 +43,7 @@ impl KademliaBase for Kademlia {
     }
 
     fn stop(&self) {
-        unimplemented!()
+        self.server.borrow().stop();
     }
 
     fn get_server(&self) -> &Server {
