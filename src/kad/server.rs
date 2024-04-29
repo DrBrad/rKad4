@@ -4,31 +4,33 @@ use std::sync::mpsc::{channel, Sender};
 use std::time::Duration;
 use crate::kad::kademlia_base::KademliaBase;
 use crate::messages::inter::message_base::MessageBase;
+use crate::utils;
 
-pub struct Server<'a> {
-    kademlia: Box<&'a dyn KademliaBase>,
+const TID_LENGTH: usize = 6;
+
+pub struct Server {
+    //kademlia: Box<&'a dyn KademliaBase>,
     server: Option<UdpSocket>
 }
 
-impl<'a> Server<'a> {
+impl Server {
 
-    const TID_LENGTH: usize = 6;
 
     //WE CANNOT HOLD THE KADEMLIA... THIS SHOULD BE FUN TO DEAL WITH...
 
-    pub fn new(kademlia: Box<&'a dyn KademliaBase>) -> Self {
+    pub fn new(/*kademlia: Box<&'a dyn KademliaBase>*/) -> Self {
         Self {
-            kademlia,
+            //kademlia,
             server: None
         }
     }
 
-    pub fn start(&mut self, port: u16) {
+    pub fn start(&mut self, kademlia: Box<&dyn KademliaBase>, port: u16) {
         //START 2 THREADS - A will be packet receiver - B will be packet poller - Update Java one back to this method...
         self.server = Some(UdpSocket::bind(SocketAddr::from(([127, 0, 0, 1], 0))).unwrap());
         println!("Socket bound to {:?}", self.server.as_ref().unwrap().local_addr());
 
-        println!("{:?}", self.kademlia.get_routing_table().as_ref().get_derived_uid());
+        println!("{:?}", kademlia.get_routing_table().as_ref().get_derived_uid());
 
         // Create a channel for communication between threads
         let (sender, receiver) = channel::<Vec<u8>>();
@@ -85,7 +87,8 @@ impl<'a> Server<'a> {
         self.server.as_ref().unwrap().send_to(&buf, &message.destination.unwrap()).unwrap();
     }
 
-    pub fn generate_transaction_id(&self) {
-
+    pub fn generate_transaction_id(&self) -> [u8; TID_LENGTH] {
+        //let random = utils::random::gen();
+        [0u8; TID_LENGTH]
     }
 }
