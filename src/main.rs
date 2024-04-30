@@ -27,7 +27,7 @@ use crate::utils::node_utils::pack_nodes;
 extern crate bencode;
 
 //MAYBE MAKE ROUTING TABLE A BASE SET - IE ABSTRACT - NOT TRAIT
-
+//echo -n "hello" >/dev/udp/localhost/8080
 fn main() {
     let mut kad = Kademlia::new();
     kad.lock().unwrap().bind(&kad, 1080);

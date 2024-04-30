@@ -39,7 +39,7 @@ impl KademliaBase for Kademlia {
         //let b: Box<&mut dyn KademliaBase> = Box::new(self);
         //let handle = thread::spawn(move || Server::run());
         //handle.join().unwrap();
-        self.server.start(/*kad, */port);
+        self.server.start(kad, port);
     }
 
     fn join(&self, local_port: u16, addr: SocketAddr) {

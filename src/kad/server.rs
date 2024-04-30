@@ -28,12 +28,18 @@ impl Server {
         }
     }
 
-    pub fn start(&mut self/*, kademlia: &Arc<Mutex<dyn KademliaBase>>*/, port: u16) {
+    pub fn start(&mut self, kademlia: &Arc<Mutex<dyn KademliaBase>>, port: u16) {
 
-        //let kademlia = Arc::clone(kademlia);
+        let kademlia = Arc::clone(kademlia);
 
         //let (sender, receiver) = channel::<Vec<u8>>();
-        let handle = thread::spawn(move || Self::run());//Self::run(kademlia));//sender, receiver));
+        let handle = thread::spawn(move || {
+            let i = 0;
+            while true {
+                println!("TEST  {}", i);
+                sleep(Duration::from_secs(1));
+            }
+        });//Self::run(600, kademlia));//Self::run(kademlia));//sender, receiver));
         //kademlia: Arc<Mutex<dyn KademliaBase>>
 
         println!("TEST");
@@ -86,9 +92,9 @@ impl Server {
         //handle.join().unwrap();
     }
 
-    pub fn run() {//sender: Sender<Vec<u8>>, receiver: Receiver<Vec<u8>>) {
+    pub fn run(i: i32, kademlia: Arc<Mutex<dyn KademliaBase>>) {//sender: Sender<Vec<u8>>, receiver: Receiver<Vec<u8>>) {
         while true {
-            println!("TEST");
+            println!("TEST  {}", i);
             sleep(Duration::from_secs(1));
         }
     }
