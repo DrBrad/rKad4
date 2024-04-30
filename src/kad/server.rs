@@ -1,7 +1,7 @@
 use std::net::{SocketAddr, UdpSocket};
 use std::sync::{Arc, Mutex};
 use std::thread;
-use std::sync::mpsc::{channel, Sender};
+use std::sync::mpsc::{channel, Receiver, Sender};
 use std::thread::sleep;
 use std::time::Duration;
 use crate::kad::kademlia_base::KademliaBase;
@@ -28,15 +28,23 @@ impl Server {
         }
     }
 
-    pub fn start(&mut self, kademlia: &Arc<Mutex<dyn KademliaBase>>, port: u16) {
+    pub fn start(&mut self/*, kademlia: &Arc<Mutex<dyn KademliaBase>>*/, port: u16) {
+
         //let kademlia = Arc::clone(kademlia);
 
+        //let (sender, receiver) = channel::<Vec<u8>>();
+        let handle = thread::spawn(move || Self::run());//Self::run(kademlia));//sender, receiver));
+        //kademlia: Arc<Mutex<dyn KademliaBase>>
+
+        println!("TEST");
+
+        handle.join().unwrap();
 
         //START 2 THREADS - A will be packet receiver - B will be packet poller - Update Java one back to this method...
         //self.server = Some(UdpSocket::bind(SocketAddr::from(([127, 0, 0, 1], port))).unwrap());
         //println!("Socket bound to {:?}", self.server.as_ref().unwrap().local_addr());
 
-        println!("{:?}", kademlia.lock().unwrap().test());//.get_routing_table().as_ref().get_derived_uid());
+        //println!("{:?}", kademlia.lock().unwrap().test());//.get_routing_table().as_ref().get_derived_uid());
 
         /*
         // Create a channel for communication between threads
@@ -76,6 +84,13 @@ impl Server {
         //drop(receiver_sender);
         //drop(processor_sender);
         //handle.join().unwrap();
+    }
+
+    pub fn run() {//sender: Sender<Vec<u8>>, receiver: Receiver<Vec<u8>>) {
+        while true {
+            println!("TEST");
+            sleep(Duration::from_secs(1));
+        }
     }
 
     pub fn stop(&self) {
