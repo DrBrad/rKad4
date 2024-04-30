@@ -1,10 +1,11 @@
 use std::net::SocketAddr;
+use std::sync::{Arc, Mutex};
 use crate::kad::server::Server;
 use crate::routing::inter::routing_table::RoutingTable;
 
 pub trait KademliaBase {
 
-    fn bind(&mut self, port: u16);
+    fn bind(&mut self, kad: &Arc<Mutex<dyn KademliaBase>>, port: u16);
 
     fn join(&self, local_port: u16, addr: SocketAddr);
 

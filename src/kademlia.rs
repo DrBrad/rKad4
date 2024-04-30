@@ -1,5 +1,6 @@
 use std::cell::RefCell;
 use std::net::SocketAddr;
+use std::sync::{Arc, Mutex};
 use crate::kad::kademlia_base::KademliaBase;
 use crate::kad::server::Server;
 use crate::routing::bucket_types::BucketTypes;
@@ -12,11 +13,11 @@ pub struct Kademlia {
 
 impl Kademlia {
 
-    pub fn new() -> Self {
-        Self {
+    pub fn new() -> Arc<Mutex<dyn KademliaBase>> {
+        Arc::new(Mutex::new(Self {
             routing_table: BucketTypes::Kademlia.routing_table(),
             server: RefCell::new(Server::new())
-        }
+        }))
     }
 }
 
@@ -32,10 +33,10 @@ impl From<String> for Kademlia {
 
 impl KademliaBase for Kademlia {
 
-    fn bind(&mut self, port: u16) {
+    fn bind(&mut self, kad: &Arc<Mutex<dyn KademliaBase>>, port: u16) {
         //let mut server = Server::new();//Box::new(self));
         //let b: Box<&mut dyn KademliaBase> = Box::new(self);
-        self.server.borrow_mut().start(Box::new(self), port);
+        self.server.borrow_mut().start(kad, port);
     }
 
     fn join(&self, local_port: u16, addr: SocketAddr) {
