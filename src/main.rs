@@ -7,6 +7,8 @@ mod kademlia;
 use std::net::{IpAddr, SocketAddr};
 use std::sync::{Arc, Mutex};
 use std::thread;
+use std::thread::sleep;
+use std::time::Duration;
 use bencode::variables::bencode_object::BencodeObject;
 use bencode::variables::inter::bencode_variable::BencodeVariable;
 use crate::kad::kademlia_base::KademliaBase;
@@ -44,15 +46,16 @@ mod refresh;
 
 
 fn main() {
-    test2::test();
+    //test2::test();
 
-    /*
     let mut refresh = RefreshHandler::new();
     refresh.add_operation(Box::new(BucketRefreshTask::new()));
     refresh.add_operation(Box::new(StaleRefreshTask::new()));
     refresh.start();
-    */
 
+    sleep(Duration::from_secs(5));
+    refresh.stop();
+    sleep(Duration::from_secs(3));
 
     //let mut kad = Kademlia::new();//Arc::new(Mutex::new(Kademlia::new()));
 

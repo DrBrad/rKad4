@@ -7,7 +7,8 @@ use crate::refresh::tasks::inter::task::Task;
 
 pub struct RefreshHandler {
     tasks: Vec<Box<dyn Task>>,//Vec<Box<dyn Task>>,
-    refresh_time: u64
+    refresh_time: u64,
+    running: Arc<Mutex<bool>>
 }
 
 impl RefreshHandler {
@@ -15,7 +16,8 @@ impl RefreshHandler {
     pub fn new() -> Self {
         Self {
             tasks: Vec::new(),
-            refresh_time: 1000//3600000
+            refresh_time: 1000,//3600000
+            running: Arc::new(Mutex::new(false))
         }
     }
 
@@ -26,9 +28,11 @@ impl RefreshHandler {
     pub fn start(&self) {
         let tasks = self.tasks.clone();
         let refresh_time = self.refresh_time;
+        *self.running.lock().unwrap() = true;
+        let running = Arc::clone(&self.running);
 
         let handle = thread::spawn(move || {
-            loop {
+            while *running.lock().unwrap() {
                 for task in &tasks {
                     task.execute();
                 }
@@ -37,11 +41,11 @@ impl RefreshHandler {
             }
         });
 
-        handle.join().unwrap();
+        //handle.join().unwrap();
     }
 
     pub fn stop(&self) {
-
+        *self.running.lock().unwrap() = false;
     }
 
     pub fn add_operation(&mut self, task: Box<dyn Task>) {
