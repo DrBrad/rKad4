@@ -1,3 +1,4 @@
+use std::sync::{Arc, Mutex};
 use std::thread;
 use std::thread::sleep;
 use std::time::Duration;
@@ -5,7 +6,7 @@ use crate::refresh::tasks::inter::task::Task;
 //use std::old_io::Timer;
 
 pub struct RefreshHandler {
-    tasks: Vec<Box<dyn Task>>,
+    tasks: Vec<Box<dyn Task>>,//Vec<Box<dyn Task>>,
     refresh_time: u64
 }
 
@@ -18,12 +19,19 @@ impl RefreshHandler {
         }
     }
 
-    pub fn start(&self) {
+    pub fn is_running() -> bool {
+        false
+    }
+
+    pub fn start(&'static mut self) {
+        //let tasks = self.tasks.clone(); // Clone the tasks vector
+        //let tasks = self.tasks.iter().clone();//Arc::clone(&self.tasks);
         let refresh_time = self.refresh_time;
 
         let handle = thread::spawn(move || {
+
             /*
-            for task in self.tasks {
+            for task in &tasks {
                 task.execute();
             }
             */

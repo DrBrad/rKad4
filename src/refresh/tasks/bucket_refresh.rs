@@ -11,6 +11,6 @@ impl BucketRefresh {
 impl Task for BucketRefresh {
 
     fn execute(&self) {
-        println!("BucketRefresh")
+        println!("BucketRefresh");
     }
 }
