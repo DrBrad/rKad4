@@ -92,9 +92,9 @@ impl Server {
         //handle.join().unwrap();
     }
 
-    pub fn run(i: i32, kademlia: Arc<Mutex<dyn KademliaBase>>) {//sender: Sender<Vec<u8>>, receiver: Receiver<Vec<u8>>) {
+    pub fn run(kademlia: Arc<Mutex<dyn KademliaBase>>) {//sender: Sender<Vec<u8>>, receiver: Receiver<Vec<u8>>) {
         while true {
-            println!("TEST  {}", i);
+            println!("TEST");
             sleep(Duration::from_secs(1));
         }
     }

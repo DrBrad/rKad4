@@ -8,7 +8,7 @@ use crate::routing::bucket_types::BucketTypes;
 use crate::routing::inter::routing_table::RoutingTable;
 
 pub struct Kademlia {
-    pub(crate) routing_table: Box<dyn RoutingTable>,
+    //pub(crate) routing_table: Box<dyn RoutingTable>,
     pub(crate) server: Server//RefCell<Server>
 }
 
@@ -16,7 +16,7 @@ impl Kademlia {
 
     pub fn new() -> Arc<Mutex<dyn KademliaBase>> {
         Arc::new(Mutex::new(Self {
-            routing_table: BucketTypes::Kademlia.routing_table(),
+            //routing_table: BucketTypes::Kademlia.routing_table(),
             server: Server::new()//RefCell::new(Server::new())
         }))
     }
@@ -26,7 +26,7 @@ impl From<String> for Kademlia {
 
     fn from(value: String) -> Self {
         Self {
-            routing_table: BucketTypes::from_string(value).unwrap().routing_table(),
+            //routing_table: BucketTypes::from_string(value).unwrap().routing_table(),
             server: Server::new()//RefCell::new(Server::new())
         }
     }
@@ -39,7 +39,12 @@ impl KademliaBase for Kademlia {
         //let b: Box<&mut dyn KademliaBase> = Box::new(self);
         //let handle = thread::spawn(move || Server::run());
         //handle.join().unwrap();
-        self.server.start(kad, port);
+        //self.server.start(kad, port);
+
+        let clone = Arc::clone(&kad);
+        let handle = thread::spawn(move || Server::run(clone));
+        handle.join().unwrap();
+
     }
 
     fn join(&self, local_port: u16, addr: SocketAddr) {
@@ -55,7 +60,10 @@ impl KademliaBase for Kademlia {
         unimplemented!()
     }
 
+    /*
     fn get_routing_table(&self) -> &Box<dyn RoutingTable> {
-        &self.routing_table
+        //&self.routing_table
+        unimplemented!()
     }
+    */
 }
