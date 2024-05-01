@@ -21,11 +21,17 @@ impl RefreshHandler {
         }
     }
 
-    pub fn is_running() -> bool {
-        false
+    pub fn is_running(&self) -> bool {
+        *self.running.lock().unwrap()
     }
 
+    //- we should probably just static the damn handler at this point....
     pub fn start(&self) {
+        if self.is_running() {
+            //panic or something...
+            return;
+        }
+
         *self.running.lock().unwrap() = true;
 
         let tasks = self.tasks.clone();
@@ -33,7 +39,7 @@ impl RefreshHandler {
         let running = Arc::clone(&self.running);
 
         let handle = thread::spawn(move || {
-            while *running.lock().unwrap() {
+            while *running.lock().unwrap() { //self.is_running()
                 for task in &tasks {
                     task.execute();
                 }
