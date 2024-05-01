@@ -42,8 +42,8 @@ impl KademliaBase for Kademlia {
         //self.server.start(kad, port);
 
         let clone = Arc::clone(&kad);
-        let handle = thread::spawn(move || Server::run(clone));
-        handle.join().unwrap();
+        //let handle = thread::spawn(move || Server::run(clone));
+        //handle.join().unwrap();
 
     }
 
