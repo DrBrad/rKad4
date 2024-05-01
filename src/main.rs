@@ -26,8 +26,11 @@ use crate::utils::node_utils::pack_nodes;
 //use rand::{Rng, thread_rng};
 extern crate bencode;
 
+//MessageTypes must be a trait...
+
 //MAYBE MAKE ROUTING TABLE A BASE SET - IE ABSTRACT - NOT TRAIT
 //echo -n "hello" >/dev/udp/localhost/8080
+
 fn main() {
     let mut kad = Kademlia::new();
     kad.lock().unwrap().bind(&kad, 1080);
