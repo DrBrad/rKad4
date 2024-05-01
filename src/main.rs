@@ -5,9 +5,12 @@ mod kad;
 mod kademlia;
 
 use std::net::{IpAddr, SocketAddr};
+use std::sync::{Arc, Mutex};
+use std::thread;
 use bencode::variables::bencode_object::BencodeObject;
 use bencode::variables::inter::bencode_variable::BencodeVariable;
 use crate::kad::kademlia_base::KademliaBase;
+use crate::kad::server::run;
 use crate::kademlia::Kademlia;
 use crate::messages::find_node_request::FindNodeRequest;
 use crate::messages::find_node_response::FindNodeResponse;
@@ -26,7 +29,7 @@ use crate::utils::node_utils::pack_nodes;
 //use rand::{Rng, thread_rng};
 extern crate bencode;
 
-mod test2;
+//mod test2;
 
 //MessageTypes must be a trait...
 
@@ -34,11 +37,28 @@ mod test2;
 //echo -n "hello" >/dev/udp/localhost/8080
 
 fn main() {
-    //let mut kad = Kademlia::new();
+    let kad = Kademlia::new();//Arc::new(Mutex::new(Kademlia::new()));
+
+    //let kad = Kademlia {};
+
+    kad.lock().unwrap().bind(Arc::clone(&kad), 8080);
+    //let clone = Arc::clone(&kad);
+    //let handle = thread::spawn(move || run(clone));
+
+    //handle.join().unwrap();
+
+
     //kad.lock().unwrap().bind(&kad, 1080);
+
+    //let clone = Arc::clone(&kad);
+    //let handle = thread::spawn(move || run(clone));
+    //let clone = Arc::clone(&kad);
+    //let handle = thread::spawn(move || crate::kad::server::run(clone));
+    //handle.join().unwrap();
+
     //kad.lock().unwrap().stop();
 
-    test2::test();
+    //test2::test();
 
 
 

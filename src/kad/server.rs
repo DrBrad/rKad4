@@ -92,13 +92,6 @@ impl Server {
         //handle.join().unwrap();
     }
 
-    pub fn run(kademlia: Arc<Mutex<dyn KademliaBase>>) {//sender: Sender<Vec<u8>>, receiver: Receiver<Vec<u8>>) {
-        while true {
-            println!("TEST");
-            sleep(Duration::from_secs(1));
-        }
-    }
-
     pub fn stop(&self) {
         //self.server.as_ref().unwrap().drop();
     }
@@ -123,3 +116,12 @@ impl Server {
         [0u8; TID_LENGTH]
     }
 }
+
+pub fn run(arc: Arc<Mutex<dyn KademliaBase>>) {
+//pub fn run(kademlia: Arc<Mutex<dyn KademliaBase>>) {//sender: Sender<Vec<u8>>, receiver: Receiver<Vec<u8>>) {
+    while true {
+        println!("TEST");
+        sleep(Duration::from_secs(1));
+    }
+}
+

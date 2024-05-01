@@ -69,6 +69,7 @@ pub fn test() {
 
 pub fn run(arc: Arc<Mutex<dyn KademliaBase>>) {
     let mut i = 0;
+
     while true {
         println!("TEST  {}", arc.lock().unwrap().to_string());
         sleep(Duration::from_secs(1));
