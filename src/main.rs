@@ -17,6 +17,9 @@ use crate::messages::find_node_response::FindNodeResponse;
 use crate::messages::inter::message_base::MessageBase;
 use crate::messages::inter::method_message_base::MethodMessageBase;
 use crate::messages::ping_request::PingRequest;
+use crate::refresh::refresh_handler::RefreshHandler;
+use crate::refresh::tasks::bucket_refresh_task::BucketRefreshTask;
+use crate::refresh::tasks::stale_refresh_task::StaleRefreshTask;
 use crate::utils::hash::crc32c::CRC32c;
 use crate::routing::inter::routing_table::RoutingTable;
 use crate::routing::kb::k_bucket::KBucket;
@@ -39,7 +42,18 @@ mod refresh;
 //MAYBE MAKE ROUTING TABLE A BASE SET - IE ABSTRACT - NOT TRAIT
 //echo -n "hello" >/dev/udp/localhost/8080
 
+
 fn main() {
+    test2::test();
+
+    /*
+    let mut refresh = RefreshHandler::new();
+    refresh.add_operation(Box::new(BucketRefreshTask::new()));
+    refresh.add_operation(Box::new(StaleRefreshTask::new()));
+    refresh.start();
+    */
+
+
     //let mut kad = Kademlia::new();//Arc::new(Mutex::new(Kademlia::new()));
 
     //kad.bind(8080);
@@ -62,7 +76,6 @@ fn main() {
 
     //kad.lock().unwrap().stop();
 
-    test2::test();
 
 
 

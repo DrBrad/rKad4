@@ -15,7 +15,7 @@ impl RefreshHandler {
     pub fn new() -> Self {
         Self {
             tasks: Vec::new(),
-            refresh_time: 3600000
+            refresh_time: 1000//3600000
         }
     }
 
@@ -23,31 +23,21 @@ impl RefreshHandler {
         false
     }
 
-    pub fn start(&'static mut self) {
-        //let tasks = self.tasks.clone(); // Clone the tasks vector
-        //let tasks = self.tasks.iter().clone();//Arc::clone(&self.tasks);
+    pub fn start(&self) {
+        let tasks = self.tasks.clone();
         let refresh_time = self.refresh_time;
 
         let handle = thread::spawn(move || {
+            loop {
+                for task in &tasks {
+                    task.execute();
+                }
 
-            /*
-            for task in &tasks {
-                task.execute();
+                sleep(Duration::from_millis(refresh_time));
             }
-            */
-
-            sleep(Duration::from_millis(refresh_time));
         });
 
         handle.join().unwrap();
-
-        /*
-        let mut timer = Timer::new().unwrap();
-        let ticks = timer.periodic(Duration::minutes(5));
-        for _ in ticks.iter() {
-            your_function();
-        }
-        */
     }
 
     pub fn stop(&self) {
