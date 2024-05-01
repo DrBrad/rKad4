@@ -29,6 +29,8 @@ use crate::utils::node_utils::pack_nodes;
 //use rand::{Rng, thread_rng};
 extern crate bencode;
 
+mod test2;
+
 //mod test2;
 
 //MessageTypes must be a trait...
@@ -37,9 +39,9 @@ extern crate bencode;
 //echo -n "hello" >/dev/udp/localhost/8080
 
 fn main() {
-    let mut kad = Kademlia::new();//Arc::new(Mutex::new(Kademlia::new()));
+    //let mut kad = Kademlia::new();//Arc::new(Mutex::new(Kademlia::new()));
 
-    kad.bind(8080);
+    //kad.bind(8080);
     //let kad = Kademlia {};
 
     //kad.lock().unwrap().bind(Arc::clone(&kad), 8080);
@@ -59,7 +61,7 @@ fn main() {
 
     //kad.lock().unwrap().stop();
 
-    //test2::test();
+    test2::test();
 
 
 

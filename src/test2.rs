@@ -22,48 +22,6 @@ pub fn test() {
     println!("{}", arc.lock().unwrap().to_string());
 
     handle.join().unwrap();
-
-    //thread::spawn(|_|, run());
-
-
-    /*
-    let kad = Kademlia::new();
-    let kad = kad.start();
-
-    println!("{}", kad.lock().unwrap().to_string());
-
-    while true {
-
-    }
-    */
-
-    /*
-    // Create a UDP socket
-    let socket = UdpSocket::bind("127.0.0.1:8080").expect("Failed to bind socket");
-
-    // Create a shared Arc<Mutex<UdpSocket>>
-    let socket = Arc::new(Mutex::new(socket));
-    test(&socket);
-    */
-
-
-    /*
-
-    println!("Hello, world!");
-
-    let mut kademlia = Kademlia::new();
-    kademlia.lock().unwrap().server.start(&kademlia);
-
-
-    while true {
-        println!("Looper {}", kademlia.lock().unwrap().to_string());
-        sleep(Duration::from_millis(1000));
-    }
-    */
-
-    /*
-    handle.join().unwrap();
-    */
 }
 
 
