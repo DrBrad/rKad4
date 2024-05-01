@@ -26,9 +26,10 @@ impl RefreshHandler {
     }
 
     pub fn start(&self) {
+        *self.running.lock().unwrap() = true;
+
         let tasks = self.tasks.clone();
         let refresh_time = self.refresh_time;
-        *self.running.lock().unwrap() = true;
         let running = Arc::clone(&self.running);
 
         let handle = thread::spawn(move || {
