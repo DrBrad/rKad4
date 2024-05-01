@@ -37,11 +37,12 @@ extern crate bencode;
 //echo -n "hello" >/dev/udp/localhost/8080
 
 fn main() {
-    let kad = Kademlia::new();//Arc::new(Mutex::new(Kademlia::new()));
+    let mut kad = Kademlia::new();//Arc::new(Mutex::new(Kademlia::new()));
 
+    kad.bind(8080);
     //let kad = Kademlia {};
 
-    kad.lock().unwrap().bind(Arc::clone(&kad), 8080);
+    //kad.lock().unwrap().bind(Arc::clone(&kad), 8080);
     //let clone = Arc::clone(&kad);
     //let handle = thread::spawn(move || run(clone));
 

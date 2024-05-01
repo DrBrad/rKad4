@@ -4,7 +4,7 @@ use std::thread;
 use std::sync::mpsc::{channel, Receiver, Sender};
 use std::thread::sleep;
 use std::time::Duration;
-use crate::kad::kademlia_base::KademliaBase;
+use crate::kad::kademlia_base::{KademliaBase, Settings};
 use crate::kademlia::Kademlia;
 use crate::messages::inter::message_base::MessageBase;
 use crate::utils;
@@ -117,7 +117,7 @@ impl Server {
     }
 }
 
-pub fn run(arc: Arc<Mutex<dyn KademliaBase>>) {
+pub fn run(arc: Arc<Mutex<Settings>>) {
 //pub fn run(kademlia: Arc<Mutex<dyn KademliaBase>>) {//sender: Sender<Vec<u8>>, receiver: Receiver<Vec<u8>>) {
     while true {
         println!("TEST");

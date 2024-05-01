@@ -2,23 +2,23 @@ use std::cell::RefCell;
 use std::net::SocketAddr;
 use std::sync::{Arc, Mutex};
 use std::thread;
-use crate::kad::kademlia_base::KademliaBase;
+use crate::kad::kademlia_base::{KademliaBase, Settings};
 use crate::kad::server::{Server, run};
 use crate::routing::bucket_types::BucketTypes;
 use crate::routing::inter::routing_table::RoutingTable;
 
 pub struct Kademlia {
+    settings: Arc<Mutex<Settings>>
     //pub(crate) routing_table: Box<dyn RoutingTable>,
     //pub(crate) server: Server//RefCell<Server>
 }
 
 impl Kademlia {
 
-    pub fn new() -> Arc<Mutex<dyn KademliaBase>> {
-        Arc::new(Mutex::new(Self {
-            //routing_table: BucketTypes::Kademlia.routing_table(),
-            //server: Server::new()//RefCell::new(Server::new())
-        }))
+    pub fn new() -> Self {
+        Self {
+            settings: Arc::new(Mutex::new(Settings::new()))
+        }
     }
 }
 
@@ -26,6 +26,7 @@ impl From<String> for Kademlia {
 
     fn from(value: String) -> Self {
         Self {
+            settings: Arc::new(Mutex::new(Settings::new()))
             //routing_table: BucketTypes::from_string(value).unwrap().routing_table(),
             //server: Server::new()//RefCell::new(Server::new())
         }
@@ -41,7 +42,10 @@ impl KademliaBase for Kademlia {
         //handle.join().unwrap();
         //self.server.start(kad, port);
 
-        let clone = Arc::clone(&kad);
+        //let clone = Arc::clone(&kad);
+        //let handle = thread::spawn(move || run(clone));
+        //handle.join().unwrap();
+        let clone = Arc::clone(&self.settings);
         let handle = thread::spawn(move || run(clone));
         handle.join().unwrap();
 
