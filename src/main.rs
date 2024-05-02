@@ -49,6 +49,7 @@ fn main() {
     //test2::test();
 
     let mut refresh = RefreshHandler::new();
+    refresh.set_refresh_time(1000);
     refresh.add_operation(Box::new(BucketRefreshTask::new()));
     refresh.add_operation(Box::new(StaleRefreshTask::new()));
     refresh.start();
