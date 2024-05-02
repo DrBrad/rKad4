@@ -35,8 +35,19 @@ pub fn test() {
     }
     */
 
-    let s = AtomicMyStruct::new(MyStruct { data: 100 });
-    println!("{}", s.load(Ordering::Relaxed).data);
+    let s = Arc::new(AtomicMyStruct::new(MyStruct { data: 100 }));
+    let c = Arc::clone(&s);
+
+    println!("START {}", s.load(Ordering::Relaxed).data);
+
+    let handle = thread::spawn(move || {
+        println!("ATOMIC {}", c.load(Ordering::Relaxed).data);
+    });
+
+    println!("END {}", s.load(Ordering::Relaxed).data);
+
+    handle.join().unwrap();
+
 }
 
 
