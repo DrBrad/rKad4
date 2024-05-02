@@ -1,7 +1,7 @@
 use std::net::UdpSocket;
 use std::rc::Rc;
 use std::sync::{Arc, Mutex};
-use std::sync::atomic::{AtomicI32, AtomicPtr, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicI32, AtomicPtr, Ordering};
 use std::sync::mpsc::channel;
 use std::thread;
 use std::thread::sleep;
@@ -29,37 +29,47 @@ pub fn test() {
     let kad = Kademlia::new();
     kad.start();
 
-    while true {
+    sleep(Duration::from_secs(5));
+    kad.stop();
+
+    //while true {
         
-    }
+    //}
 
 }
 
 
 
 struct Kademlia {
-    settings: Arc<Mutex<Settings>>
+    routing_table: Arc<Mutex<RoutingTable>>,
+    server: Arc<Mutex<Server>>
 }
 
 impl Kademlia {
 
     pub fn new() -> Self {
         Self {
-            settings: Arc::new(Mutex::new(Settings::new()))
+            routing_table: Arc::new(Mutex::new(RoutingTable::new())),
+            server: Arc::new(Mutex::new(Server::new()))
         }
     }
 
     pub fn start(&self) {
-        let routing_table = Arc::clone(&self.settings.lock().unwrap().routing_table);//.lock().unwrap().routing_table;
-        self.settings.lock().unwrap().server.lock().unwrap().start(routing_table);
+        let routing_table = Arc::clone(&self.routing_table);//.lock().unwrap().routing_table;
+        self.server.lock().unwrap().start(routing_table);
     }
-
+    /*
     pub fn get_settings(&self) -> &Arc<Mutex<Settings>> {
         &self.settings
     }
+    */
+
+    pub fn stop(&self) {
+        self.server.lock().unwrap().stop();
+    }
 }
 
-
+/*
 struct Settings {
     routing_table: Arc<Mutex<RoutingTable>>,
     server: Arc<Mutex<Server>>
@@ -74,33 +84,42 @@ impl Settings {
         }
     }
 }
-
+*/
 
 
 struct Server {
-
+    running: Arc<AtomicBool>
 }
 
 impl Server {
 
     pub fn new() -> Self {
         Self {
-
+            running: Arc::new(AtomicBool::new(false))
         }
     }
 
     pub fn start(&self, routing_table: Arc<Mutex<RoutingTable>>) {
+        self.running.store(true, Ordering::Relaxed);
+        let running = Arc::clone(&self.running);
         println!("STARTING SERVER a");
         //let settings = Arc::clone(settings);
         //let routing_table = Arc::clone(routing_table);
 
         let handle = thread::spawn(move || {
-            println!("{}", routing_table.lock().unwrap().msg);
+            while running.load(Ordering::Relaxed) {
+                println!("{}", routing_table.lock().unwrap().msg);
+                sleep(Duration::from_secs(1));
+            }
         });
 
         println!("STARTING SERVER");
 
-        handle.join().unwrap();
+        //handle.join().unwrap();
+    }
+
+    pub fn stop(&self) {
+        self.running.store(false, Ordering::Relaxed);
     }
 }
 
