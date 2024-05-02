@@ -1,7 +1,7 @@
 use std::net::UdpSocket;
 use std::rc::Rc;
 use std::sync::{Arc, Mutex};
-use std::sync::atomic::{AtomicPtr, Ordering};
+use std::sync::atomic::{AtomicI32, AtomicPtr, Ordering};
 use std::sync::mpsc::channel;
 use std::thread;
 use std::thread::sleep;
@@ -26,27 +26,12 @@ pub fn test() {
     handle.join().unwrap();
     */
 
-    /*
     let kad = Kademlia::new();
     kad.start();
 
     while true {
         
     }
-    */
-
-    let s = Arc::new(AtomicMyStruct::new(MyStruct { data: 100 }));
-    let c = Arc::clone(&s);
-
-    println!("START {}", s.load(Ordering::Relaxed).data);
-
-    let handle = thread::spawn(move || {
-        println!("ATOMIC {}", c.load(Ordering::Relaxed).data);
-    });
-
-    println!("END {}", s.load(Ordering::Relaxed).data);
-
-    handle.join().unwrap();
 
 }
 
@@ -139,41 +124,6 @@ impl RoutingTable {
     }
 }
 
-
-
-
-
-
-#[derive(Debug, Clone)]
-struct MyStruct {
-    data: i32,
-}
-
-// Define your atomic wrapper struct
-pub struct AtomicMyStruct {
-    inner: AtomicPtr<MyStruct>,
-}
-
-impl AtomicMyStruct {
-    // Create a new AtomicMyStruct with the given value
-    pub fn new(value: MyStruct) -> Self {
-        let ptr = Box::into_raw(Box::new(value));
-        Self {
-            inner: AtomicPtr::new(ptr),
-        }
-    }
-
-    // Get the value atomically
-    pub fn load(&self, ordering: Ordering) -> MyStruct {
-        unsafe { (*self.inner.load(ordering)).clone() }
-    }
-
-    // Set the value atomically
-    pub fn store(&self, value: MyStruct, ordering: Ordering) {
-        let ptr = Box::into_raw(Box::new(value));
-        self.inner.store(ptr, ordering);
-    }
-}
 
 
 /*
