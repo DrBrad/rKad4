@@ -42,6 +42,7 @@ pub fn test() {
 
 struct Kademlia {
     routing_table: Arc<Mutex<RoutingTable>>,
+    refresh_handler: Arc<Mutex<RefreshHandler>>,
     server: Arc<Mutex<Server>>
 }
 
@@ -50,13 +51,16 @@ impl Kademlia {
     pub fn new() -> Self {
         Self {
             routing_table: Arc::new(Mutex::new(RoutingTable::new())),
+            refresh_handler: Arc::new(Mutex::new(RefreshHandler::new())),
             server: Arc::new(Mutex::new(Server::new()))
         }
     }
 
     pub fn start(&self) {
-        let routing_table = Arc::clone(&self.routing_table);//.lock().unwrap().routing_table;
-        self.server.lock().unwrap().start(routing_table);
+        //let routing_table = Arc::clone(&self.routing_table);//.lock().unwrap().routing_table;
+        self.server.lock().unwrap().start(&self.routing_table);
+
+        self.refresh_handler.lock().unwrap().start(&self.routing_table);
     }
     /*
     pub fn get_settings(&self) -> &Arc<Mutex<Settings>> {
@@ -66,6 +70,7 @@ impl Kademlia {
 
     pub fn stop(&self) {
         self.server.lock().unwrap().stop();
+        self.refresh_handler.lock().unwrap().stop();
     }
 }
 
@@ -99,16 +104,19 @@ impl Server {
         }
     }
 
-    pub fn start(&self, routing_table: Arc<Mutex<RoutingTable>>) {
+    pub fn start(&self, routing_table: &Arc<Mutex<RoutingTable>>) {
         self.running.store(true, Ordering::Relaxed);
         let running = Arc::clone(&self.running);
+
+        let routing_table = Arc::clone(routing_table);
+
         println!("STARTING SERVER a");
         //let settings = Arc::clone(settings);
         //let routing_table = Arc::clone(routing_table);
 
         let handle = thread::spawn(move || {
             while running.load(Ordering::Relaxed) {
-                println!("{}", routing_table.lock().unwrap().msg);
+                println!("Server {}", routing_table.lock().unwrap().msg);
                 sleep(Duration::from_secs(1));
             }
         });
@@ -122,6 +130,48 @@ impl Server {
         self.running.store(false, Ordering::Relaxed);
     }
 }
+
+struct RefreshHandler {
+    running: Arc<AtomicBool>
+}
+
+impl RefreshHandler {
+
+    pub fn new() -> Self {
+        Self {
+            running: Arc::new(AtomicBool::new(false))
+        }
+    }
+
+    pub fn start(&self, routing_table: &Arc<Mutex<RoutingTable>>) {
+        self.running.store(true, Ordering::Relaxed);
+        let running = Arc::clone(&self.running);
+
+        let routing_table = Arc::clone(routing_table);
+
+        println!("STARTING REFRESH a");
+        //let settings = Arc::clone(settings);
+        //let routing_table = Arc::clone(routing_table);
+
+        let handle = thread::spawn(move || {
+            while running.load(Ordering::Relaxed) {
+                println!("Refresh {}", routing_table.lock().unwrap().msg);
+                sleep(Duration::from_secs(1));
+                routing_table.lock().unwrap().set_message("Refresh_Change".to_string());
+            }
+        });
+
+        println!("STARTING REFRESH");
+
+        //handle.join().unwrap();
+    }
+
+    pub fn stop(&self) {
+        self.running.store(false, Ordering::Relaxed);
+    }
+}
+
+
 
 
 
