@@ -46,8 +46,9 @@ mod refresh;
 
 
 fn main() {
-    //test2::test();
+    test2::test();
 
+    /*
     let mut refresh = RefreshHandler::new();
     refresh.set_refresh_time(1000);
     refresh.add_operation(Box::new(BucketRefreshTask::new()));
@@ -57,6 +58,7 @@ fn main() {
     sleep(Duration::from_secs(5));
     refresh.stop();
     sleep(Duration::from_secs(3));
+    */
 
     //let mut kad = Kademlia::new();//Arc::new(Mutex::new(Kademlia::new()));
 
