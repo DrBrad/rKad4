@@ -8,6 +8,7 @@ use std::time::Duration;
 
 pub fn test() {
 
+    /*
     let kad = Kademlia::new();
     let arc = kad.arc();
 
@@ -22,9 +23,111 @@ pub fn test() {
     println!("{}", arc.lock().unwrap().to_string());
 
     handle.join().unwrap();
+    */
+
+    let kad = Kademlia::new();
+    kad.start();
+
+    while true {
+        
+    }
 }
 
 
+
+struct Kademlia {
+    settings: Arc<Mutex<Settings>>
+}
+
+impl Kademlia {
+
+    pub fn new() -> Self {
+        Self {
+            settings: Arc::new(Mutex::new(Settings::new()))
+        }
+    }
+
+    pub fn start(&self) {
+        self.settings.lock().unwrap().server.lock().unwrap().start(&self.settings)
+    }
+
+    pub fn get_settings(&self) -> &Arc<Mutex<Settings>> {
+        &self.settings
+    }
+}
+
+
+struct Settings {
+    routing_table: Arc<Mutex<RoutingTable>>,
+    server: Arc<Mutex<Server>>
+}
+
+impl Settings {
+
+    pub fn new() -> Self {
+        Self {
+            routing_table: Arc::new(Mutex::new(RoutingTable::new())),
+            server: Arc::new(Mutex::new(Server::new()))
+        }
+    }
+}
+
+
+
+struct Server {
+
+}
+
+impl Server {
+
+    pub fn new() -> Self {
+        Self {
+
+        }
+    }
+
+    pub fn start(&self, settings: &Arc<Mutex<Settings>>) {
+        let settings = Arc::clone(settings);
+
+        let handle = thread::spawn(move || {
+            println!("{}", settings.lock().unwrap().routing_table.lock().unwrap().msg);
+        });
+
+        println!("STARTING SERVER");
+
+        //handle.join().unwrap();
+    }
+}
+
+
+
+struct RoutingTable {
+    msg: String
+}
+
+impl RoutingTable {
+
+    pub fn new() -> Self {
+        Self {
+            msg: "Hello World".to_string()
+        }
+    }
+
+    pub fn set_message(&mut self, msg: String) {
+        self.msg = msg;
+    }
+
+    pub fn to_string(&self) -> String {
+        self.msg.clone()
+    }
+}
+
+
+
+
+
+
+/*
 pub fn run(arc: Arc<Mutex<dyn KademliaBase>>) {
     let mut i = 0;
 
@@ -71,7 +174,7 @@ impl KademliaBase for Kademlia {
         self.msg.clone()
     }
 }
-
+*/
 
 /*
 pub struct Kademlia {
