@@ -50,7 +50,8 @@ impl Kademlia {
     }
 
     pub fn start(&self) {
-        self.settings.lock().unwrap().server.lock().unwrap().start(&self.settings)
+        let routing_table = Arc::clone(&self.settings.lock().unwrap().routing_table);//.lock().unwrap().routing_table;
+        self.settings.lock().unwrap().server.lock().unwrap().start(routing_table);
     }
 
     pub fn get_settings(&self) -> &Arc<Mutex<Settings>> {
@@ -88,16 +89,18 @@ impl Server {
         }
     }
 
-    pub fn start(&self, settings: &Arc<Mutex<Settings>>) {
-        let settings = Arc::clone(settings);
+    pub fn start(&self, routing_table: Arc<Mutex<RoutingTable>>) {
+        println!("STARTING SERVER a");
+        //let settings = Arc::clone(settings);
+        //let routing_table = Arc::clone(routing_table);
 
         let handle = thread::spawn(move || {
-            println!("{}", settings.lock().unwrap().routing_table.lock().unwrap().msg);
+            println!("{}", routing_table.lock().unwrap().msg);
         });
 
         println!("STARTING SERVER");
 
-        //handle.join().unwrap();
+        handle.join().unwrap();
     }
 }
 
