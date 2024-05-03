@@ -60,8 +60,8 @@ impl MessageBase for FindNodeRequest {
         self.uid = Some(uid);
     }
 
-    fn get_uid(&self) -> Result<&UID, ()> {
-        self.uid.as_ref().map_or_else(|| Err(()), |uid| Ok(uid))
+    fn get_uid(&self) -> UID {
+        self.uid.unwrap()
     }
 
     fn set_transaction_id(&mut self, tid: [u8; 6]) {
@@ -76,24 +76,24 @@ impl MessageBase for FindNodeRequest {
         self.public_address = Some(public_address);
     }
 
-    fn get_public_address(&self) -> Result<&SocketAddr, ()> {
-        self.public_address.as_ref().map_or_else(|| Err(()), |addr| Ok(addr))
+    fn get_public_address(&self) -> SocketAddr {
+        self.public_address.unwrap()
     }
 
     fn set_destination_address(&mut self, destination_address: SocketAddr) {
         self.destination_address = Some(destination_address);
     }
 
-    fn get_destination_address(&self) -> Result<&SocketAddr, ()> {
-        self.destination_address.as_ref().map_or_else(|| Err(()), |addr| Ok(addr))
+    fn get_destination_address(&self) -> SocketAddr {
+        self.destination_address.unwrap()
     }
 
     fn set_origin_address(&mut self, origin_address: SocketAddr) {
         self.origin_address = Some(origin_address);
     }
 
-    fn get_origin_address(&self) -> Result<&SocketAddr, ()> {
-        self.origin_address.as_ref().map_or_else(|| Err(()), |addr| Ok(addr))
+    fn get_origin_address(&self) -> SocketAddr {
+        self.origin_address.unwrap()
     }
 
     fn get_type(&self) -> MessageType {

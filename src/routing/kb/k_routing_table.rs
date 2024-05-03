@@ -105,7 +105,7 @@ impl RoutingTable for KRoutingTable {
     }
 
     fn get_derived_uid(&self) -> UID {
-        return self.uid.unwrap()
+        self.uid.unwrap()
     }
 
     fn has_queried(&self, n: &Node, now: u64) -> bool {

@@ -48,7 +48,7 @@ fn main() {
     let kad = Kademlia::new();
     kad.bind(8080);
     sleep(Duration::from_secs(3));
-    kad.get_server().lock().unwrap().send();
+    //kad.get_server().lock().unwrap().send();
     sleep(Duration::from_secs(5));
 
 

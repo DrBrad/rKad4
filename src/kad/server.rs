@@ -120,14 +120,11 @@ impl Server {
 
     }
 
-    pub fn send(&self) {//, mut message: Box<dyn MessageBase>) { //Message.... - needs to be a trait...
-        println!("TEST {}", self.kademlia.get_routing_table().lock().unwrap().get_derived_uid().to_string());
-        /*
+    pub fn send(&self, mut message: Box<dyn MessageBase>) {
         if let Some(server) = &self.server {
-            message.set_uid(kademlia.get_routing_table().lock().unwrap().get_derived_uid());
-            server.send_to(message.encode().encode().as_slice(), message.get_destination_address().unwrap()).unwrap(); //probably should return if failed to send...
+            message.set_uid(self.kademlia.get_routing_table().lock().unwrap().get_derived_uid());
+            server.send_to(message.encode().encode().as_slice(), message.get_destination_address()).unwrap(); //probably should return if failed to send...
         }
-        */
     }
 
     pub fn generate_transaction_id(&self) -> [u8; TID_LENGTH] {
