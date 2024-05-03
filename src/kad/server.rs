@@ -5,6 +5,7 @@ use std::thread;
 use std::sync::mpsc::{channel, Receiver, Sender};
 use std::thread::sleep;
 use std::time::Duration;
+use bencode::variables::inter::bencode_variable::BencodeVariable;
 use crate::kad::kademlia_base::KademliaBase;
 use crate::kademlia::Kademlia;
 use crate::messages::inter::message_base::MessageBase;
@@ -123,8 +124,10 @@ impl Server {
     }
 
     pub fn send(&self, message: Box<dyn MessageBase>) { //Message.... - needs to be a trait...
-        let buf = vec![0, 0, 5, 5, 0];
-        //self.server.as_ref().unwrap().send_to(&buf, &message.get_destination_address()).unwrap();
+        if let Some(server) = &self.server {
+            //message.set_uid(kademlia.get_routing_table().lock().unwrap().get_derived_uid());
+            //server.send_to(message.encode().encode(), message.get_destination_address());
+        }
     }
 
     pub fn generate_transaction_id(&self) -> [u8; TID_LENGTH] {
