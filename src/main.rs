@@ -12,7 +12,6 @@ use std::time::Duration;
 use bencode::variables::bencode_object::BencodeObject;
 use bencode::variables::inter::bencode_variable::BencodeVariable;
 use crate::kad::kademlia_base::KademliaBase;
-use crate::kad::server::run;
 use crate::kademlia::Kademlia;
 use crate::messages::find_node_request::FindNodeRequest;
 use crate::messages::find_node_response::FindNodeResponse;
@@ -34,7 +33,7 @@ use crate::utils::node_utils::pack_nodes;
 //use rand::{Rng, thread_rng};
 extern crate bencode;
 
-mod test2;
+//mod test2;
 mod refresh;
 
 //mod test2;
@@ -46,7 +45,18 @@ mod refresh;
 
 
 fn main() {
-    test2::test();
+    let kad = Kademlia::new();
+    kad.bind(8080);
+
+    sleep(Duration::from_secs(2));
+    kad.routing_table.lock().unwrap().derive_uid();
+    sleep(Duration::from_secs(2));
+    kad.routing_table.lock().unwrap().derive_uid();
+    sleep(Duration::from_secs(2));
+    kad.stop();
+    sleep(Duration::from_secs(3));
+
+    //test2::test();
 
     /*
     let mut refresh = RefreshHandler::new();

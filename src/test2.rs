@@ -26,6 +26,18 @@ pub fn test() {
     handle.join().unwrap();
     */
 
+
+    /*
+    let kad = Kademlia::new();
+    let k2 = kad.clone();
+
+    k2.routing_table.lock().unwrap().set_message("new message".to_string());
+
+    println!("{}", kad.routing_table.lock().unwrap().to_string());
+    */
+
+
+
     let kad = Kademlia::new();
     kad.start();
 
@@ -39,7 +51,7 @@ pub fn test() {
 }
 
 
-
+#[derive(Clone)]
 struct Kademlia {
     routing_table: Arc<Mutex<RoutingTable>>,
     refresh_handler: Arc<Mutex<RefreshHandler>>,
@@ -58,9 +70,9 @@ impl Kademlia {
 
     pub fn start(&self) {
         //let routing_table = Arc::clone(&self.routing_table);//.lock().unwrap().routing_table;
-        self.server.lock().unwrap().start(&self.routing_table);
+        self.server.lock().unwrap().start(self.clone());
 
-        self.refresh_handler.lock().unwrap().start(&self.routing_table);
+        self.refresh_handler.lock().unwrap().start(self.clone());
     }
     /*
     pub fn get_settings(&self) -> &Arc<Mutex<Settings>> {
@@ -104,11 +116,11 @@ impl Server {
         }
     }
 
-    pub fn start(&self, routing_table: &Arc<Mutex<RoutingTable>>) {
+    pub fn start(&self, kademlia: Kademlia) {
         self.running.store(true, Ordering::Relaxed);
         let running = Arc::clone(&self.running);
 
-        let routing_table = Arc::clone(routing_table);
+        //let routing_table = Arc::clone(&kademlia.routing_table);
 
         println!("STARTING SERVER a");
         //let settings = Arc::clone(settings);
@@ -116,7 +128,7 @@ impl Server {
 
         let handle = thread::spawn(move || {
             while running.load(Ordering::Relaxed) {
-                println!("Server {}", routing_table.lock().unwrap().msg);
+                println!("Server {}", kademlia.routing_table.lock().unwrap().msg);
                 sleep(Duration::from_secs(1));
             }
         });
@@ -143,11 +155,11 @@ impl RefreshHandler {
         }
     }
 
-    pub fn start(&self, routing_table: &Arc<Mutex<RoutingTable>>) {
+    pub fn start(&self, kademlia: Kademlia) {
         self.running.store(true, Ordering::Relaxed);
         let running = Arc::clone(&self.running);
 
-        let routing_table = Arc::clone(routing_table);
+        //let routing_table = Arc::clone(routing_table);
 
         println!("STARTING REFRESH a");
         //let settings = Arc::clone(settings);
@@ -155,9 +167,9 @@ impl RefreshHandler {
 
         let handle = thread::spawn(move || {
             while running.load(Ordering::Relaxed) {
-                println!("Refresh {}", routing_table.lock().unwrap().msg);
+                println!("Refresh {}", kademlia.routing_table.lock().unwrap().msg);
                 sleep(Duration::from_secs(1));
-                routing_table.lock().unwrap().set_message("Refresh_Change".to_string());
+                kademlia.routing_table.lock().unwrap().set_message("Refresh_Change".to_string());
             }
         });
 

@@ -2,7 +2,7 @@ use std::net::IpAddr;
 use crate::utils::node::Node;
 use crate::utils::uid::UID;
 
-pub trait RoutingTable {
+pub trait RoutingTable: Send {
 
     fn update_public_ip_consensus(&self, source: IpAddr, addr: IpAddr);
 

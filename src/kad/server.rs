@@ -1,10 +1,11 @@
 use std::net::{SocketAddr, UdpSocket};
 use std::sync::{Arc, Mutex};
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
 use std::sync::mpsc::{channel, Receiver, Sender};
 use std::thread::sleep;
 use std::time::Duration;
-use crate::kad::kademlia_base::{KademliaBase, Settings};
+use crate::kad::kademlia_base::KademliaBase;
 use crate::kademlia::Kademlia;
 use crate::messages::inter::message_base::MessageBase;
 use crate::utils;
@@ -12,24 +13,32 @@ use crate::utils;
 const TID_LENGTH: usize = 6;
 
 pub struct Server {
-    //kademlia: Box<&'a dyn KademliaBase>,
-    server: Option<UdpSocket>
+    server: Option<UdpSocket>,
+    running: Arc<AtomicBool> //MAY NOT BE NEEDED
 }
 
 impl Server {
 
-
-    //WE CANNOT HOLD THE KADEMLIA... THIS SHOULD BE FUN TO DEAL WITH...
-
-    pub fn new(/*kademlia: Box<&'a dyn KademliaBase>*/) -> Self {
+    pub fn new() -> Self {
         Self {
-            //kademlia,
-            server: None
+            server: None,
+            running: Arc::new(AtomicBool::new(false)) //MAY NOT BE NEEDED
         }
     }
 
-    pub fn start(&mut self, kademlia: &Arc<Mutex<dyn KademliaBase>>, port: u16) {
+    pub fn start(&mut self, kademlia: Box<dyn KademliaBase>, port: u16) {
+        self.running.store(true, Ordering::Relaxed);
+        let running = Arc::clone(&self.running);
 
+        let handle = thread::spawn(move || {
+            while running.load(Ordering::Relaxed) {
+                println!("{}", kademlia.get_routing_table().lock().unwrap().get_derived_uid().to_string());
+                sleep(Duration::from_secs(1));
+            }
+        });
+
+
+        /*
         let kademlia = Arc::clone(kademlia);
 
         //let (sender, receiver) = channel::<Vec<u8>>();
@@ -45,6 +54,7 @@ impl Server {
         println!("TEST");
 
         handle.join().unwrap();
+        */
 
         //START 2 THREADS - A will be packet receiver - B will be packet poller - Update Java one back to this method...
         //self.server = Some(UdpSocket::bind(SocketAddr::from(([127, 0, 0, 1], port))).unwrap());
@@ -93,7 +103,7 @@ impl Server {
     }
 
     pub fn stop(&self) {
-        //self.server.as_ref().unwrap().drop();
+        self.running.store(false, Ordering::Relaxed);
     }
 
     //REGISTER MESSAGES...
@@ -116,7 +126,7 @@ impl Server {
         [0u8; TID_LENGTH]
     }
 }
-
+/*
 pub fn run(arc: Arc<Mutex<Settings>>) {
 //pub fn run(kademlia: Arc<Mutex<dyn KademliaBase>>) {//sender: Sender<Vec<u8>>, receiver: Receiver<Vec<u8>>) {
     while true {
@@ -124,4 +134,4 @@ pub fn run(arc: Arc<Mutex<Settings>>) {
         sleep(Duration::from_secs(1));
     }
 }
-
+*/

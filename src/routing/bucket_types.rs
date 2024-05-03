@@ -1,3 +1,4 @@
+use std::sync::{Arc, Mutex};
 use crate::routing::inter::routing_table::RoutingTable;
 use crate::routing::kb::k_routing_table::KRoutingTable;
 
@@ -25,10 +26,10 @@ impl BucketTypes {
         }
     }
 
-    pub fn routing_table(&self) -> Box<dyn RoutingTable> {
+    pub fn routing_table(&self) -> Arc<Mutex<dyn RoutingTable>> {
         match self {
             BucketTypes::MainLine => unimplemented!(),
-            BucketTypes::Kademlia => Box::new(KRoutingTable::new())
+            BucketTypes::Kademlia => Arc::new(Mutex::new(KRoutingTable::new()))
         }
     }
 }
