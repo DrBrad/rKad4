@@ -40,73 +40,58 @@ impl Server {
 
 
         /*
-        let handle = thread::spawn(move || {
-        });
-        */
+        let socket = UdpSocket::bind("127.0.0.1:8080").expect("Failed to bind socket");
 
+        // Create a shared Arc<Mutex<UdpSocket>>
+        let socket = Arc::new(Mutex::new(socket));
 
-        /*
-        let kademlia = Arc::clone(kademlia);
+        // Create a channel for passing packets from receiver to handler
+        let (tx, rx) = channel();
 
-        //let (sender, receiver) = channel::<Vec<u8>>();
-        let handle = thread::spawn(move || {
-            let i = 0;
-            while true {
-                println!("TEST  {}", i);
-                sleep(Duration::from_secs(1));
+        // Clone the sender for the receiver thread
+        let sender = tx.clone();
+
+        // Clone the socket for the receiver thread
+        let receiver_socket = Arc::clone(&socket);
+
+        // Start the receiver thread
+        let receiver_handle = thread::spawn(move || {
+            // Create a buffer to receive messages
+            let mut buf = [0; 1024];
+
+            loop {
+                // Receive a message
+                let (size, src_addr) = {
+                    let mut socket = receiver_socket.lock().unwrap();
+                    socket.recv_from(&mut buf).expect("Failed to receive message")
+                };
+
+                // Send the received packet to the handler thread
+                let packet = buf[..size].to_vec();
+                sender.send((packet, src_addr)).expect("Failed to send packet to handler");
             }
-        });//Self::run(600, kademlia));//Self::run(kademlia));//sender, receiver));
-        //kademlia: Arc<Mutex<dyn KademliaBase>>
+        });
 
-        println!("TEST");
-
-        handle.join().unwrap();
-        */
-
-        //START 2 THREADS - A will be packet receiver - B will be packet poller - Update Java one back to this method...
-        //self.server = Some(UdpSocket::bind(SocketAddr::from(([127, 0, 0, 1], port))).unwrap());
-        //println!("Socket bound to {:?}", self.server.as_ref().unwrap().local_addr());
-
-        //println!("{:?}", kademlia.lock().unwrap().test());//.get_routing_table().as_ref().get_derived_uid());
-
-        /*
-        // Create a channel for communication between threads
-        let (sender, receiver) = channel::<Vec<u8>>();
-
-        // Spawn the receiver thread
-        let receiver_server = self.server.as_ref().unwrap().try_clone().unwrap();
-        thread::spawn(move || {
-            let buf = &mut [0u8; 65535];
-            while let Ok(buf) = receiver_server.recv_from(buf) {
-                /*
-                if let Some((size, addr)) = buf {
-                    let mut packet_data = vec![0u8; size];
-                    packet_data.copy_from_slice(&buf[0..size]);
-                    if sender.send(packet_data).is_err() {
-                        break;
+        // Start the handler thread
+        let handler_handle = thread::spawn(move || {
+            loop {
+                // Receive packets from the receiver
+                match rx.recv() {
+                    Ok((packet, src_addr)) => {
+                        // Process the received packet (e.g., parse, handle, etc.)
+                        let message = String::from_utf8_lossy(&packet);
+                        println!("Received message '{}' from {}", message, src_addr);
                     }
+                    Err(_) => break, // Break the loop if the channel is closed
                 }
-                */
             }
         });
 
-        // Spawn the processor thread
-        let (sender_processor, receiver_processor) = channel::<Vec<u8>>();
-        let handle = thread::spawn(move || {
-            while let Ok(packet) = receiver_processor.recv() {
-                // Process the received packet
-                println!("Received packet: {:?}", packet);
-                //cloned_self.on_receive(packet);
-            }
-        });
 
-        handle.join().unwrap();
+        // Join the threads
+        receiver_handle.join().expect("Receiver thread panicked");
+        handler_handle.join().expect("Handler thread panicked");
         */
-
-        //drop(server);
-        //drop(receiver_sender);
-        //drop(processor_sender);
-        //handle.join().unwrap();
     }
 
     pub fn stop(&self) {

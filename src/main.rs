@@ -45,13 +45,12 @@ mod refresh;
 
 
 fn main() {
-    /*
     let kad = Kademlia::new();
     kad.bind(8080);
     sleep(Duration::from_secs(10));
-    */
 
 
+    /*
     let mut request = FindNodeRequest::default();
     request.set_target(UID::from("e5af5f5134c1e664b6f8260e9d99d7a8719254c3"));
     request.set_destination_address(SocketAddr::from(([127, 2, 0, 1], 1080)));
@@ -64,6 +63,7 @@ fn main() {
     decoded.decode(&encoded);
 
     println!("{}", decoded.encode().to_string());
+    */
 
     /*
     sleep(Duration::from_secs(2));
