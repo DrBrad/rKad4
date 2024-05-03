@@ -21,9 +21,10 @@ pub struct Kademlia {
 impl Kademlia {
 
     pub fn new() -> Self {
-        let refresh = Arc::new(Mutex::new(RefreshHandler::new()));
-        refresh.lock().unwrap().add_operation(Box::new(BucketRefreshTask::new()));
-        refresh.lock().unwrap().add_operation(Box::new(StaleRefreshTask::new()));
+        let mut refresh = RefreshHandler::new();
+        refresh.add_operation(Box::new(BucketRefreshTask::new()));
+        refresh.add_operation(Box::new(StaleRefreshTask::new()));
+        let refresh = Arc::new(Mutex::new(refresh));
 
         Self {
             routing_table: Arc::new(Mutex::new(KRoutingTable::new())),
@@ -36,9 +37,10 @@ impl Kademlia {
 impl From<String> for Kademlia {
 
     fn from(value: String) -> Self {
-        let refresh = Arc::new(Mutex::new(RefreshHandler::new()));
-        refresh.lock().unwrap().add_operation(Box::new(BucketRefreshTask::new()));
-        refresh.lock().unwrap().add_operation(Box::new(StaleRefreshTask::new()));
+        let mut refresh = RefreshHandler::new();
+        refresh.add_operation(Box::new(BucketRefreshTask::new()));
+        refresh.add_operation(Box::new(StaleRefreshTask::new()));
+        let refresh = Arc::new(Mutex::new(refresh));
 
         Self {
             routing_table: BucketTypes::from_string(value).unwrap().routing_table(),

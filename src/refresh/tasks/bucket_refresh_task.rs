@@ -1,3 +1,4 @@
+use crate::kad::kademlia_base::KademliaBase;
 use super::inter::task::Task;
 
 #[derive(Clone)]
@@ -16,7 +17,7 @@ impl BucketRefreshTask {
 
 impl Task for BucketRefreshTask {
 
-    fn execute(&self) {
+    fn execute(&self, kademlia: &Box<dyn KademliaBase>) {
         println!("BucketRefresh");
     }
 
