@@ -122,9 +122,9 @@ impl Server {
 
     }
 
-    pub fn send(&self, message: MessageBase) { //Message.... - needs to be a trait...
+    pub fn send(&self, message: Box<dyn MessageBase>) { //Message.... - needs to be a trait...
         let buf = vec![0, 0, 5, 5, 0];
-        self.server.as_ref().unwrap().send_to(&buf, &message.destination.unwrap()).unwrap();
+        self.server.as_ref().unwrap().send_to(&buf, &message.get_destination_address()).unwrap();
     }
 
     pub fn generate_transaction_id(&self) -> [u8; TID_LENGTH] {

@@ -52,7 +52,7 @@ impl MessageBase for FindNodeRequest {
     }
 
     fn get_uid(&self) -> &UID {
-        &self.uid.unwrap()
+        &self.uid.as_ref().unwrap()
     }
 
     fn set_transaction_id(&mut self, tid: [u8; 6]) {
@@ -68,7 +68,8 @@ impl MessageBase for FindNodeRequest {
     }
 
     fn get_public_address(&self) -> &SocketAddr {
-        &self.public_address.unwrap()
+        //&self.public_address.unwrap()
+        unimplemented!()
     }
 
     fn set_destination_address(&mut self, destination_address: SocketAddr) {
@@ -76,7 +77,8 @@ impl MessageBase for FindNodeRequest {
     }
 
     fn get_destination_address(&self) -> &SocketAddr {
-        &self.destination_address.unwrap()
+        //&self.destination_address.unwrap()
+        unimplemented!()
     }
 
     fn set_origin_address(&mut self, origin_address: SocketAddr) {
@@ -84,7 +86,8 @@ impl MessageBase for FindNodeRequest {
     }
 
     fn get_origin_address(&self) -> &SocketAddr {
-        &self.origin_address.unwrap()
+        //&self.origin_address.unwrap()
+        unimplemented!()
     }
 
     fn get_type(&self) -> MessageType {
