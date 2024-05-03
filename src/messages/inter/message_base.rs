@@ -3,6 +3,8 @@ use std::net::SocketAddr;
 use bencode::variables::bencode_object::BencodeObject;
 use crate::messages::inter::message_type::MessageType;
 
+pub const TID_KEY: &str = "t";
+
 pub trait MessageBase {
 
     fn set_uid(&mut self, uid: UID);

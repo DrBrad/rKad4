@@ -1,7 +1,8 @@
 use std::net::SocketAddr;
 use bencode::variables::bencode_object::{BencodeObject, PutObject};
-use crate::messages::inter::message_base::MessageBase;
-use crate::messages::inter::message_type::MessageType;
+use crate::messages::inter::message_base::{MessageBase, TID_KEY};
+use crate::messages::inter::message_type::{MessageType, TYPE_KEY};
+use crate::utils::net::address_utils::pack_address;
 use crate::utils::uid::{ID_LENGTH, UID};
 use super::inter::method_message_base::MethodMessageBase;
 
@@ -100,9 +101,33 @@ impl MessageBase for FindNodeRequest {
     }
 
     fn encode(&self) -> BencodeObject {
-        let ben = BencodeObject::new();
-        //let ben = MessageBase::encode(self);//<Self as MessageBase>::encode(self);
-        println!("2");
+        let mut ben = BencodeObject::new();
+
+        ben.put(TID_KEY, self.tid.clone());
+        ben.put("v", "1.0");
+        ben.put(TYPE_KEY, self.get_type().rpc_type_name());
+
+        match self.get_type() {
+            MessageType::ReqMsg => {
+                ben.put(self.get_type().rpc_type_name(), self.get_method());
+                ben.put(self.get_type().inner_key(), BencodeObject::new());
+                ben.get_object_mut(self.get_type().inner_key()).unwrap().put("id", self.uid.unwrap().bid.clone());
+            },
+            MessageType::RspMsg => {
+                ben.put(self.get_type().inner_key(), BencodeObject::new());
+                ben.get_object_mut(self.get_type().inner_key()).unwrap().put("id", self.uid.unwrap().bid.clone());
+
+                if let Some(public_address) = self.public_address {
+                    ben.put("ip", pack_address(&public_address));
+                }
+            },
+            _ => unimplemented!()
+        }
+
+        if let Some(target) = self.target {
+            ben.get_object_mut(self.get_type().inner_key()).unwrap().put("target", target.bid.clone());
+        }
+
         ben
     }
 
