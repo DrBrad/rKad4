@@ -7,8 +7,9 @@ use crate::utils::net::address_utils::{pack_address, unpack_addr}
 use crate::utils::uid::{ID_LENGTH, UID};
 use super::message_base::MessageBase;//{MessageBase, MessageBaseStruct};
 
-trait MethodMessageBase {
+pub trait MethodMessageBase: MessageBase {
 
+    fn get_method(&self) -> String;
 }
 
 /*
