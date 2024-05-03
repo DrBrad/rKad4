@@ -64,9 +64,8 @@ impl KademliaBase for Kademlia {
         self.refresh.lock().unwrap().stop();
     }
 
-    fn get_server(&self) -> &Server {
-        //&self.server
-        unimplemented!()
+    fn get_server(&self) -> &Arc<Mutex<Server>> {
+        &self.server
     }
 
     fn get_routing_table(&self) -> &Arc<Mutex<dyn RoutingTable>> {

@@ -12,7 +12,7 @@ pub trait KademliaBase: Send {
 
     fn stop(&self);
 
-    fn get_server(&self) -> &Server;
+    fn get_server(&self) -> &Arc<Mutex<Server>>;
 
     //fn get_settings(&self) -> &Settings;
     fn get_routing_table(&self) -> &Arc<Mutex<dyn RoutingTable>>;
