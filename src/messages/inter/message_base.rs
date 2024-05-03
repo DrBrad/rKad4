@@ -7,7 +7,7 @@ pub trait MessageBase {
 
     fn set_uid(&mut self, uid: UID);
 
-    fn get_uid(&self) -> UID;
+    fn get_uid(&self) -> &UID;
 
     fn set_transaction_id(&mut self, tid: [u8; 6]);
 
@@ -25,7 +25,7 @@ pub trait MessageBase {
 
     fn get_origin_address(&self) -> &SocketAddr;
 
-    fn get_type(&self) -> &MessageType;
+    fn get_type(&self) -> MessageType;
 
     fn encode(&self) -> BencodeObject;
 

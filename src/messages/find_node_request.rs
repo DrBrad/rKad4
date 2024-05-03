@@ -8,70 +8,87 @@ use super::inter::method_message_base::MethodMessageBase;
 pub struct FindNodeRequest {
     uid: Option<UID>,
     tid: [u8; 6],
-    type_: MessageType,
-    destination: Option<SocketAddr>,
-    origin: Option<SocketAddr>,
+    //type_: MessageType,
     public_address: Option<SocketAddr>,
-    method: String,
+    destination_address: Option<SocketAddr>,
+    origin_address: Option<SocketAddr>,
+    //method: String,
     target: Option<UID>
 }
 
 impl FindNodeRequest {
 
-    pub fn new() -> Self {
-        /*
+    pub fn new(tid: [u8; 6]) -> Self {
         Self {
-
+            uid: None,
+            tid,
+            public_address: None,
+            destination_address: None,
+            origin_address: None,
+            target: None
         }
-        */
-        unimplemented!()
     }
 }
 
+impl Default for FindNodeRequest {
+
+    fn default() -> Self {
+        Self {
+            uid: None,
+            tid: [0u8; 6],
+            public_address: None,
+            destination_address: None,
+            origin_address: None,
+            target: None
+        }
+    }
+}
+
+//I WONDER IF WE CAN MACRO THIS SHIT FOR EVERY CLASS...?
 impl MessageBase for FindNodeRequest {
 
     fn set_uid(&mut self, uid: UID) {
-        todo!()
+        self.uid = Some(uid);
     }
 
-    fn get_uid(&self) -> UID {
-        todo!()
+    fn get_uid(&self) -> &UID {
+        &self.uid.unwrap()
     }
 
     fn set_transaction_id(&mut self, tid: [u8; 6]) {
-        todo!()
+        self.tid = tid;
     }
 
     fn get_transaction_id(&self) -> &[u8; 6] {
-        todo!()
+        &self.tid
     }
 
     fn set_public_address(&mut self, public_address: SocketAddr) {
-        todo!()
+        self.public_address = Some(public_address);
     }
 
     fn get_public_address(&self) -> &SocketAddr {
-        todo!()
+        &self.public_address.unwrap()
     }
 
     fn set_destination_address(&mut self, destination_address: SocketAddr) {
-        todo!()
+        self.destination_address = Some(destination_address);
     }
 
     fn get_destination_address(&self) -> &SocketAddr {
-        todo!()
+        &self.destination_address.unwrap()
     }
 
     fn set_origin_address(&mut self, origin_address: SocketAddr) {
-        todo!()
+        self.origin_address = Some(origin_address);
     }
 
     fn get_origin_address(&self) -> &SocketAddr {
-        todo!()
+        &self.origin_address.unwrap()
     }
 
-    fn get_type(&self) -> &MessageType {
-        todo!()
+    fn get_type(&self) -> MessageType {
+        MessageType::ReqMsg
     }
 
     fn encode(&self) -> BencodeObject {
@@ -85,8 +102,8 @@ impl MessageBase for FindNodeRequest {
 
 impl MethodMessageBase for FindNodeRequest {
 
-    fn get_method(&self) -> String {
-        todo!()
+    fn get_method(&self) -> &str {
+        "find_node"
     }
 }
 

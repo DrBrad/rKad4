@@ -9,7 +9,7 @@ use super::message_base::MessageBase;//{MessageBase, MessageBaseStruct};
 
 pub trait MethodMessageBase: MessageBase {
 
-    fn get_method(&self) -> String;
+    fn get_method(&self) -> &str;
 }
 
 /*

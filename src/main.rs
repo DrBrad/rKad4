@@ -49,6 +49,10 @@ fn main() {
     kad.bind(8080);
     sleep(Duration::from_secs(10));
 
+
+    //let find_node_request = FindNodeRequest::default();
+    //find_node_request.encode();
+
     /*
     sleep(Duration::from_secs(2));
     kad.get_routing_table().lock().unwrap().derive_uid();
