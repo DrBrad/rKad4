@@ -27,7 +27,11 @@ pub trait MessageBase {
 
     fn get_type(&self) -> MessageType;
 
-    fn encode(&self) -> BencodeObject;
+    fn encode(&self) -> BencodeObject {
+        let ben = BencodeObject::new();
+        println!("1");
+        ben
+    }
 
     fn decode(&mut self, ben: &BencodeObject);
 }

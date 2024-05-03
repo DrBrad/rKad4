@@ -100,7 +100,9 @@ impl MessageBase for FindNodeRequest {
     }
 
     fn encode(&self) -> BencodeObject {
-        todo!()
+        let ben = <Self as MessageBase>::encode(self);
+        println!("2");
+        ben
     }
 
     fn decode(&mut self, ben: &BencodeObject) {
