@@ -49,9 +49,9 @@ fn main() {
     kad.bind(8080);
 
     sleep(Duration::from_secs(2));
-    kad.routing_table.lock().unwrap().derive_uid();
+    kad.get_routing_table().lock().unwrap().derive_uid();
     sleep(Duration::from_secs(2));
-    kad.routing_table.lock().unwrap().derive_uid();
+    kad.get_routing_table().lock().unwrap().derive_uid();
     sleep(Duration::from_secs(2));
     kad.stop();
     sleep(Duration::from_secs(3));

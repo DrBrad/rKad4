@@ -13,9 +13,9 @@ use crate::routing::kb::k_routing_table::KRoutingTable;
 
 #[derive(Clone)]
 pub struct Kademlia {
-    pub routing_table: Arc<Mutex<dyn RoutingTable>>,
-    pub server: Arc<Mutex<Server>>,
-    pub refresh: Arc<Mutex<RefreshHandler>>
+    routing_table: Arc<Mutex<dyn RoutingTable>>,
+    server: Arc<Mutex<Server>>,
+    refresh: Arc<Mutex<RefreshHandler>>
 }
 
 impl Kademlia {
