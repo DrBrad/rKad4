@@ -45,13 +45,15 @@ mod refresh;
 
 
 fn main() {
+    /*
     let kad = Kademlia::new();
     kad.bind(8080);
     sleep(Duration::from_secs(10));
+    */
 
 
-    //let find_node_request = FindNodeRequest::default();
-    //find_node_request.encode();
+    let find_node_request = FindNodeRequest::default();
+    find_node_request.encode();
 
     /*
     sleep(Duration::from_secs(2));

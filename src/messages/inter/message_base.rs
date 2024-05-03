@@ -7,7 +7,7 @@ pub trait MessageBase {
 
     fn set_uid(&mut self, uid: UID);
 
-    fn get_uid(&self) -> &UID;
+    fn get_uid(&self) -> Result<&UID, ()>;
 
     fn set_transaction_id(&mut self, tid: [u8; 6]);
 
@@ -15,15 +15,15 @@ pub trait MessageBase {
 
     fn set_public_address(&mut self, public_address: SocketAddr);
 
-    fn get_public_address(&self) -> &SocketAddr;
+    fn get_public_address(&self) -> Result<&SocketAddr, ()>;
 
     fn set_destination_address(&mut self, destination_address: SocketAddr);
 
-    fn get_destination_address(&self) -> &SocketAddr;
+    fn get_destination_address(&self) -> Result<&SocketAddr, ()>;
 
     fn set_origin_address(&mut self, origin_address: SocketAddr);
 
-    fn get_origin_address(&self) -> &SocketAddr;
+    fn get_origin_address(&self) -> Result<&SocketAddr, ()>;
 
     fn get_type(&self) -> MessageType;
 
