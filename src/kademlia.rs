@@ -5,6 +5,8 @@ use std::thread;
 use crate::kad::kademlia_base::KademliaBase;
 use crate::kad::server::Server;
 use crate::refresh::refresh_handler::RefreshHandler;
+use crate::refresh::tasks::bucket_refresh_task::BucketRefreshTask;
+use crate::refresh::tasks::stale_refresh_task::StaleRefreshTask;
 use crate::routing::bucket_types::BucketTypes;
 use crate::routing::inter::routing_table::RoutingTable;
 use crate::routing::kb::k_routing_table::KRoutingTable;
@@ -19,10 +21,14 @@ pub struct Kademlia {
 impl Kademlia {
 
     pub fn new() -> Self {
+        let refresh = Arc::new(Mutex::new(RefreshHandler::new()));
+        refresh.lock().unwrap().add_operation(Box::new(BucketRefreshTask::new()));
+        refresh.lock().unwrap().add_operation(Box::new(StaleRefreshTask::new()));
+
         Self {
             routing_table: Arc::new(Mutex::new(KRoutingTable::new())),
             server: Arc::new(Mutex::new(Server::new())),
-            refresh: Arc::new(Mutex::new(RefreshHandler::new()))
+            refresh
         }
     }
 }
@@ -30,10 +36,14 @@ impl Kademlia {
 impl From<String> for Kademlia {
 
     fn from(value: String) -> Self {
+        let refresh = Arc::new(Mutex::new(RefreshHandler::new()));
+        refresh.lock().unwrap().add_operation(Box::new(BucketRefreshTask::new()));
+        refresh.lock().unwrap().add_operation(Box::new(StaleRefreshTask::new()));
+
         Self {
             routing_table: BucketTypes::from_string(value).unwrap().routing_table(),
             server: Arc::new(Mutex::new(Server::new())),
-            refresh: Arc::new(Mutex::new(RefreshHandler::new()))
+            refresh
         }
     }
 }
@@ -41,22 +51,8 @@ impl From<String> for Kademlia {
 impl KademliaBase for Kademlia {
 
     fn bind(&self, port: u16) {
-
         self.server.lock().unwrap().start(Box::new(self.clone()), port);
-
-        //let mut server = Server::new();//Box::new(self));
-        //let b: Box<&mut dyn KademliaBase> = Box::new(self);
-        //let handle = thread::spawn(move || Server::run());
-        //handle.join().unwrap();
-        //self.server.start(kad, port);
-
-        //let clone = Arc::clone(&kad);
-        //let handle = thread::spawn(move || run(clone));
-        //handle.join().unwrap();
-        //let clone = Arc::clone(&self.settings);
-        //let handle = thread::spawn(move || run(clone));
-        //handle.join().unwrap();
-
+        self.refresh.lock().unwrap().start(Box::new(self.clone()));
     }
 
     fn join(&self, local_port: u16, addr: SocketAddr) {
@@ -65,6 +61,7 @@ impl KademliaBase for Kademlia {
 
     fn stop(&self) {
         self.server.lock().unwrap().stop();
+        self.refresh.lock().unwrap().stop();
     }
 
     fn get_server(&self) -> &Server {

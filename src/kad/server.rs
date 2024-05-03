@@ -39,6 +39,12 @@ impl Server {
 
 
         /*
+        let handle = thread::spawn(move || {
+        });
+        */
+
+
+        /*
         let kademlia = Arc::clone(kademlia);
 
         //let (sender, receiver) = channel::<Vec<u8>>();

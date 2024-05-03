@@ -3,6 +3,7 @@ use std::sync::atomic::{AtomicBool, AtomicU32, AtomicU64, Ordering};
 use std::thread;
 use std::thread::sleep;
 use std::time::Duration;
+use crate::kad::kademlia_base::KademliaBase;
 use crate::refresh::tasks::inter::task::Task;
 //use std::old_io::Timer;
 
@@ -27,7 +28,7 @@ impl RefreshHandler {
     }
 
     //- we should probably just static the damn handler at this point....
-    pub fn start(&self) {
+    pub fn start(&self, kademlia: Box<dyn KademliaBase>) {
         if self.is_running() {
             //panic or something...
             return;
