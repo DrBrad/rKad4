@@ -14,22 +14,34 @@ use crate::utils;
 const TID_LENGTH: usize = 6;
 
 pub struct Server {
+    kademlia: Box<dyn KademliaBase>,
     server: Option<UdpSocket>,
     running: Arc<AtomicBool> //MAY NOT BE NEEDED
 }
 
 impl Server {
 
+    /*
     pub fn new() -> Self {
         Self {
             server: None,
             running: Arc::new(AtomicBool::new(false)) //MAY NOT BE NEEDED
         }
     }
+    */
 
-    pub fn start(&mut self, kademlia: Box<dyn KademliaBase>, port: u16) {
+    pub fn new3(kademlia: Box<dyn KademliaBase>) -> Self {
+        Self {
+            kademlia,
+            server: None,
+            running: Arc::new(AtomicBool::new(false)) //MAY NOT BE NEEDED
+        }
+    }
+
+    pub fn start(&mut self, port: u16) {
         self.running.store(true, Ordering::Relaxed);
         let running = Arc::clone(&self.running);
+        let kademlia = self.kademlia.clone();
 
         let handle = thread::spawn(move || {
             while running.load(Ordering::Relaxed) {
@@ -108,11 +120,14 @@ impl Server {
 
     }
 
-    pub fn send(&self, kademlia: &Box<dyn KademliaBase>, mut message: Box<dyn MessageBase>) { //Message.... - needs to be a trait...
+    pub fn send(&self) {//, mut message: Box<dyn MessageBase>) { //Message.... - needs to be a trait...
+        println!("TEST {}", self.kademlia.get_routing_table().lock().unwrap().get_derived_uid().to_string());
+        /*
         if let Some(server) = &self.server {
             message.set_uid(kademlia.get_routing_table().lock().unwrap().get_derived_uid());
             server.send_to(message.encode().encode().as_slice(), message.get_destination_address().unwrap()).unwrap(); //probably should return if failed to send...
         }
+        */
     }
 
     pub fn generate_transaction_id(&self) -> [u8; TID_LENGTH] {

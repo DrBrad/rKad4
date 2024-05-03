@@ -1,6 +1,7 @@
 use std::net::SocketAddr;
 use std::sync::{Arc, Mutex};
 use crate::kad::server::Server;
+use crate::refresh::tasks::inter::task::Task;
 use crate::routing::inter::routing_table::RoutingTable;
 use crate::routing::kb::k_routing_table::KRoutingTable;
 
@@ -16,4 +17,13 @@ pub trait KademliaBase: Send {
 
     //fn get_settings(&self) -> &Settings;
     fn get_routing_table(&self) -> &Arc<Mutex<dyn RoutingTable>>;
+
+    fn clone_dyn(&self) -> Box<dyn KademliaBase>;
+}
+
+impl Clone for Box<dyn KademliaBase> {
+
+    fn clone(&self) -> Self {
+        self.clone_dyn()
+    }
 }
