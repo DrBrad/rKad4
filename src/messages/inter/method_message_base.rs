@@ -9,8 +9,8 @@ use super::message_base::MessageBase;//{MessageBase, MessageBaseStruct};
 
 
 pub struct MethodMessageBase {
-    pub(crate) base: MessageBase,
-    pub(crate) method: String
+    pub base: MessageBase,
+    pub method: String
 }
 
 impl MethodMessageBase {

@@ -4,12 +4,12 @@ use bencode::variables::bencode_object::{BencodeObject, PutObject};
 use crate::messages::inter::message_type::{MessageType, TYPE_KEY};
 
 pub struct MessageBase {
-    pub(crate) uid: Option<UID>,
-    pub(crate) tid: [u8; 6],
-    pub(crate) type_: MessageType,
-    pub(crate) destination: Option<SocketAddr>,
-    pub(crate) origin: Option<SocketAddr>,
-    pub(crate) public_address: Option<SocketAddr>,
+    pub uid: Option<UID>,
+    pub tid: [u8; 6],
+    pub type_: MessageType,
+    pub destination: Option<SocketAddr>,
+    pub origin: Option<SocketAddr>,
+    pub public_address: Option<SocketAddr>,
 }
 
 pub const TID_KEY: &str = "t";
