@@ -123,10 +123,10 @@ impl Server {
 
     }
 
-    pub fn send(&self, message: Box<dyn MessageBase>) { //Message.... - needs to be a trait...
+    pub fn send(&self, kademlia: &Box<dyn KademliaBase>, mut message: Box<dyn MessageBase>) { //Message.... - needs to be a trait...
         if let Some(server) = &self.server {
-            //message.set_uid(kademlia.get_routing_table().lock().unwrap().get_derived_uid());
-            //server.send_to(message.encode().encode(), message.get_destination_address());
+            message.set_uid(kademlia.get_routing_table().lock().unwrap().get_derived_uid());
+            server.send_to(message.encode().encode().as_slice(), message.get_destination_address().unwrap()).unwrap(); //probably should return if failed to send...
         }
     }
 
