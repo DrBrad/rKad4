@@ -60,6 +60,11 @@ fn main() {
     let encoded = request.encode();
     println!("{}", encoded.to_string());
 
+    let mut decoded = FindNodeRequest::default();
+    decoded.decode(&encoded);
+
+    println!("{}", decoded.encode().to_string());
+
     /*
     sleep(Duration::from_secs(2));
     kad.get_routing_table().lock().unwrap().derive_uid();

@@ -2,7 +2,7 @@ use std::net::SocketAddr;
 use bencode::variables::bencode_object::{BencodeObject, PutObject};
 use crate::messages::inter::message_base::{MessageBase, TID_KEY};
 use crate::messages::inter::message_type::{MessageType, TYPE_KEY};
-use crate::utils::net::address_utils::pack_address;
+use crate::utils::net::address_utils::{pack_address, unpack_addr};
 use crate::utils::uid::{ID_LENGTH, UID};
 use super::inter::method_message_base::MethodMessageBase;
 
@@ -132,7 +132,34 @@ impl MessageBase for FindNodeRequest {
     }
 
     fn decode(&mut self, ben: &BencodeObject) {
-        todo!()
+        if !ben.contains_key(self.get_type().inner_key()) {
+            //throw new MessageException("Protocol Error, such as a malformed packet.", 203);
+        }
+
+        if !ben.get_object(self.get_type().inner_key()).unwrap().contains_key("id") {
+            //throw new MessageException("Protocol Error, such as a malformed packet.", 203);
+        }
+
+        let mut bid = [0u8; ID_LENGTH];
+        bid.copy_from_slice(&ben.get_object(self.get_type().inner_key()).unwrap().get_bytes("id").unwrap()[..ID_LENGTH]);
+        self.uid = Some(UID::from(bid));
+
+        match self.get_type() {
+            MessageType::RspMsg => {
+                if ben.contains_key("ip") {
+                    self.public_address = unpack_addr(ben.get_bytes("ip").unwrap());
+                }
+            },
+            _ => ()
+        };
+
+        if !ben.get_object(self.get_type().inner_key()).unwrap().contains_key("target") {
+            //throw new MessageException("Protocol Error, such as a malformed packet.", 203);
+        }
+
+        let mut bid = [0u8; ID_LENGTH];
+        bid.copy_from_slice(&ben.get_object(self.get_type().inner_key()).unwrap().get_bytes("target").unwrap()[..ID_LENGTH]);
+        self.target = Some(UID::from(bid));
     }
 }
 
