@@ -1,6 +1,7 @@
 use bencode::variables::bencode_object::{BencodeObject, PutObject};
 use crate::messages::inter::message_type::MessageType;
 use crate::utils::uid::{ID_LENGTH, UID};
+/*
 use super::inter::method_message_base::MethodMessageBase;
 
 pub struct FindNodeRequest {
@@ -39,10 +40,5 @@ impl FindNodeRequest {
         bid.copy_from_slice(&ben.get_object(self.base.base.type_.inner_key()).unwrap().get_bytes("target").unwrap()[..ID_LENGTH]);
         self.target = Some(UID::from(bid));
     }
-
-    /*
-    fn to_string() -> String {
-        None
-    }
-    */
 }
+*/

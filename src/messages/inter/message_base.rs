@@ -1,5 +1,16 @@
 use crate::utils::uid::UID;
 use std::net::SocketAddr;
+use bencode::variables::bencode_object::BencodeObject;
+use crate::messages::inter::message_type::MessageType;
+
+pub trait MessageBase {
+
+    fn encode(&self) -> BencodeObject;
+
+    fn decode(&mut self, ben: &BencodeObject);
+}
+
+/*
 use bencode::variables::bencode_object::{BencodeObject, PutObject};
 use crate::messages::inter::message_type::{MessageType, TYPE_KEY};
 
@@ -41,11 +52,5 @@ impl MessageBase {
             //throw new MessageException("Protocol Error, such as a malformed packet.", 203);
         }
     }
-
-    /*
-
-    fn to_string() -> String {
-        None
-    }
-    */
 }
+*/

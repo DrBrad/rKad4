@@ -1,6 +1,7 @@
 use bencode::variables::bencode_object::{BencodeObject, PutObject};
 use crate::messages::inter::message_type::MessageType;
 use super::inter::message_base::MessageBase;
+/*
 use super::inter::method_message_base::MethodMessageBase;
 
 pub struct PingRequest {
@@ -23,10 +24,5 @@ impl PingRequest {
     pub fn decode(&mut self, ben: &BencodeObject) {
         self.base.decode(&ben);
     }
-
-    /*
-    fn to_string() -> String {
-        None
-    }
-    */
 }
+*/

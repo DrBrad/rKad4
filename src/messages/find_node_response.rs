@@ -3,6 +3,7 @@ use crate::messages::inter::message_type::MessageType;
 use crate::utils::net::address_type::AddressType;
 use crate::utils::node_utils::pack_nodes;
 use crate::utils::node::Node;
+/*
 use super::inter::method_message_base::MethodMessageBase;
 
 pub const NODE_CAP: usize = 20;
@@ -66,10 +67,5 @@ impl FindNodeResponse {
     pub fn ipv6_nodes(&self) -> Vec<Node> {
         Vec::new()
     }
-
-    /*
-    fn to_string() -> String {
-        None
-    }
-    */
 }
+*/

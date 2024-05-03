@@ -1,5 +1,6 @@
 use bencode::variables::bencode_object::BencodeObject;
 use crate::messages::inter::message_type::MessageType;
+/*
 use super::inter::method_message_base::MethodMessageBase;
 
 pub struct PingResponse {
@@ -29,3 +30,4 @@ impl PingResponse {
     }
     */
 }
+*/
