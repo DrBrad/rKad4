@@ -18,16 +18,16 @@ use crate::utils;
 const TID_LENGTH: usize = 6;
 
 pub struct Server {
-    kademlia: Box<dyn KademliaBase>,
+    pub(crate) kademlia: Option<Box<dyn KademliaBase>>,
     server: Option<Arc<Mutex<UdpSocket>>>,
     running: Arc<AtomicBool> //MAY NOT BE NEEDED
 }
 
 impl Server {
 
-    pub fn new(kademlia: Box<dyn KademliaBase>) -> Self {
+    pub fn new(/*kademlia: Box<dyn KademliaBase>*/) -> Self {
         Self {
-            kademlia,
+            kademlia: None,
             server: None,
             running: Arc::new(AtomicBool::new(false)) //MAY NOT BE NEEDED
         }
@@ -36,7 +36,6 @@ impl Server {
     pub fn start(&mut self, port: u16) {
         self.running.store(true, Ordering::Relaxed);
         let running = Arc::clone(&self.running);
-        let kademlia = self.kademlia.clone();
 
         /*
         let handle = thread::spawn(move || {
@@ -72,6 +71,9 @@ impl Server {
             }
         });
 
+
+        let kademlia = self.kademlia.clone();
+
         // Start the handler thread
         let handler_handle = thread::spawn(move || {
             loop {
@@ -79,11 +81,12 @@ impl Server {
                 match rx.recv() {
                     Ok((data, src_addr)) => {
                         // Process the received packet (e.g., parse, handle, etc.)
-                        let message = String::from_utf8_lossy(data);
-                        println!("Received message '{}' from {}", message, src_addr);
+                        //let message = String::from_utf8_lossy(data);
+                        //println!("Received message '{}' from {}", message, src_addr);
 
+                        kademlia.as_ref().unwrap().get_server().lock().unwrap().on_receive(data, src_addr);
                         //Server::on_receive(data, src_addr);
-                        //kademlia.get_server().lock().unwrap().
+                        //kademlia.get_server().lock().unwrap().is_running();
 
                     }
                     Err(_) => break, // Break the loop if the channel is closed
@@ -107,14 +110,16 @@ impl Server {
         false
     }
 
-    pub fn on_receive(data: &[u8], src_addr: SocketAddr) {
+    pub fn on_receive(&self, data: &[u8], src_addr: SocketAddr) {
         //WE ALSO NEED ADDRESS...
         //if(AddressUtils.isBogon(packet.getAddress(), packet.getPort())){
         //    return;
         //}
 
+        println!("RECEIVED: {}", self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap().get_derived_uid().to_string());
 
-        let ben = BencodeObject::new();//::decode(packet.data);
+
+        let ben = BencodeObject::decode(data);
 
         if !ben.contains_key(TID_KEY) || !ben.contains_key(TYPE_KEY) {
             //panic
@@ -125,21 +130,21 @@ impl Server {
 
         match t {
             MessageType::ReqMsg => {
-                println!("REQ");
+                println!("REQ  {}", ben.to_string());
             },
             MessageType::RspMsg => {
-                println!("RES");
+                println!("RES  {}", ben.to_string());
             },
             MessageType::ErrMsg => {
-                println!("ERR");
+                println!("ERR  {}", ben.to_string());
             }
         }
     }
 
     pub fn send(&self, mut message: Box<dyn MessageBase>) {
         if let Some(server) = &self.server {
-            message.set_uid(self.kademlia.get_routing_table().lock().unwrap().get_derived_uid());
-            server.lock().unwrap().send_to(message.encode().encode().as_slice(), message.get_destination_address()).unwrap(); //probably should return if failed to send...
+            //message.set_uid(self.kademlia.get_routing_table().lock().unwrap().get_derived_uid());
+            //server.lock().unwrap().send_to(message.encode().encode().as_slice(), message.get_destination_address()).unwrap(); //probably should return if failed to send...
         }
     }
 
