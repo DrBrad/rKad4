@@ -15,7 +15,7 @@ const TID_LENGTH: usize = 6;
 
 pub struct Server {
     kademlia: Box<dyn KademliaBase>,
-    server: Option<UdpSocket>,
+    server: Option<Arc<Mutex<UdpSocket>>>,
     running: Arc<AtomicBool> //MAY NOT BE NEEDED
 }
 
@@ -44,19 +44,10 @@ impl Server {
         */
 
 
-        let socket = UdpSocket::bind("127.0.0.1:8080").expect("Failed to bind socket");
-
-        // Create a shared Arc<Mutex<UdpSocket>>
-        let socket = Arc::new(Mutex::new(socket));
-
-        // Create a channel for passing packets from receiver to handler
+        self.server = Some(Arc::new(Mutex::new(UdpSocket::bind("127.0.0.1:8080").expect("Failed to bind socket"))));
         let (tx, rx) = channel();
-
-        // Clone the sender for the receiver thread
         let sender = tx.clone();
-
-        // Clone the socket for the receiver thread
-        let receiver_socket = Arc::clone(&socket);
+        let server = Arc::clone(self.server.as_ref().unwrap());
 
         // Start the receiver thread
         let receiver_handle = thread::spawn(move || {
@@ -66,7 +57,7 @@ impl Server {
             loop {
                 // Receive a message
                 let (size, src_addr) = {
-                    let mut socket = receiver_socket.lock().unwrap();
+                    let mut socket = server.lock().unwrap();
                     socket.recv_from(&mut buf).expect("Failed to receive message")
                 };
 
@@ -114,7 +105,7 @@ impl Server {
     pub fn send(&self, mut message: Box<dyn MessageBase>) {
         if let Some(server) = &self.server {
             message.set_uid(self.kademlia.get_routing_table().lock().unwrap().get_derived_uid());
-            server.send_to(message.encode().encode().as_slice(), message.get_destination_address()).unwrap(); //probably should return if failed to send...
+            server.lock().unwrap().send_to(message.encode().encode().as_slice(), message.get_destination_address()).unwrap(); //probably should return if failed to send...
         }
     }
 
