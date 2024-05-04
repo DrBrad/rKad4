@@ -51,20 +51,22 @@ impl Server {
         let sender = tx.clone();
         let server = Arc::clone(self.server.as_ref().unwrap());
 
-        // Start the receiver thread
         let receiver_handle = thread::spawn(move || {
-            // Create a buffer to receive messages
-            let mut buf = [0; 1024];
+            let mut buf = [0u8; 65535];
+            //let mut packet = [0u8; 65535];
 
             loop {
-                // Receive a message
+                //let mut buf = [0u8; 65535];
+
                 let (size, src_addr) = {
-                    let mut socket = server.lock().unwrap();
-                    socket.recv_from(&mut buf).expect("Failed to receive message")
+                    server.lock().unwrap().recv_from(&mut buf).expect("Failed to receive message")
                 };
 
-                // Send the received packet to the handler thread
-                let packet = buf[..size];//.to_vec();
+                //packet[..size].copy_from_slice(&buf[..size]);
+                //let packet = buf[..size].to_vec();
+
+                let packet = Packet::new(buf[..size].to_vec(), src_addr);
+
                 sender.send((packet, src_addr)).expect("Failed to send packet to handler");
             }
         });
@@ -76,8 +78,11 @@ impl Server {
                 match rx.recv() {
                     Ok((packet, src_addr)) => {
                         // Process the received packet (e.g., parse, handle, etc.)
-                        let message = String::from_utf8_lossy(&packet);
-                        println!("Received message '{}' from {}", message, src_addr);
+                        //let message = String::from_utf8_lossy(&packet);
+                        //println!("Received message '{}' from {}", message, src_addr);
+
+                        //self.on_receive(&packet.as_slice());
+
                     }
                     Err(_) => break, // Break the loop if the channel is closed
                 }
@@ -100,31 +105,31 @@ impl Server {
         false
     }
 
-    pub fn on_receive(&self, packet: &[u8]) {
+    pub fn on_receive(&self, packet: Packet) {
         //WE ALSO NEED ADDRESS...
         //if(AddressUtils.isBogon(packet.getAddress(), packet.getPort())){
         //    return;
         //}
 
 
-        let ben = BencodeObject::decode(packet);
+        let ben = BencodeObject::decode(packet.data);
 
         if !ben.contains_key(TID_KEY) || !ben.contains_key(TYPE_KEY) {
             //panic
             return;
         }
 
-        let t = MessageType::from_string(ben.get_string(TYPE_KEY).unwrap().to_string()).unwrap();
+        let t = MessageType::from_rpc_type_name(ben.get_string(TYPE_KEY).unwrap().to_string()).unwrap();
 
         match t {
             MessageType::ReqMsg => {
-
+                println!("REQ");
             },
             MessageType::RspMsg => {
-
+                println!("RES");
             },
             MessageType::ErrMsg => {
-
+                println!("ERR");
             }
         }
     }
@@ -150,3 +155,18 @@ pub fn run(arc: Arc<Mutex<Settings>>) {
     }
 }
 */
+
+pub struct Packet {
+    data: Vec<u8>,
+    src: SocketAddr
+}
+
+impl Packet {
+
+    pub fn new(data: Vec<u8>, src: SocketAddr) -> Self {
+        Self {
+            data,
+            src
+        }
+    }
+}

@@ -10,14 +10,16 @@ pub enum MessageType {
 
 impl MessageType {
 
-    pub fn from_string(name: String) -> Result<Self, String> {
+    pub fn from_rpc_type_name(key: String) -> Result<Self, String> {
+        let key = key.to_lowercase();
+
         for value in [MessageType::ReqMsg, MessageType::RspMsg, MessageType::ErrMsg] {
-            if value.value() == name {
+            if value.rpc_type_name() == key {
                 return Ok(value);
             }
         }
 
-        Err(format!("No enum constant {}", name))
+        Err(format!("No enum constant {}", key))
     }
 
     pub fn inner_key(&self) -> &str {
