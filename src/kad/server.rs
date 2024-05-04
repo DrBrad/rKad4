@@ -5,10 +5,12 @@ use std::thread;
 use std::sync::mpsc::{channel, Receiver, Sender};
 use std::thread::sleep;
 use std::time::Duration;
+use bencode::variables::bencode_object::BencodeObject;
 use bencode::variables::inter::bencode_variable::BencodeVariable;
 use crate::kad::kademlia_base::KademliaBase;
 use crate::kademlia::Kademlia;
-use crate::messages::inter::message_base::MessageBase;
+use crate::messages::inter::message_base::{MessageBase, TID_KEY};
+use crate::messages::inter::message_type::{MessageType, TYPE_KEY};
 use crate::utils;
 
 const TID_LENGTH: usize = 6;
@@ -62,7 +64,7 @@ impl Server {
                 };
 
                 // Send the received packet to the handler thread
-                let packet = buf[..size].to_vec();
+                let packet = buf[..size];//.to_vec();
                 sender.send((packet, src_addr)).expect("Failed to send packet to handler");
             }
         });
@@ -98,8 +100,33 @@ impl Server {
         false
     }
 
-    pub fn on_receive(&self, packet: Vec<u8>) {
+    pub fn on_receive(&self, packet: &[u8]) {
+        //WE ALSO NEED ADDRESS...
+        //if(AddressUtils.isBogon(packet.getAddress(), packet.getPort())){
+        //    return;
+        //}
 
+
+        let ben = BencodeObject::decode(packet);
+
+        if !ben.contains_key(TID_KEY) || !ben.contains_key(TYPE_KEY) {
+            //panic
+            return;
+        }
+
+        let t = MessageType::from_string(ben.get_string(TYPE_KEY).unwrap().to_string()).unwrap();
+
+        match t {
+            MessageType::ReqMsg => {
+
+            },
+            MessageType::RspMsg => {
+
+            },
+            MessageType::ErrMsg => {
+
+            }
+        }
     }
 
     pub fn send(&self, mut message: Box<dyn MessageBase>) {

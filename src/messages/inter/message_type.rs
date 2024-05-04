@@ -1,3 +1,5 @@
+use crate::routing::bucket_types::BucketTypes;
+
 pub const TYPE_KEY: &str = "y";
 
 pub enum MessageType {
@@ -7,6 +9,16 @@ pub enum MessageType {
 }
 
 impl MessageType {
+
+    pub fn from_string(name: String) -> Result<Self, String> {
+        for value in [MessageType::ReqMsg, MessageType::RspMsg, MessageType::ErrMsg] {
+            if value.value() == name {
+                return Ok(value);
+            }
+        }
+
+        Err(format!("No enum constant {}", name))
+    }
 
     pub fn inner_key(&self) -> &str {
         match self {
