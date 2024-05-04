@@ -64,11 +64,23 @@ impl Server {
                     server.lock().unwrap().recv_from(&mut buf).expect("Failed to receive message")
                 };
 
-                let packet = Packet::new(&buf[..size], src_addr);
+                let data = &buf[..size];
+
+                let bytes = data.as_ptr();
+                let len = data.len();
+                forget(data);
+
+                unsafe {
+                    sender.send((from_raw_parts(bytes, len), src_addr)).expect("Failed to send packet to handler");
+                }
+
+
 
                 //let packet = Packet::new(&buf[..size], src_addr);
 
-                sender.send((packet, src_addr)).expect("Failed to send packet to handler");
+                //let packet = Packet::new(&buf[..size], src_addr);
+
+                //sender.send((packet, src_addr)).expect("Failed to send packet to handler");
             }
         });
 
@@ -77,9 +89,9 @@ impl Server {
             loop {
                 // Receive packets from the receiver
                 match rx.recv() {
-                    Ok((packet, src_addr)) => {
+                    Ok((data, src_addr)) => {
                         // Process the received packet (e.g., parse, handle, etc.)
-                        let message = String::from_utf8_lossy(packet.get_data());
+                        let message = String::from_utf8_lossy(data);
                         println!("Received message '{}' from {}", message, src_addr);
 
                         //self.on_receive(&packet.as_slice());
@@ -106,14 +118,14 @@ impl Server {
         false
     }
 
-    pub fn on_receive(&self, packet: Packet) {
+    pub fn on_receive(&self) {
         //WE ALSO NEED ADDRESS...
         //if(AddressUtils.isBogon(packet.getAddress(), packet.getPort())){
         //    return;
         //}
 
 
-        let ben = BencodeObject::decode(packet.data);
+        let ben = BencodeObject::new();//::decode(packet.data);
 
         if !ben.contains_key(TID_KEY) || !ben.contains_key(TYPE_KEY) {
             //panic
@@ -156,33 +168,3 @@ pub fn run(arc: Arc<Mutex<Settings>>) {
     }
 }
 */
-
-pub struct Packet<'a> {
-    data: &'a [u8],
-    //data: Vec<u8>,
-    src: SocketAddr
-}
-
-impl<'a> Packet<'a> {
-
-    pub fn new(data: &[u8], src: SocketAddr) -> Self {
-        let bytes = data.as_ptr();
-        let len = data.len();
-        forget(data);
-
-        unsafe {
-            Self {
-                data: from_raw_parts(bytes, len),
-                src
-            }
-        }
-    }
-
-    pub fn get_data(&self) -> &[u8] {
-        self.data
-    }
-
-    pub fn get_source(&self) -> SocketAddr {
-        self.src
-    }
-}
