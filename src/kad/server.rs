@@ -47,7 +47,6 @@ impl Server {
         });
         */
 
-
         self.server = Some(Arc::new(Mutex::new(UdpSocket::bind("127.0.0.1:8080").expect("Failed to bind socket"))));
         let (tx, rx) = channel();
         let sender = tx.clone();
@@ -73,14 +72,6 @@ impl Server {
                 unsafe {
                     sender.send((from_raw_parts(bytes, len), src_addr)).expect("Failed to send packet to handler");
                 }
-
-
-
-                //let packet = Packet::new(&buf[..size], src_addr);
-
-                //let packet = Packet::new(&buf[..size], src_addr);
-
-                //sender.send((packet, src_addr)).expect("Failed to send packet to handler");
             }
         });
 
@@ -94,7 +85,7 @@ impl Server {
                         let message = String::from_utf8_lossy(data);
                         println!("Received message '{}' from {}", message, src_addr);
 
-                        //self.on_receive(&packet.as_slice());
+                        //self.on_receive(data);
 
                     }
                     Err(_) => break, // Break the loop if the channel is closed
@@ -118,7 +109,7 @@ impl Server {
         false
     }
 
-    pub fn on_receive(&self) {
+    pub fn on_receive(&self, data: &[u8], src_addr: SocketAddr) {
         //WE ALSO NEED ADDRESS...
         //if(AddressUtils.isBogon(packet.getAddress(), packet.getPort())){
         //    return;
@@ -159,12 +150,3 @@ impl Server {
         [0u8; TID_LENGTH]
     }
 }
-/*
-pub fn run(arc: Arc<Mutex<Settings>>) {
-//pub fn run(kademlia: Arc<Mutex<dyn KademliaBase>>) {//sender: Sender<Vec<u8>>, receiver: Receiver<Vec<u8>>) {
-    while true {
-        println!("TEST");
-        sleep(Duration::from_secs(1));
-    }
-}
-*/
