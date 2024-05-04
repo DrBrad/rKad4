@@ -33,8 +33,6 @@ impl Kademlia {
             refresh
         };
 
-        //let server = Server::new3(Box::new(self_.clone()));
-
         self_.server = Some(Arc::new(Mutex::new(Server::new3(Box::new(self_.clone())))));
 
         self_
@@ -49,11 +47,15 @@ impl From<String> for Kademlia {
         refresh.add_operation(Box::new(StaleRefreshTask::new()));
         let refresh = Arc::new(Mutex::new(refresh));
 
-        Self {
+        let mut self_ = Self {
             routing_table: BucketTypes::from_string(value).unwrap().routing_table(),
-            server: None,//Arc::new(Mutex::new(Server::new())),
+            server: None,
             refresh
-        }
+        };
+
+        self_.server = Some(Arc::new(Mutex::new(Server::new3(Box::new(self_.clone())))));
+
+        self_
     }
 }
 
@@ -82,6 +84,9 @@ impl KademliaBase for Kademlia {
         &self.routing_table
     }
 
+    fn get_refresh_handler(&self) -> &Arc<Mutex<RefreshHandler>> {
+        &self.refresh
+    }
 
     fn clone_dyn(&self) -> Box<dyn KademliaBase> {
         Box::new(self.clone())
