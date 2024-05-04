@@ -42,6 +42,7 @@ mod refresh;
 
 //MAYBE MAKE ROUTING TABLE A BASE SET - IE ABSTRACT - NOT TRAIT
 //echo -n "hello" >/dev/udp/localhost/8080
+//netcat -ul 8080
 
 
 fn main() {
