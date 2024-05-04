@@ -54,11 +54,8 @@ impl Server {
 
         let receiver_handle = thread::spawn(move || {
             let mut buf = [0u8; 65535];
-            //let mut packet = [0u8; 65535];
 
             loop {
-                //let mut buf = [0u8; 65535];
-
                 let (size, src_addr) = {
                     server.lock().unwrap().recv_from(&mut buf).expect("Failed to receive message")
                 };
@@ -85,7 +82,8 @@ impl Server {
                         let message = String::from_utf8_lossy(data);
                         println!("Received message '{}' from {}", message, src_addr);
 
-                        //self.on_receive(data);
+                        //Server::on_receive(data, src_addr);
+                        //kademlia.get_server().lock().unwrap().
 
                     }
                     Err(_) => break, // Break the loop if the channel is closed
@@ -109,7 +107,7 @@ impl Server {
         false
     }
 
-    pub fn on_receive(&self, data: &[u8], src_addr: SocketAddr) {
+    pub fn on_receive(data: &[u8], src_addr: SocketAddr) {
         //WE ALSO NEED ADDRESS...
         //if(AddressUtils.isBogon(packet.getAddress(), packet.getPort())){
         //    return;
