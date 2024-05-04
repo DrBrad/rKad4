@@ -8,6 +8,7 @@ use crate::refresh::tasks::inter::task::Task;
 //use std::old_io::Timer;
 
 pub struct RefreshHandler {
+    kademlia: Box<dyn KademliaBase>,
     tasks: Vec<Box<dyn Task>>,
     refresh_time: Arc<AtomicU64>,
     running: Arc<AtomicBool>
@@ -15,8 +16,9 @@ pub struct RefreshHandler {
 
 impl RefreshHandler {
 
-    pub fn new() -> Self {
+    pub fn new(kademlia: Box<dyn KademliaBase>) -> Self {
         Self {
+            kademlia,
             tasks: Vec::new(),
             refresh_time: Arc::new(AtomicU64::new(3600000)),
             running: Arc::new(AtomicBool::new(false))
@@ -28,7 +30,7 @@ impl RefreshHandler {
     }
 
     //- we should probably just static the damn handler at this point....
-    pub fn start(&self, kademlia: Box<dyn KademliaBase>) {
+    pub fn start(&self) {
         if self.is_running() {
             //panic or something...
             return;
@@ -38,6 +40,7 @@ impl RefreshHandler {
         let tasks = self.tasks.clone();
         let refresh_time = Arc::clone(&self.refresh_time);
         let running = Arc::clone(&self.running);
+        let kademlia = self.kademlia.clone();
 
         let handle = thread::spawn(move || {
             while running.load(Ordering::Relaxed) { //self.is_running()

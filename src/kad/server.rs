@@ -30,7 +30,7 @@ impl Server {
     }
     */
 
-    pub fn new3(kademlia: Box<dyn KademliaBase>) -> Self {
+    pub fn new(kademlia: Box<dyn KademliaBase>) -> Self {
         Self {
             kademlia,
             server: None,

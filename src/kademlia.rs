@@ -16,24 +16,24 @@ use crate::routing::kb::k_routing_table::KRoutingTable;
 pub struct Kademlia {
     routing_table: Arc<Mutex<dyn RoutingTable>>,
     server: Option<Arc<Mutex<Server>>>,
-    refresh: Arc<Mutex<RefreshHandler>>
+    refresh: Option<Arc<Mutex<RefreshHandler>>>
 }
 
 impl Kademlia {
 
     pub fn new() -> Self {
-        let mut refresh = RefreshHandler::new();
-        refresh.add_operation(Box::new(BucketRefreshTask::new()));
-        refresh.add_operation(Box::new(StaleRefreshTask::new()));
-        let refresh = Arc::new(Mutex::new(refresh));
-
         let mut self_ = Self {
             routing_table: Arc::new(Mutex::new(KRoutingTable::new())),
             server: None,
-            refresh
+            refresh: None
         };
 
-        self_.server = Some(Arc::new(Mutex::new(Server::new3(Box::new(self_.clone())))));
+        self_.server = Some(Arc::new(Mutex::new(Server::new(Box::new(self_.clone())))));
+
+        let mut refresh = RefreshHandler::new(Box::new(self_.clone()));
+        refresh.add_operation(Box::new(BucketRefreshTask::new()));
+        refresh.add_operation(Box::new(StaleRefreshTask::new()));
+        self_.refresh = Some(Arc::new(Mutex::new(refresh)));
 
         self_
     }
@@ -42,18 +42,18 @@ impl Kademlia {
 impl From<String> for Kademlia {
 
     fn from(value: String) -> Self {
-        let mut refresh = RefreshHandler::new();
-        refresh.add_operation(Box::new(BucketRefreshTask::new()));
-        refresh.add_operation(Box::new(StaleRefreshTask::new()));
-        let refresh = Arc::new(Mutex::new(refresh));
-
         let mut self_ = Self {
             routing_table: BucketTypes::from_string(value).unwrap().routing_table(),
             server: None,
-            refresh
+            refresh: None
         };
 
-        self_.server = Some(Arc::new(Mutex::new(Server::new3(Box::new(self_.clone())))));
+        self_.server = Some(Arc::new(Mutex::new(Server::new(Box::new(self_.clone())))));
+
+        let mut refresh = RefreshHandler::new(Box::new(self_.clone()));
+        refresh.add_operation(Box::new(BucketRefreshTask::new()));
+        refresh.add_operation(Box::new(StaleRefreshTask::new()));
+        self_.refresh = Some(Arc::new(Mutex::new(refresh)));
 
         self_
     }
@@ -63,8 +63,7 @@ impl KademliaBase for Kademlia {
 
     fn bind(&self, port: u16) {
         self.server.as_ref().unwrap().lock().unwrap().start(port);
-        //self.server.lock().unwrap().start(Box::new(self.clone()), port);
-        self.refresh.lock().unwrap().start(Box::new(self.clone()));
+        self.refresh.as_ref().unwrap().lock().unwrap().start();
     }
 
     fn join(&self, local_port: u16, addr: SocketAddr) {
@@ -73,7 +72,7 @@ impl KademliaBase for Kademlia {
 
     fn stop(&self) {
         self.server.as_ref().unwrap().lock().unwrap().stop();
-        self.refresh.lock().unwrap().stop();
+        self.refresh.as_ref().unwrap().lock().unwrap().stop();
     }
 
     fn get_server(&self) -> &Arc<Mutex<Server>> {
@@ -85,7 +84,7 @@ impl KademliaBase for Kademlia {
     }
 
     fn get_refresh_handler(&self) -> &Arc<Mutex<RefreshHandler>> {
-        &self.refresh
+        self.refresh.as_ref().unwrap()
     }
 
     fn clone_dyn(&self) -> Box<dyn KademliaBase> {
