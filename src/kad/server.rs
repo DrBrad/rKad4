@@ -62,10 +62,9 @@ impl Server {
                     server.lock().unwrap().recv_from(&mut buf).expect("Failed to receive message")
                 };
 
-                //packet[..size].copy_from_slice(&buf[..size]);
-                //let packet = buf[..size].to_vec();
+                let packet = Packet::new(&buf[..size].to_vec(), src_addr);
 
-                let packet = Packet::new(buf[..size].to_vec(), src_addr);
+                //let packet = Packet::new(&buf[..size], src_addr);
 
                 sender.send((packet, src_addr)).expect("Failed to send packet to handler");
             }
@@ -78,8 +77,8 @@ impl Server {
                 match rx.recv() {
                     Ok((packet, src_addr)) => {
                         // Process the received packet (e.g., parse, handle, etc.)
-                        //let message = String::from_utf8_lossy(&packet);
-                        //println!("Received message '{}' from {}", message, src_addr);
+                        let message = String::from_utf8_lossy(packet.get_data());
+                        println!("Received message '{}' from {}", message, src_addr);
 
                         //self.on_receive(&packet.as_slice());
 
@@ -105,14 +104,14 @@ impl Server {
         false
     }
 
-    pub fn on_receive(&self, packet: Packet) {
+    pub fn on_receive(&self) {
         //WE ALSO NEED ADDRESS...
         //if(AddressUtils.isBogon(packet.getAddress(), packet.getPort())){
         //    return;
         //}
 
 
-        let ben = BencodeObject::decode(packet.data);
+        let ben = BencodeObject::new();//::decode(packet.data);
 
         if !ben.contains_key(TID_KEY) || !ben.contains_key(TYPE_KEY) {
             //panic
@@ -163,10 +162,18 @@ pub struct Packet {
 
 impl Packet {
 
-    pub fn new(data: Vec<u8>, src: SocketAddr) -> Self {
+    pub fn new(data: &[u8], src: SocketAddr) -> Self {
         Self {
-            data,
+            data: data.to_vec(),
             src
         }
+    }
+
+    pub fn get_data(&self) -> &[u8] {
+        self.data.as_slice()
+    }
+
+    pub fn get_source(&self) -> SocketAddr {
+        self.src
     }
 }
