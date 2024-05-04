@@ -53,14 +53,14 @@ fn main() {
     request.set_target(UID::from("e5af5f5134c1e664b6f8260e9d99d7a8719254c3"));
     request.set_destination_address(SocketAddr::from(([127, 2, 0, 1], 1080)));
     request.set_uid(UID::from("6a677a188b9c209021eb185ed0c9d44a1347f1bb"));
+    println!("{}", request.to_string());
 
     let encoded = request.encode();
-    println!("{}", encoded.to_string());
 
     let mut decoded = FindNodeRequest::default();
     decoded.decode(&encoded);
 
-    println!("{}", decoded.encode().to_string());
+    println!("{}", decoded.to_string());
 
     kad.get_server().lock().unwrap().send(Box::new(request));
     sleep(Duration::from_secs(5));

@@ -1,6 +1,7 @@
 use crate::utils::uid::UID;
 use std::net::SocketAddr;
 use bencode::variables::bencode_object::BencodeObject;
+use bencode::variables::inter::bencode_variable::BencodeVariable;
 use crate::messages::inter::message_type::MessageType;
 
 pub const TID_KEY: &str = "t";
@@ -32,6 +33,10 @@ pub trait MessageBase {
     fn encode(&self) -> BencodeObject;
 
     fn decode(&mut self, ben: &BencodeObject);
+
+    fn to_string(&self) -> String {
+        self.encode().to_string()
+    }
 }
 
 /*
