@@ -64,7 +64,7 @@ impl Server {
                     server.lock().unwrap().recv_from(&mut buf).expect("Failed to receive message")
                 };
 
-                let packet = Packet::new(&buf[..size].to_vec(), src_addr);
+                let packet = Packet::new(&buf[..size], src_addr);
 
                 //let packet = Packet::new(&buf[..size], src_addr);
 
