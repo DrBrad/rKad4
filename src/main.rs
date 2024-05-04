@@ -265,6 +265,7 @@ fn vec_u8_to_hex_string(data: &[u8]) -> String {
     hex_chars.join("") // Concatenate all hexadecimal strings into one string
 }
 
+
 /*
 
 const V4_MASK: [u8; 4] = [0x03, 0x0f, 0x3f, 0xff];

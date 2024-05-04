@@ -106,14 +106,14 @@ impl Server {
         false
     }
 
-    pub fn on_receive(&self) {
+    pub fn on_receive(&self, packet: Packet) {
         //WE ALSO NEED ADDRESS...
         //if(AddressUtils.isBogon(packet.getAddress(), packet.getPort())){
         //    return;
         //}
 
 
-        let ben = BencodeObject::new();//::decode(packet.data);
+        let ben = BencodeObject::decode(packet.data);
 
         if !ben.contains_key(TID_KEY) || !ben.contains_key(TYPE_KEY) {
             //panic
@@ -166,31 +166,20 @@ pub struct Packet<'a> {
 impl<'a> Packet<'a> {
 
     pub fn new(data: &[u8], src: SocketAddr) -> Self {
-        //let value = value.to_string();
-        //let size = value.len()+2;
-
         let bytes = data.as_ptr();
         let len = data.len();
         forget(data);
 
         unsafe {
             Self {
-                data: from_raw_parts(bytes, len),//bytes,
+                data: from_raw_parts(bytes, len),
                 src
             }
         }
-
-
-        /*
-        Self {
-            data: data.to_vec(),
-            src
-        }
-        */
     }
 
     pub fn get_data(&self) -> &[u8] {
-        self.data//.as_slice()
+        self.data
     }
 
     pub fn get_source(&self) -> SocketAddr {
