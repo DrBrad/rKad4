@@ -67,7 +67,8 @@ impl KademliaBase for Kademlia {
     }
 
     fn join(&self, local_port: u16, addr: SocketAddr) {
-        todo!()
+        self.server.as_ref().unwrap().lock().unwrap().start(local_port);
+        self.refresh.as_ref().unwrap().lock().unwrap().start();
     }
 
     fn stop(&self) {
