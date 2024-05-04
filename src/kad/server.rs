@@ -21,15 +21,6 @@ pub struct Server {
 
 impl Server {
 
-    /*
-    pub fn new() -> Self {
-        Self {
-            server: None,
-            running: Arc::new(AtomicBool::new(false)) //MAY NOT BE NEEDED
-        }
-    }
-    */
-
     pub fn new(kademlia: Box<dyn KademliaBase>) -> Self {
         Self {
             kademlia,
@@ -43,15 +34,16 @@ impl Server {
         let running = Arc::clone(&self.running);
         let kademlia = self.kademlia.clone();
 
+        /*
         let handle = thread::spawn(move || {
             while running.load(Ordering::Relaxed) {
                 println!("{}", kademlia.get_routing_table().lock().unwrap().get_derived_uid().to_string());
                 sleep(Duration::from_secs(1));
             }
         });
+        */
 
 
-        /*
         let socket = UdpSocket::bind("127.0.0.1:8080").expect("Failed to bind socket");
 
         // Create a shared Arc<Mutex<UdpSocket>>
@@ -101,9 +93,8 @@ impl Server {
 
 
         // Join the threads
-        receiver_handle.join().expect("Receiver thread panicked");
-        handler_handle.join().expect("Handler thread panicked");
-        */
+        //receiver_handle.join().expect("Receiver thread panicked");
+        //handler_handle.join().expect("Handler thread panicked");
     }
 
     pub fn stop(&self) {
