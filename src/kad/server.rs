@@ -1,4 +1,6 @@
+use std::mem::forget;
 use std::net::{SocketAddr, UdpSocket};
+use std::slice::from_raw_parts;
 use std::sync::{Arc, Mutex};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
@@ -155,22 +157,40 @@ pub fn run(arc: Arc<Mutex<Settings>>) {
 }
 */
 
-pub struct Packet {
-    data: Vec<u8>,
+pub struct Packet<'a> {
+    data: &'a [u8],
+    //data: Vec<u8>,
     src: SocketAddr
 }
 
-impl Packet {
+impl<'a> Packet<'a> {
 
     pub fn new(data: &[u8], src: SocketAddr) -> Self {
+        //let value = value.to_string();
+        //let size = value.len()+2;
+
+        let bytes = data.as_ptr();
+        let len = data.len();
+        forget(data);
+
+        unsafe {
+            Self {
+                data: from_raw_parts(bytes, len),//bytes,
+                src
+            }
+        }
+
+
+        /*
         Self {
             data: data.to_vec(),
             src
         }
+        */
     }
 
     pub fn get_data(&self) -> &[u8] {
-        self.data.as_slice()
+        self.data//.as_slice()
     }
 
     pub fn get_source(&self) -> SocketAddr {
