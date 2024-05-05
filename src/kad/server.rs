@@ -146,7 +146,9 @@ impl Server {
                     }
                 }
             },
-            Err(_) => {}
+            Err(e) => {
+                println!("{}", e.to_string());
+            }
         }
 
         /*
