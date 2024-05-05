@@ -130,7 +130,9 @@ impl Server {
 
         match t {
             MessageType::ReqMsg => {
-                println!("REQ  {}", ben.to_string());
+                let k = ben.get_string(t.rpc_type_name()).unwrap(); //PROBABLY SHOULD ERR OUT IF NO RESULT...
+
+                println!("REQ  {}", k);
             },
             MessageType::RspMsg => {
                 println!("RES  {}", ben.to_string());

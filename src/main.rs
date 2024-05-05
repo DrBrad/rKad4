@@ -44,6 +44,9 @@ mod refresh;
 //echo -n "hello" >/dev/udp/localhost/8080
 //netcat -ul 8080
 
+//FIX ERROR HANDLING WITH THIS AND BENCODE SIDE - No panic - dont just unwrap - CHECK
+//REGISTER MESSAGE TYPES...
+
 
 fn main() {
     let kad = Kademlia::new();
