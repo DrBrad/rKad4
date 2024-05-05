@@ -10,12 +10,9 @@ use super::inter::method_message_base::MethodMessageBase;
 pub struct PingRequest {
     uid: Option<UID>,
     tid: [u8; TID_LENGTH],
-    //type_: MessageType,
     public: Option<SocketAddr>,
     destination: Option<SocketAddr>,
-    origin: Option<SocketAddr>,
-    //method: String,
-    target: Option<UID>
+    origin: Option<SocketAddr>
 }
 
 impl PingRequest {
@@ -26,17 +23,8 @@ impl PingRequest {
             tid,
             public: None,
             destination: None,
-            origin: None,
-            target: None
+            origin: None
         }
-    }
-
-    pub fn set_target(&mut self, target: UID) {
-        self.target = Some(target);
-    }
-
-    pub fn get_target(&mut self) -> Result<&UID, ()> {
-        self.target.as_ref().map_or_else(|| Err(()), |uid| Ok(uid))
     }
 }
 
@@ -48,8 +36,7 @@ impl Default for PingRequest {
             tid: [0u8; TID_LENGTH],
             public: None,
             destination: None,
-            origin: None,
-            target: None
+            origin: None
         }
     }
 }
@@ -114,14 +101,6 @@ impl MessageBase for PingRequest {
                 ben.put(self.get_type().inner_key(), BencodeObject::new());
                 ben.get_object_mut(self.get_type().inner_key()).unwrap().put("id", self.uid.unwrap().bid.clone());
             },
-            MessageType::RspMsg => {
-                ben.put(self.get_type().inner_key(), BencodeObject::new());
-                ben.get_object_mut(self.get_type().inner_key()).unwrap().put("id", self.uid.unwrap().bid.clone());
-
-                if let Some(public) = self.public {
-                    ben.put("ip", pack_address(&public));
-                }
-            },
             _ => unimplemented!()
         }
 
@@ -140,15 +119,6 @@ impl MessageBase for PingRequest {
         let mut bid = [0u8; ID_LENGTH];
         bid.copy_from_slice(&ben.get_object(self.get_type().inner_key()).unwrap().get_bytes("id").unwrap()[..ID_LENGTH]);
         self.uid = Some(UID::from(bid));
-
-        match self.get_type() {
-            MessageType::RspMsg => {
-                if ben.contains_key("ip") {
-                    self.public = unpack_address(ben.get_bytes("ip").unwrap());
-                }
-            },
-            _ => ()
-        };
     }
 }
 

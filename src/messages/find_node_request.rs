@@ -114,14 +114,6 @@ impl MessageBase for FindNodeRequest {
                 ben.put(self.get_type().inner_key(), BencodeObject::new());
                 ben.get_object_mut(self.get_type().inner_key()).unwrap().put("id", self.uid.unwrap().bid.clone());
             },
-            MessageType::RspMsg => {
-                ben.put(self.get_type().inner_key(), BencodeObject::new());
-                ben.get_object_mut(self.get_type().inner_key()).unwrap().put("id", self.uid.unwrap().bid.clone());
-
-                if let Some(public) = self.public {
-                    ben.put("ip", pack_address(&public));
-                }
-            },
             _ => unimplemented!()
         }
 
@@ -144,15 +136,6 @@ impl MessageBase for FindNodeRequest {
         let mut bid = [0u8; ID_LENGTH];
         bid.copy_from_slice(&ben.get_object(self.get_type().inner_key()).unwrap().get_bytes("id").unwrap()[..ID_LENGTH]);
         self.uid = Some(UID::from(bid));
-
-        match self.get_type() {
-            MessageType::RspMsg => {
-                if ben.contains_key("ip") {
-                    self.public = unpack_address(ben.get_bytes("ip").unwrap());
-                }
-            },
-            _ => ()
-        };
 
         if !ben.get_object(self.get_type().inner_key()).unwrap().contains_key("target") {
             //throw new MessageException("Protocol Error, such as a malformed packet.", 203);
