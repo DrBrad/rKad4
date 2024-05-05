@@ -108,6 +108,14 @@ impl RoutingTable for KRoutingTable {
         self.uid.unwrap()
     }
 
+    fn is_secure(&self) -> bool {
+        self.secure_only
+    }
+
+    fn set_secure(&mut self, secure_only: bool) {
+        self.secure_only = secure_only;
+    }
+
     fn has_queried(&self, n: &Node, now: u64) -> bool {
         let id = self.bucket_uid(&n.uid);
 

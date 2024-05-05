@@ -53,13 +53,16 @@ mod refresh;
 
 fn main() {
     let kad = Kademlia::new();
+    kad.get_routing_table().lock().unwrap().set_secure(false);
     kad.get_server().lock().unwrap().register_message(|| Box::new(PingRequest::default()));
     kad.get_server().lock().unwrap().register_message(|| Box::new(FindNodeRequest::default()));
 
 
     kad.bind(8080);
     println!("{}", kad.get_routing_table().lock().unwrap().get_derived_uid().to_string());
-    sleep(Duration::from_secs(10));
+    sleep(Duration::from_secs(5));
+    println!("{}", kad.get_routing_table().lock().unwrap().all_nodes().len());
+    sleep(Duration::from_secs(30));
 
 
 

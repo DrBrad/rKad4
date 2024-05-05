@@ -12,6 +12,10 @@ pub trait RoutingTable: Send {
 
     fn get_derived_uid(&self) -> UID;
 
+    fn is_secure(&self) -> bool;
+
+    fn set_secure(&mut self, secure_only: bool);
+
     //getDerivedUID - NOT NEEDED
 
     //fn add_restart_listener()
