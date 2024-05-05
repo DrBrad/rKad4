@@ -14,6 +14,7 @@ use crate::kademlia::Kademlia;
 use crate::messages::inter::message_base::{MessageBase, TID_KEY};
 use crate::messages::inter::message_type::{MessageType, TYPE_KEY};
 use crate::utils;
+use crate::utils::net::address_utils::is_bogon;
 
 const TID_LENGTH: usize = 6;
 
@@ -111,10 +112,9 @@ impl Server {
     }
 
     pub fn on_receive(&self, data: &[u8], src_addr: SocketAddr) {
-        //WE ALSO NEED ADDRESS...
-        //if(AddressUtils.isBogon(packet.getAddress(), packet.getPort())){
-        //    return;
-        //}
+        if is_bogon(src_addr) {
+            //return;
+        }
 
         println!("RECEIVED: {}", self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap().get_derived_uid().to_string());
 
