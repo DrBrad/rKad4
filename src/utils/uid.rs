@@ -33,26 +33,24 @@ impl From<Vec<u8>> for UID {
     }
 }
 */
-impl From<&str> for UID {
+impl TryFrom<&str> for UID {
 
-    fn from(key: &str) -> Self {
+    type Error = ();
+
+    fn try_from(key: &str) -> Result<Self, Self::Error> {
         if key.len() != ID_LENGTH * 2 {
-            panic!("Node ID is not correct length");
-            //return Err("Node ID is not correct length");
+            return Err(());
         }
 
         let mut bid = [0u8; ID_LENGTH];
         for (i, chunk) in key.as_bytes().chunks(2).enumerate() {
-            let byte = match u8::from_str_radix(std::str::from_utf8(chunk).unwrap(), 16) {
-                Ok(byte) => byte,
-                Err(_) => panic!("Invalid hex string"),
-            };
+            let byte = u8::from_str_radix(std::str::from_utf8(chunk).unwrap(), 16).map_err(|_| ())?;
             bid[i] = byte;
         }
 
-        Self {
+        Ok(Self {
             bid
-        }
+        })
     }
 }
 

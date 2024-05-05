@@ -7,7 +7,7 @@ pub struct NetMask {
 
 impl NetMask {
 
-    pub fn new(address: IpAddr, mask: u32) -> Result<Self, &'static str> {
+    pub fn new(address: IpAddr, mask: u32) -> Result<Self, ()> {
         if let IpAddr::V6(v6) = address {
             let octets = v6.octets();
 
@@ -17,7 +17,7 @@ impl NetMask {
             })
         }
 
-        Err("Node ID is not correct length")
+        Err(())
     }
 
     pub fn contains(&self, other_address: IpAddr) -> bool {
