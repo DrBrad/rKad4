@@ -60,7 +60,6 @@ impl KademliaBase for Kademlia {
 
     fn bind(&self, port: u16) {
         self.server.lock().unwrap().start(port);
-        self.refresh.lock().unwrap().start();
     }
 
     fn join(&self, local_port: u16, addr: SocketAddr) {

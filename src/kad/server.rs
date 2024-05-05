@@ -162,22 +162,47 @@ impl Server {
 
 
 
+                            /*
+                                RequestEvent event = new RequestEvent(m, node);
+                                event.received();
 
+                                for(ReflectMethod r : requestMapping.get(m.getMethod())){
+                                    r.getMethod().invoke(r.getInstance(), event); //THROW ERROR - SEND ERROR MESSAGE
+                                }
 
+                                if(event.isPreventDefault()){
+                                    return;
+                                }
 
+                                if(!event.hasResponse()){
+                                    throw new MessageException("Method Unknown", 204);
+                                }
+
+                                send(event.getResponse());
+
+                            }catch(MessageException e){
+                                ErrorResponse response = new ErrorResponse(ben.getBytes(TID_KEY));
+                                response.setDestination(packet.getAddress(), packet.getPort());
+                                response.setPublic(packet.getAddress(), packet.getPort());
+                                response.setCode(e.getCode());
+                                response.setDescription(e.getMessage());
+                                send(response);
+                            }
+                            */
 
                             println!("MESSAGE CREATED {}", m.to_string());
+
+                            if !self.kademlia.as_ref().unwrap().get_refresh_handler().lock().unwrap().is_running() {
+                                self.kademlia.as_ref().unwrap().get_refresh_handler().lock().unwrap().start();
+                            }
                         }
-
-
-
-
-
-
-
-
                     },
                     MessageType::RspMsg => {
+                        let mut tid = [0u8; TID_LENGTH];
+                        tid.copy_from_slice(ben.get_bytes(TID_KEY).expect("Failed to find TID key."));
+
+
+
                         println!("RES  {}", ben.to_string());
                     },
                     MessageType::ErrMsg => {
