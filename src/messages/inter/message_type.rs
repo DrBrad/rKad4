@@ -2,6 +2,7 @@ use crate::routing::bucket_types::BucketTypes;
 
 pub const TYPE_KEY: &str = "y";
 
+#[derive(Eq, PartialEq, Hash)]
 pub enum MessageType {
     ReqMsg,
     RspMsg,

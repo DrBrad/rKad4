@@ -13,6 +13,7 @@ use bencode::variables::inter::bencode_variable::BencodeVariable;
 use crate::kad::kademlia_base::KademliaBase;
 use crate::kademlia::Kademlia;
 use crate::messages::inter::message_base::{MessageBase, TID_KEY};
+use crate::messages::inter::message_key::MessageKey;
 use crate::messages::inter::message_type::{MessageType, TYPE_KEY};
 use crate::messages::inter::method_message_base::MethodMessageBase;
 use crate::utils::net::address_utils::is_bogon;
@@ -23,7 +24,7 @@ pub struct Server {
     pub(crate) kademlia: Option<Box<dyn KademliaBase>>,
     server: Option<Arc<Mutex<UdpSocket>>>,
     running: Arc<AtomicBool>, //MAY NOT BE NEEDED
-    messages: HashMap<String, fn() -> Box<dyn MessageBase>>
+    messages: HashMap<MessageKey, fn() -> Box<dyn MethodMessageBase>>
 }
 
 impl Server {
@@ -110,8 +111,9 @@ impl Server {
 
     //REGISTER MESSAGES...
 
-    pub fn register_message(&mut self, name: &str, constructor: fn() -> Box<dyn MethodMessageBase>) {
-        self.messages.insert(name.to_string(), constructor);
+    pub fn register_message(&mut self, constructor: fn() -> Box<dyn MethodMessageBase>) {
+        let message = constructor();
+        self.messages.insert(MessageKey::new(message.get_method(), message.get_type()), constructor);
     }
 
     pub fn is_running(&self) -> bool {
@@ -137,25 +139,23 @@ impl Server {
 
                 match t {
                     MessageType::ReqMsg => {
-                        match ben.get_string(t.rpc_type_name()) {
-                            Ok(k) => {
-                                println!("REQ  {}", k);
+                        let message_key = MessageKey::new(ben.get_string(t.rpc_type_name()).expect("Failed to find valid key."), t);
 
+                        //let message_key = ;
 
-                                if let Some(constructor) = self.messages.get(k) {
-                                    let message = constructor();
+                        if let Some(constructor) = self.messages.get(&message_key) {
+                            let mut message = constructor();
+                            message.set_transaction_id([0u8; 6]);
+                            message.decode(&ben);
+                            message.set_origin(src_addr);
+                            //message.set_transaction_id(ben.get_bytes(TID_KEY).expect("Failed to find TID"));
 
-                                    println!("MESSAGE CREATED");
+                            println!("MESSAGE CREATED {}", message.to_string());
 
-                                }
-
-
-
-                            },
-                            Err(e) => {
-                                println!("{}", e.to_string());
-                            }
                         }
+
+
+
 
 
 

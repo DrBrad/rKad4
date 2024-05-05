@@ -72,27 +72,27 @@ impl MessageBase for FindNodeRequest {
         &self.tid
     }
 
-    fn set_public_address(&mut self, public_address: SocketAddr) {
+    fn set_public(&mut self, public_address: SocketAddr) {
         self.public_address = Some(public_address);
     }
 
-    fn get_public_address(&self) -> SocketAddr {
+    fn get_public(&self) -> SocketAddr {
         self.public_address.unwrap()
     }
 
-    fn set_destination_address(&mut self, destination_address: SocketAddr) {
+    fn set_destination(&mut self, destination_address: SocketAddr) {
         self.destination_address = Some(destination_address);
     }
 
-    fn get_destination_address(&self) -> SocketAddr {
+    fn get_destination(&self) -> SocketAddr {
         self.destination_address.unwrap()
     }
 
-    fn set_origin_address(&mut self, origin_address: SocketAddr) {
+    fn set_origin(&mut self, origin_address: SocketAddr) {
         self.origin_address = Some(origin_address);
     }
 
-    fn get_origin_address(&self) -> SocketAddr {
+    fn get_origin(&self) -> SocketAddr {
         self.origin_address.unwrap()
     }
 

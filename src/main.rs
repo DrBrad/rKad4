@@ -18,6 +18,7 @@ use crate::messages::find_node_request::FindNodeRequest;
 //use crate::messages::find_node_response::FindNodeResponse;
 use crate::messages::inter::message_base::MessageBase;
 use crate::messages::inter::method_message_base::MethodMessageBase;
+use crate::messages::ping_request::PingRequest;
 //use crate::messages::ping_request::PingRequest;
 use crate::refresh::refresh_handler::RefreshHandler;
 use crate::refresh::tasks::bucket_refresh_task::BucketRefreshTask;
@@ -52,7 +53,8 @@ mod refresh;
 
 fn main() {
     let kad = Kademlia::new();
-    kad.get_server().lock().unwrap().register_message("ping", || Box::new(FindNodeRequest::default()));
+    kad.get_server().lock().unwrap().register_message(|| Box::new(PingRequest::default()));
+    kad.get_server().lock().unwrap().register_message(|| Box::new(FindNodeRequest::default()));
 
 
     kad.bind(8080);

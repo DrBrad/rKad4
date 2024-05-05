@@ -16,17 +16,17 @@ pub trait MessageBase {
 
     fn get_transaction_id(&self) -> &[u8; 6];
 
-    fn set_public_address(&mut self, public_address: SocketAddr);
+    fn set_public(&mut self, public_address: SocketAddr);
 
-    fn get_public_address(&self) -> SocketAddr;
+    fn get_public(&self) -> SocketAddr;
 
-    fn set_destination_address(&mut self, destination_address: SocketAddr);
+    fn set_destination(&mut self, destination_address: SocketAddr);
 
-    fn get_destination_address(&self) -> SocketAddr;
+    fn get_destination(&self) -> SocketAddr;
 
-    fn set_origin_address(&mut self, origin_address: SocketAddr);
+    fn set_origin(&mut self, origin_address: SocketAddr);
 
-    fn get_origin_address(&self) -> SocketAddr;
+    fn get_origin(&self) -> SocketAddr;
 
     fn get_type(&self) -> MessageType;
 
