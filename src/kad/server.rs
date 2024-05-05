@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::mem::forget;
 use std::net::{SocketAddr, UdpSocket};
 use std::slice::from_raw_parts;
@@ -13,7 +14,7 @@ use crate::kad::kademlia_base::KademliaBase;
 use crate::kademlia::Kademlia;
 use crate::messages::inter::message_base::{MessageBase, TID_KEY};
 use crate::messages::inter::message_type::{MessageType, TYPE_KEY};
-use crate::utils;
+use crate::messages::inter::method_message_base::MethodMessageBase;
 use crate::utils::net::address_utils::is_bogon;
 
 const TID_LENGTH: usize = 6;
@@ -21,7 +22,8 @@ const TID_LENGTH: usize = 6;
 pub struct Server {
     pub(crate) kademlia: Option<Box<dyn KademliaBase>>,
     server: Option<Arc<Mutex<UdpSocket>>>,
-    running: Arc<AtomicBool> //MAY NOT BE NEEDED
+    running: Arc<AtomicBool>, //MAY NOT BE NEEDED
+    messages: HashMap<String, fn() -> Box<dyn MessageBase>>
 }
 
 impl Server {
@@ -30,7 +32,8 @@ impl Server {
         Self {
             kademlia: None,
             server: None,
-            running: Arc::new(AtomicBool::new(false)) //MAY NOT BE NEEDED
+            running: Arc::new(AtomicBool::new(false)), //MAY NOT BE NEEDED
+            messages: HashMap::new()
         }
     }
 
@@ -107,6 +110,10 @@ impl Server {
 
     //REGISTER MESSAGES...
 
+    pub fn register_message(&mut self, name: &str, constructor: fn() -> Box<dyn MethodMessageBase>) {
+        self.messages.insert(name.to_string(), constructor);
+    }
+
     pub fn is_running(&self) -> bool {
         false
     }
@@ -135,6 +142,12 @@ impl Server {
                                 println!("REQ  {}", k);
 
 
+                                if let Some(constructor) = self.messages.get(k) {
+                                    let message = constructor();
+
+                                    println!("MESSAGE CREATED");
+
+                                }
 
 
 

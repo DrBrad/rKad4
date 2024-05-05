@@ -14,6 +14,7 @@ use bencode::variables::inter::bencode_variable::BencodeVariable;
 use crate::kad::kademlia_base::KademliaBase;
 use crate::kademlia::Kademlia;
 use crate::messages::find_node_request::FindNodeRequest;
+//use crate::messages::ping_request::PingRequest;
 //use crate::messages::find_node_response::FindNodeResponse;
 use crate::messages::inter::message_base::MessageBase;
 use crate::messages::inter::method_message_base::MethodMessageBase;
@@ -47,12 +48,19 @@ mod refresh;
 //FIX ERROR HANDLING WITH THIS AND BENCODE SIDE - No panic - dont just unwrap - CHECK
 //REGISTER MESSAGE TYPES...
 
+//Java version - register message as MethodMessageBase not MessageBase...
 
 fn main() {
     let kad = Kademlia::new();
+    kad.get_server().lock().unwrap().register_message("ping", || Box::new(FindNodeRequest::default()));
+
+
     kad.bind(8080);
     println!("{}", kad.get_routing_table().lock().unwrap().get_derived_uid().to_string());
-    sleep(Duration::from_secs(3));
+    sleep(Duration::from_secs(10));
+
+
+
 
     /*
     let mut request = FindNodeRequest::default();
@@ -70,7 +78,7 @@ fn main() {
     */
 
     //kad.get_server().lock().unwrap().send(Box::new(request));
-    sleep(Duration::from_secs(5));
+    //sleep(Duration::from_secs(5));
 
     /*
     sleep(Duration::from_secs(2));
