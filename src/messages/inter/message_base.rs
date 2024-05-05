@@ -2,6 +2,7 @@ use crate::utils::uid::UID;
 use std::net::SocketAddr;
 use bencode::variables::bencode_object::BencodeObject;
 use bencode::variables::inter::bencode_variable::BencodeVariable;
+use crate::kad::server::TID_LENGTH;
 use crate::messages::inter::message_type::MessageType;
 
 pub const TID_KEY: &str = "t";
@@ -12,9 +13,9 @@ pub trait MessageBase {
 
     fn get_uid(&self) -> UID;
 
-    fn set_transaction_id(&mut self, tid: [u8; 6]);
+    fn set_transaction_id(&mut self, tid: [u8; TID_LENGTH]);
 
-    fn get_transaction_id(&self) -> &[u8; 6];
+    fn get_transaction_id(&self) -> &[u8; TID_LENGTH];
 
     fn set_public(&mut self, public_address: SocketAddr);
 

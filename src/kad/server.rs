@@ -17,8 +17,9 @@ use crate::messages::inter::message_key::MessageKey;
 use crate::messages::inter::message_type::{MessageType, TYPE_KEY};
 use crate::messages::inter::method_message_base::MethodMessageBase;
 use crate::utils::net::address_utils::is_bogon;
+use crate::utils::uid::{ID_LENGTH, UID};
 
-const TID_LENGTH: usize = 6;
+pub const TID_LENGTH: usize = 6;
 
 pub struct Server {
     pub(crate) kademlia: Option<Box<dyn KademliaBase>>,
@@ -145,12 +146,22 @@ impl Server {
 
                         if let Some(constructor) = self.messages.get(&message_key) {
                             let mut message = constructor();
-                            message.set_transaction_id([0u8; 6]);
+
+                            let mut tid = [0u8; TID_LENGTH];
+                            tid.copy_from_slice(ben.get_bytes(TID_KEY).expect("Failed to find TID key."));
+
+                            message.set_transaction_id(tid);
                             message.decode(&ben);
                             message.set_origin(src_addr);
                             //message.set_transaction_id(ben.get_bytes(TID_KEY).expect("Failed to find TID"));
 
                             println!("MESSAGE CREATED {}", message.to_string());
+
+
+
+
+
+
 
                         }
 

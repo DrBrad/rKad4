@@ -1,5 +1,6 @@
 use std::net::SocketAddr;
 use bencode::variables::bencode_object::{BencodeObject, PutObject};
+use crate::kad::server::TID_LENGTH;
 use crate::messages::inter::message_base::{MessageBase, TID_KEY};
 use crate::messages::inter::message_type::{MessageType, TYPE_KEY};
 use crate::utils::net::address_utils::{pack_address, unpack_addr};
@@ -8,7 +9,7 @@ use super::inter::method_message_base::MethodMessageBase;
 
 pub struct FindNodeRequest {
     uid: Option<UID>,
-    tid: [u8; 6],
+    tid: [u8; TID_LENGTH],
     //type_: MessageType,
     public_address: Option<SocketAddr>,
     destination_address: Option<SocketAddr>,
@@ -19,7 +20,7 @@ pub struct FindNodeRequest {
 
 impl FindNodeRequest {
 
-    pub fn new(tid: [u8; 6]) -> Self {
+    pub fn new(tid: [u8; TID_LENGTH]) -> Self {
         Self {
             uid: None,
             tid,
@@ -44,7 +45,7 @@ impl Default for FindNodeRequest {
     fn default() -> Self {
         Self {
             uid: None,
-            tid: [0u8; 6],
+            tid: [0u8; TID_LENGTH],
             public_address: None,
             destination_address: None,
             origin_address: None,
@@ -64,11 +65,11 @@ impl MessageBase for FindNodeRequest {
         self.uid.unwrap()
     }
 
-    fn set_transaction_id(&mut self, tid: [u8; 6]) {
+    fn set_transaction_id(&mut self, tid: [u8; TID_LENGTH]) {
         self.tid = tid;
     }
 
-    fn get_transaction_id(&self) -> &[u8; 6] {
+    fn get_transaction_id(&self) -> &[u8; TID_LENGTH] {
         &self.tid
     }
 
