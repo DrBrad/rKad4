@@ -79,17 +79,17 @@ impl KademliaBase for Kademlia {
 
     fn bind(&self, port: u16) {
         self.server.lock().unwrap().start(port);
-        //self.refresh.as_ref().unwrap().lock().unwrap().start();
+        self.refresh.lock().unwrap().start();
     }
 
     fn join(&self, local_port: u16, addr: SocketAddr) {
         self.server.lock().unwrap().start(local_port);
-        //self.refresh.as_ref().unwrap().lock().unwrap().start();
+        self.refresh.lock().unwrap().start();
     }
 
     fn stop(&self) {
         self.server.lock().unwrap().stop();
-        //self.refresh.as_ref().unwrap().lock().unwrap().stop();
+        self.refresh.lock().unwrap().stop();
     }
 
     fn get_server(&self) -> &Arc<Mutex<Server>> {
@@ -101,8 +101,7 @@ impl KademliaBase for Kademlia {
     }
 
     fn get_refresh_handler(&self) -> &Arc<Mutex<RefreshHandler>> {
-        //self.refresh.as_ref().unwrap()
-        unimplemented!()
+        &self.refresh
     }
 
     fn clone_dyn(&self) -> Box<dyn KademliaBase> {
