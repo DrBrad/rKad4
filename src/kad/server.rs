@@ -25,6 +25,7 @@ pub const TID_LENGTH: usize = 6;
 pub struct Server {
     pub(crate) kademlia: Option<Box<dyn KademliaBase>>,
     server: Option<Arc<Mutex<UdpSocket>>>,
+    //tracker: Arc<Mutex<ResponseTracker>>,
     running: Arc<AtomicBool>, //MAY NOT BE NEEDED
     messages: HashMap<MessageKey, fn() -> Box<dyn MethodMessageBase>>
 }
