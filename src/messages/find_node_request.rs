@@ -3,7 +3,7 @@ use bencode::variables::bencode_object::{BencodeObject, PutObject};
 use crate::kad::server::TID_LENGTH;
 use crate::messages::inter::message_base::{MessageBase, TID_KEY};
 use crate::messages::inter::message_type::{MessageType, TYPE_KEY};
-use crate::utils::net::address_utils::{pack_address, unpack_addr};
+use crate::utils::net::address_utils::{pack_address, unpack_address};
 use crate::utils::uid::{ID_LENGTH, UID};
 use super::inter::method_message_base::MethodMessageBase;
 
@@ -11,9 +11,9 @@ pub struct FindNodeRequest {
     uid: Option<UID>,
     tid: [u8; TID_LENGTH],
     //type_: MessageType,
-    public_address: Option<SocketAddr>,
-    destination_address: Option<SocketAddr>,
-    origin_address: Option<SocketAddr>,
+    public: Option<SocketAddr>,
+    destination: Option<SocketAddr>,
+    origin: Option<SocketAddr>,
     //method: String,
     target: Option<UID>
 }
@@ -24,9 +24,9 @@ impl FindNodeRequest {
         Self {
             uid: None,
             tid,
-            public_address: None,
-            destination_address: None,
-            origin_address: None,
+            public: None,
+            destination: None,
+            origin: None,
             target: None
         }
     }
@@ -46,9 +46,9 @@ impl Default for FindNodeRequest {
         Self {
             uid: None,
             tid: [0u8; TID_LENGTH],
-            public_address: None,
-            destination_address: None,
-            origin_address: None,
+            public: None,
+            destination: None,
+            origin: None,
             target: None
         }
     }
@@ -73,28 +73,28 @@ impl MessageBase for FindNodeRequest {
         &self.tid
     }
 
-    fn set_public(&mut self, public_address: SocketAddr) {
-        self.public_address = Some(public_address);
+    fn set_public(&mut self, public: SocketAddr) {
+        self.public = Some(public);
     }
 
     fn get_public(&self) -> SocketAddr {
-        self.public_address.unwrap()
+        self.public.unwrap()
     }
 
-    fn set_destination(&mut self, destination_address: SocketAddr) {
-        self.destination_address = Some(destination_address);
+    fn set_destination(&mut self, destination: SocketAddr) {
+        self.destination = Some(destination);
     }
 
     fn get_destination(&self) -> SocketAddr {
-        self.destination_address.unwrap()
+        self.destination.unwrap()
     }
 
-    fn set_origin(&mut self, origin_address: SocketAddr) {
-        self.origin_address = Some(origin_address);
+    fn set_origin(&mut self, origin: SocketAddr) {
+        self.origin = Some(origin);
     }
 
     fn get_origin(&self) -> SocketAddr {
-        self.origin_address.unwrap()
+        self.origin.unwrap()
     }
 
     fn get_type(&self) -> MessageType {
@@ -118,8 +118,8 @@ impl MessageBase for FindNodeRequest {
                 ben.put(self.get_type().inner_key(), BencodeObject::new());
                 ben.get_object_mut(self.get_type().inner_key()).unwrap().put("id", self.uid.unwrap().bid.clone());
 
-                if let Some(public_address) = self.public_address {
-                    ben.put("ip", pack_address(&public_address));
+                if let Some(public) = self.public {
+                    ben.put("ip", pack_address(&public));
                 }
             },
             _ => unimplemented!()
@@ -148,7 +148,7 @@ impl MessageBase for FindNodeRequest {
         match self.get_type() {
             MessageType::RspMsg => {
                 if ben.contains_key("ip") {
-                    self.public_address = unpack_addr(ben.get_bytes("ip").unwrap());
+                    self.public = unpack_address(ben.get_bytes("ip").unwrap());
                 }
             },
             _ => ()

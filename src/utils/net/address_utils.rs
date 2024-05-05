@@ -61,7 +61,7 @@ pub fn pack_address(addr: &SocketAddr) -> Vec<u8> {
     }
 }
 
-pub fn unpack_addr(buf: &[u8]) -> Option<SocketAddr> {
+pub fn unpack_address(buf: &[u8]) -> Option<SocketAddr> {
     match buf.len() {
         6 => {
             let address = Ipv4Addr::new(buf[0], buf[1], buf[2], buf[3]);
