@@ -1,12 +1,9 @@
-use std::cell::RefCell;
 use std::net::SocketAddr;
 use std::sync::{Arc, Mutex};
-use std::thread;
 use crate::kad::kademlia_base::KademliaBase;
 use crate::kad::server::Server;
 use crate::refresh::refresh_handler::RefreshHandler;
 use crate::refresh::tasks::bucket_refresh_task::BucketRefreshTask;
-use crate::refresh::tasks::inter::task::Task;
 use crate::refresh::tasks::stale_refresh_task::StaleRefreshTask;
 use crate::routing::bucket_types::BucketTypes;
 use crate::routing::inter::routing_table::RoutingTable;
@@ -35,15 +32,6 @@ impl Kademlia {
         self_.server.lock().unwrap().kademlia = Some(Box::new(self_.clone()));
         self_.refresh.lock().unwrap().kademlia = Some(Box::new(self_.clone()));
 
-        //self_.server = Some(Arc::new(Mutex::new(Server::new(Box::new(self_.clone())))));
-
-        /*
-        let mut refresh = RefreshHandler::new(Box::new(self_.clone()));
-        refresh.add_operation(Box::new(BucketRefreshTask::new()));
-        refresh.add_operation(Box::new(StaleRefreshTask::new()));
-        self_.refresh = Some(Arc::new(Mutex::new(refresh)));
-        */
-
         self_
     }
 }
@@ -63,13 +51,6 @@ impl From<String> for Kademlia {
 
         self_.server.lock().unwrap().kademlia = Some(Box::new(self_.clone()));
         self_.refresh.lock().unwrap().kademlia = Some(Box::new(self_.clone()));
-
-        /*
-        let mut refresh = RefreshHandler::new(Box::new(self_.clone()));
-        refresh.add_operation(Box::new(BucketRefreshTask::new()));
-        refresh.add_operation(Box::new(StaleRefreshTask::new()));
-        self_.refresh = Some(Arc::new(Mutex::new(refresh)));
-        */
 
         self_
     }
