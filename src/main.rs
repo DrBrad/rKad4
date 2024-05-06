@@ -37,6 +37,7 @@ extern crate bencode;
 
 //mod test2;
 mod refresh;
+mod rpc;
 
 //mod test2;
 
