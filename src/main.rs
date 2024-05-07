@@ -125,7 +125,13 @@ fn main() {
         println!("{}", message.to_string());
     };
 
+
+    let find_node_callback: RequestCallback = |message| {
+        println!("{}", message.to_string());
+    };
+
     kad.get_server().lock().unwrap().register_request_listener("ping", ping_callback);
+    kad.get_server().lock().unwrap().register_request_listener("find_node", find_node_callback);
 
 
     kad.bind(8080);
