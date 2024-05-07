@@ -1,3 +1,4 @@
+/*
 use crate::kad::kademlia_base::KademliaBase;
 use crate::rpc::request_listener::RequestListener;
 
@@ -20,3 +21,4 @@ impl RequestListener for KRequestListener {
         todo!()
     }
 }
+*/

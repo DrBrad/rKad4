@@ -16,6 +16,7 @@ use crate::messages::inter::message_base::{MessageBase, TID_KEY};
 use crate::messages::inter::message_key::MessageKey;
 use crate::messages::inter::message_type::{MessageType, TYPE_KEY};
 use crate::messages::inter::method_message_base::MethodMessageBase;
+use crate::rpc::request_listener::RequestCallback;
 use crate::utils::net::address_utils::is_bogon;
 use crate::utils::node::Node;
 use crate::utils::uid::{ID_LENGTH, UID};
@@ -27,6 +28,7 @@ pub struct Server {
     server: Option<Arc<Mutex<UdpSocket>>>,
     //tracker: Arc<Mutex<ResponseTracker>>,
     running: Arc<AtomicBool>, //MAY NOT BE NEEDED
+    request_mapping: Arc<Mutex<HashMap<String, RequestCallback>>>,
     messages: HashMap<MessageKey, fn() -> Box<dyn MethodMessageBase>>
 }
 
@@ -37,6 +39,7 @@ impl Server {
             kademlia: None,
             server: None,
             running: Arc::new(AtomicBool::new(false)), //MAY NOT BE NEEDED
+            request_mapping: Arc::new(Mutex::new(HashMap::new())),
             messages: HashMap::new()
         }
     }
@@ -113,6 +116,10 @@ impl Server {
     }
 
     //REGISTER MESSAGES...
+
+    pub fn register_request_listener<F>(&mut self, key: &str, callback: RequestCallback) {
+        self.request_mapping.lock().unwrap().insert(key.to_string(), callback);
+    }
 
     pub fn register_message(&mut self, constructor: fn() -> Box<dyn MethodMessageBase>) {
         let message = constructor();

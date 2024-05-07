@@ -30,6 +30,7 @@ use crate::utils::hash::crc32c::CRC32c;
 use crate::routing::inter::routing_table::RoutingTable;
 use crate::routing::kb::k_bucket::KBucket;
 use crate::routing::kb::k_routing_table::KRoutingTable;
+use crate::rpc::request_listener::RequestCallback;
 use crate::utils::net::address_type::AddressType;
 use crate::utils::net::address_utils::{pack_address, unpack_address};
 use crate::utils::uid::UID;
@@ -76,6 +77,7 @@ fn process_message<F>(message: Message, callback: F)
 
 fn main() {
 
+    /*
     let ping_callback = |message: Box<dyn MessageBase>| {
         println!("{}", message.to_string());
     };
@@ -93,6 +95,8 @@ fn main() {
     if map.contains_key(&key) {
         map.get(&key).unwrap()(Box::new(request));
     }
+    */
+
 
     /*
     // Define a callback for Greeting messages
@@ -111,11 +115,17 @@ fn main() {
     */
 
 
-    /*
     let kad = Kademlia::new();
     kad.get_routing_table().lock().unwrap().set_secure(false);
     kad.get_server().lock().unwrap().register_message(|| Box::new(PingRequest::default()));
     kad.get_server().lock().unwrap().register_message(|| Box::new(FindNodeRequest::default()));
+
+
+    let ping_callback: RequestCallback = |message: Box<dyn MessageBase>| {
+        println!("{}", message.to_string());
+    };
+
+    kad.get_server().lock().unwrap().register_request_listener("ping", ping_callback);
 
 
     kad.bind(8080);
@@ -123,7 +133,6 @@ fn main() {
     sleep(Duration::from_secs(5));
     println!("{}", kad.get_routing_table().lock().unwrap().all_nodes().len());
     sleep(Duration::from_secs(30));
-    */
 
 
 
