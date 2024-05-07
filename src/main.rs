@@ -121,7 +121,7 @@ fn main() {
     kad.get_server().lock().unwrap().register_message(|| Box::new(FindNodeRequest::default()));
 
 
-    let ping_callback: RequestCallback = |message: Box<dyn MessageBase>| {
+    let ping_callback: RequestCallback = |message| {
         println!("{}", message.to_string());
     };
 

@@ -27,8 +27,8 @@ pub struct Server {
     pub(crate) kademlia: Option<Box<dyn KademliaBase>>,
     server: Option<Arc<Mutex<UdpSocket>>>,
     //tracker: Arc<Mutex<ResponseTracker>>,
-    running: Arc<AtomicBool>, //MAY NOT BE NEEDED
-    request_mapping: Arc<Mutex<HashMap<String, RequestCallback>>>,
+    //running: Arc<AtomicBool>, //MAY NOT BE NEEDED
+    request_mapping: HashMap<String, RequestCallback>,
     messages: HashMap<MessageKey, fn() -> Box<dyn MethodMessageBase>>
 }
 
@@ -38,15 +38,15 @@ impl Server {
         Self {
             kademlia: None,
             server: None,
-            running: Arc::new(AtomicBool::new(false)), //MAY NOT BE NEEDED
-            request_mapping: Arc::new(Mutex::new(HashMap::new())),
+            //running: Arc::new(AtomicBool::new(false)), //MAY NOT BE NEEDED
+            request_mapping: HashMap::new(),
             messages: HashMap::new()
         }
     }
 
     pub fn start(&mut self, port: u16) {
-        self.running.store(true, Ordering::Relaxed);
-        let running = Arc::clone(&self.running);
+        //self.running.store(true, Ordering::Relaxed);
+        //let running = Arc::clone(&self.running);
 
         /*
         let handle = thread::spawn(move || {
@@ -112,13 +112,13 @@ impl Server {
     }
 
     pub fn stop(&self) {
-        self.running.store(false, Ordering::Relaxed);
+        //self.running.store(false, Ordering::Relaxed);
     }
 
     //REGISTER MESSAGES...
 
-    pub fn register_request_listener<F>(&mut self, key: &str, callback: RequestCallback) {
-        self.request_mapping.lock().unwrap().insert(key.to_string(), callback);
+    pub fn register_request_listener(&mut self, key: &str, callback: RequestCallback) {
+        self.request_mapping.insert(key.to_string(), callback);
     }
 
     pub fn register_message(&mut self, constructor: fn() -> Box<dyn MethodMessageBase>) {
@@ -168,6 +168,12 @@ impl Server {
                             self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap().insert(node);
 
 
+                            let k = ben.get_string(t.rpc_type_name()).unwrap().to_string();
+
+                            if self.request_mapping.contains_key(&k) {
+                                let callback = self.request_mapping.get(&k).unwrap();
+                                callback(m);
+                            }
 
 
                             /*
@@ -198,7 +204,7 @@ impl Server {
                             }
                             */
 
-                            println!("MESSAGE CREATED {}", m.to_string());
+                            //println!("MESSAGE CREATED {}", m.to_string());
 
                             if !self.kademlia.as_ref().unwrap().get_refresh_handler().lock().unwrap().is_running() {
                                 self.kademlia.as_ref().unwrap().get_refresh_handler().lock().unwrap().start();
