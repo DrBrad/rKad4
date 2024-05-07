@@ -18,6 +18,8 @@ use crate::messages::find_node_request::FindNodeRequest;
 //use crate::messages::ping_request::PingRequest;
 //use crate::messages::find_node_response::FindNodeResponse;
 use crate::messages::inter::message_base::MessageBase;
+use crate::messages::inter::message_key::MessageKey;
+use crate::messages::inter::message_type::MessageType;
 use crate::messages::inter::method_message_base::MethodMessageBase;
 use crate::messages::ping_request::PingRequest;
 //use crate::messages::ping_request::PingRequest;
@@ -72,11 +74,6 @@ fn process_message<F>(message: Message, callback: F)
 }
 */
 
-fn on_request<F>(message: Box<dyn MessageBase>, callback: F) where F: FnOnce(Box<dyn MessageBase>) {
-
-}
-
-
 fn main() {
 
     let ping_callback = |message: Box<dyn MessageBase>| {
@@ -84,7 +81,7 @@ fn main() {
     };
 
     let mut map = HashMap::new();
-    map.insert("ping", &ping_callback);
+    map.insert(MessageKey::new("find_node", MessageType::ReqMsg), &ping_callback);
 
 
     let mut request = FindNodeRequest::default();
@@ -92,7 +89,7 @@ fn main() {
     request.set_destination(SocketAddr::from(([127, 2, 0, 1], 1080)));
     request.set_uid(UID::try_from("6a677a188b9c209021eb185ed0c9d44a1347f1bb").unwrap());
 
-    map.get("ping").unwrap()(Box::new(request));
+    map.get(&MessageKey::new("find_node", MessageType::ReqMsg)).unwrap()(Box::new(request));
 
     /*
     // Define a callback for Greeting messages
