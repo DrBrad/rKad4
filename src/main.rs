@@ -89,7 +89,10 @@ fn main() {
     request.set_destination(SocketAddr::from(([127, 2, 0, 1], 1080)));
     request.set_uid(UID::try_from("6a677a188b9c209021eb185ed0c9d44a1347f1bb").unwrap());
 
-    map.get(&MessageKey::new("find_node", MessageType::ReqMsg)).unwrap()(Box::new(request));
+    let key = MessageKey::new("find_node", MessageType::ReqMsg);
+    if map.contains_key(&key) {
+        map.get(&key).unwrap()(Box::new(request));
+    }
 
     /*
     // Define a callback for Greeting messages
