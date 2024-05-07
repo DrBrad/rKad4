@@ -4,6 +4,7 @@ mod routing;
 mod kad;
 mod kademlia;
 
+use std::collections::HashMap;
 use std::net::{IpAddr, SocketAddr};
 use std::sync::{Arc, Mutex};
 use std::thread;
@@ -52,7 +53,65 @@ mod rpc;
 
 //Java version - register message as MethodMessageBase not MessageBase...
 
+
+/*
+enum Message {
+    Greeting(String),
+    Farewell(String),
+}
+
+// Define a function that takes a closure as a callback
+fn process_message<F>(message: Message, callback: F)
+    where
+        F: FnOnce(&str),
+{
+    match message {
+        Message::Greeting(msg) => callback(&msg),
+        Message::Farewell(msg) => callback(&msg),
+    }
+}
+*/
+
+fn on_request<F>(message: Box<dyn MessageBase>, callback: F) where F: FnOnce(Box<dyn MessageBase>) {
+
+}
+
+
 fn main() {
+
+    let ping_callback = |message: Box<dyn MessageBase>| {
+        println!("{}", message.to_string());
+    };
+
+    let mut map = HashMap::new();
+    map.insert("ping", &ping_callback);
+
+
+    let mut request = FindNodeRequest::default();
+    request.set_target(UID::try_from("e5af5f5134c1e664b6f8260e9d99d7a8719254c3").unwrap());
+    request.set_destination(SocketAddr::from(([127, 2, 0, 1], 1080)));
+    request.set_uid(UID::try_from("6a677a188b9c209021eb185ed0c9d44a1347f1bb").unwrap());
+
+    map.get("ping").unwrap()(Box::new(request));
+
+    /*
+    // Define a callback for Greeting messages
+    let greeting_callback = |msg: &str| {
+        println!("Received greeting: {}", msg);
+    };
+
+    // Define a callback for Farewell messages
+    let farewell_callback = |msg: &str| {
+        println!("Received farewell: {}", msg);
+    };
+
+    // Process messages with different callbacks
+    process_message(Message::Greeting("Hello".to_string()), &greeting_callback);
+    process_message(Message::Farewell("Goodbye".to_string()), &farewell_callback);
+    */
+
+
+    /*
     let kad = Kademlia::new();
     kad.get_routing_table().lock().unwrap().set_secure(false);
     kad.get_server().lock().unwrap().register_message(|| Box::new(PingRequest::default()));
@@ -64,6 +123,7 @@ fn main() {
     sleep(Duration::from_secs(5));
     println!("{}", kad.get_routing_table().lock().unwrap().all_nodes().len());
     sleep(Duration::from_secs(30));
+    */
 
 
 
