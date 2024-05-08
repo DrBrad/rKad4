@@ -1,3 +1,4 @@
+use std::any::Any;
 use std::net::SocketAddr;
 use bencode::variables::bencode_object::{BencodeObject, PutObject};
 use crate::kad::server::TID_LENGTH;
@@ -121,6 +122,10 @@ impl MessageBase for PingResponse {
         if ben.contains_key("ip") {
             self.public = unpack_address(ben.get_bytes("ip").unwrap());
         }
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
     }
 }
 

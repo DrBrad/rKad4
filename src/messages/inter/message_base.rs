@@ -1,3 +1,4 @@
+use std::any::Any;
 use crate::utils::uid::UID;
 use std::net::SocketAddr;
 use bencode::variables::bencode_object::BencodeObject;
@@ -34,6 +35,8 @@ pub trait MessageBase {
     fn encode(&self) -> BencodeObject;
 
     fn decode(&mut self, ben: &BencodeObject);
+
+    fn as_any(&self) -> &dyn Any;
 
     fn to_string(&self) -> String {
         self.encode().to_string()

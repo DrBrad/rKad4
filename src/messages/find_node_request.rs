@@ -1,3 +1,4 @@
+use std::any::Any;
 use std::net::SocketAddr;
 use bencode::variables::bencode_object::{BencodeObject, PutObject};
 use crate::kad::server::TID_LENGTH;
@@ -144,6 +145,10 @@ impl MessageBase for FindNodeRequest {
         let mut bid = [0u8; ID_LENGTH];
         bid.copy_from_slice(&ben.get_object(self.get_type().inner_key()).unwrap().get_bytes("target").unwrap()[..ID_LENGTH]);
         self.target = Some(UID::from(bid));
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
     }
 }
 
