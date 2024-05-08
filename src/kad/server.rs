@@ -16,6 +16,8 @@ use crate::messages::inter::message_base::{MessageBase, TID_KEY};
 use crate::messages::inter::message_key::MessageKey;
 use crate::messages::inter::message_type::{MessageType, TYPE_KEY};
 use crate::messages::inter::method_message_base::MethodMessageBase;
+use crate::rpc::events::inter::message_event::MessageEvent;
+use crate::rpc::events::request_event::RequestEvent;
 use crate::rpc::request_listener::RequestCallback;
 use crate::utils::net::address_utils::is_bogon;
 use crate::utils::node::Node;
@@ -171,9 +173,15 @@ impl Server {
                             let k = ben.get_string(t.rpc_type_name()).unwrap().to_string();
 
                             if self.request_mapping.contains_key(&k) {
+
+
+                                let mut event = RequestEvent::new(m);
+                                event.set_node(node);
+
                                 let callback = self.request_mapping.get(&k).unwrap();
                                 callback(m);
                             }
+
 
 
                             /*

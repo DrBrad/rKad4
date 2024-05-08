@@ -4,7 +4,7 @@ use crate::utils::node::Node;
 
 pub trait MessageEvent: Event {
 
-    fn get_message(&self) -> Box<dyn MessageBase>;
+    fn get_message(&self) -> &Box<dyn MessageBase>;
 
     fn has_node(&self) -> bool;
 
