@@ -174,7 +174,7 @@ impl Server {
 
                             if self.request_mapping.contains_key(&k) {
 
-                                //let m = m.as_any().downcast_ref::<dyn MessageBase>().unwrap();
+                                let m = m.as_any().downcast_ref::<dyn MessageBase>().unwrap();
 
                                 //let mut event = RequestEvent::new(m);
                                 //event.set_node(node);
