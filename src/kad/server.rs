@@ -174,12 +174,13 @@ impl Server {
 
                             if self.request_mapping.contains_key(&k) {
 
+                                let m2: Box<dyn MessageBase> = m as Box<dyn MessageBase>;
 
-                                let mut event = RequestEvent::new(m);
+                                let mut event = RequestEvent::new(m2);
                                 event.set_node(node);
 
-                                let callback = self.request_mapping.get(&k).unwrap();
-                                callback(m);
+                                //let callback = self.request_mapping.get(&k).unwrap();
+                                //callback(m);
                             }
 
 
