@@ -125,11 +125,19 @@ impl MessageBase for PingRequest {
     fn as_any(&self) -> &dyn Any {
         self
     }
+
+    fn as_any_mut(&mut self) -> &mut dyn Any {
+        self
+    }
 }
 
 impl MethodMessageBase for PingRequest {
 
     fn get_method(&self) -> &str {
         "ping"
+    }
+
+    fn upcast(&self) -> &dyn MessageBase {
+        self
     }
 }

@@ -150,11 +150,19 @@ impl MessageBase for FindNodeRequest {
     fn as_any(&self) -> &dyn Any {
         self
     }
+
+    fn as_any_mut(&mut self) -> &mut dyn Any {
+        self
+    }
 }
 
 impl MethodMessageBase for FindNodeRequest {
 
     fn get_method(&self) -> &str {
         "find_node"
+    }
+
+    fn upcast(&self) -> &dyn MessageBase {
+        self
     }
 }

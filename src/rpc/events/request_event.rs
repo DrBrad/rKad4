@@ -3,17 +3,17 @@ use crate::rpc::events::inter::event::Event;
 use crate::rpc::events::inter::message_event::MessageEvent;
 use crate::utils::node::Node;
 
-pub struct RequestEvent {
+pub struct RequestEvent<'a> {
     prevent_default: bool,
-    message: Box<dyn MessageBase>,
+    message: &'a dyn MessageBase,
     node: Option<Node>,
     received_time: u64,
     response: Option<Box<dyn MessageBase>>
 }
 
-impl RequestEvent {
+impl<'a> RequestEvent<'a> {
 
-    pub fn new(message: Box<dyn MessageBase>) -> Self {
+    pub fn new(message: &'a dyn MessageBase) -> Self {
         Self {
             prevent_default: false,
             message,
@@ -36,7 +36,7 @@ impl RequestEvent {
     }
 }
 
-impl Event for RequestEvent {
+impl<'a> Event for RequestEvent<'a> {
 
     fn is_prevent_default(&self) -> bool {
         self.prevent_default
@@ -47,10 +47,11 @@ impl Event for RequestEvent {
     }
 }
 
-impl MessageEvent for RequestEvent {
+impl<'a> MessageEvent for RequestEvent<'a> {
 
-    fn get_message(&self) -> &Box<dyn MessageBase> {
-        self.response.as_ref().unwrap()
+    fn get_message(&self) -> &dyn MessageBase {
+        self.message
+       // self.response.as_ref().unwrap()
     }
 
     fn has_node(&self) -> bool {

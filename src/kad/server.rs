@@ -16,6 +16,7 @@ use crate::messages::inter::message_base::{MessageBase, TID_KEY};
 use crate::messages::inter::message_key::MessageKey;
 use crate::messages::inter::message_type::{MessageType, TYPE_KEY};
 use crate::messages::inter::method_message_base::MethodMessageBase;
+use crate::messages::ping_request::PingRequest;
 use crate::rpc::events::inter::message_event::MessageEvent;
 use crate::rpc::events::request_event::RequestEvent;
 use crate::rpc::request_listener::RequestCallback;
@@ -173,10 +174,22 @@ impl Server {
                             let k = ben.get_string(t.rpc_type_name()).unwrap().to_string();
 
                             if self.request_mapping.contains_key(&k) {
+                                let mut event = RequestEvent::new(m.upcast());
+                                event.set_node(node);
 
-                                let m = m.as_any().downcast_ref::<dyn MessageBase>().unwrap();
+                                let callback = self.request_mapping.get(&k).unwrap();
+                                callback(event);
 
-                                //let mut event = RequestEvent::new(m);
+                                //let m = m.as_any().downcast_ref::<dyn MessageBase>().unwrap();
+                                /*
+                                if let Some(m2) = m.as_any().downcast_ref::<PingRequest>() {
+                                    //let mut event = RequestEvent::new(m2);
+                                    println!("SUCC TO CAST");
+                                }else{
+                                    println!("FAILED TO CAST");
+                                }//: Box<dyn MessageBase> = Box::new(m);
+                                */
+
                                 //event.set_node(node);
 
                                 //let callback = self.request_mapping.get(&k).unwrap();
