@@ -8,4 +8,4 @@ pub trait RequestListener {
     fn on_request(&self);
 }
 */
-pub type RequestCallback = fn(RequestEvent);
+pub type RequestCallback = fn(&mut RequestEvent);

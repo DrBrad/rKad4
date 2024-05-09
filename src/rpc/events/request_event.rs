@@ -27,8 +27,9 @@ impl<'a> RequestEvent<'a> {
         false
     }
 
-    pub fn get_response(&self) -> &Box<dyn MessageBase> {
-        self.response.as_ref().unwrap()
+    pub fn get_response(&self) -> &dyn MessageBase {
+        //self.response.as_ref().unwrap().as_any()
+        unimplemented!()
     }
 
     pub fn set_response(&mut self, message: Box<dyn MessageBase>) {

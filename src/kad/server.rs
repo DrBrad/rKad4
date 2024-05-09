@@ -17,6 +17,7 @@ use crate::messages::inter::message_key::MessageKey;
 use crate::messages::inter::message_type::{MessageType, TYPE_KEY};
 use crate::messages::inter::method_message_base::MethodMessageBase;
 use crate::messages::ping_request::PingRequest;
+use crate::rpc::events::inter::event::Event;
 use crate::rpc::events::inter::message_event::MessageEvent;
 use crate::rpc::events::request_event::RequestEvent;
 use crate::rpc::request_listener::RequestCallback;
@@ -31,7 +32,7 @@ pub struct Server {
     server: Option<Arc<Mutex<UdpSocket>>>,
     //tracker: Arc<Mutex<ResponseTracker>>,
     //running: Arc<AtomicBool>, //MAY NOT BE NEEDED
-    request_mapping: HashMap<String, RequestCallback>,
+    request_mapping: HashMap<String, Vec<RequestCallback>>,
     messages: HashMap<MessageKey, fn() -> Box<dyn MethodMessageBase>>
 }
 
@@ -121,7 +122,13 @@ impl Server {
     //REGISTER MESSAGES...
 
     pub fn register_request_listener(&mut self, key: &str, callback: RequestCallback) {
-        self.request_mapping.insert(key.to_string(), callback);
+        let key = key.to_string();
+        if self.request_mapping.contains_key(&key) {
+            self.request_mapping.get_mut(&key).unwrap().push(callback);
+        }
+        let mut mapping = Vec::new();
+        mapping.push(callback);
+        self.request_mapping.insert(key.to_string(), mapping);
     }
 
     pub fn register_message(&mut self, constructor: fn() -> Box<dyn MethodMessageBase>) {
@@ -177,8 +184,24 @@ impl Server {
                                 let mut event = RequestEvent::new(m.upcast());
                                 event.set_node(node);
 
-                                let callback = self.request_mapping.get(&k).unwrap();
-                                callback(event);
+                                let callbacks = self.request_mapping.get(&k).unwrap();
+
+                                if !callbacks.is_empty() {
+                                    for callback in callbacks {
+                                        callback(&mut event);
+                                    }
+
+                                    if event.is_prevent_default() {
+                                        return;
+                                    }
+
+                                    if !event.has_response() {
+                                        //NO RESPONSE...
+                                        //throw new MessageException("Method Unknown", 204);
+                                    }
+
+                                    self.send(event.get_response());
+                                }
 
                                 //let m = m.as_any().downcast_ref::<dyn MessageBase>().unwrap();
                                 /*
@@ -279,7 +302,7 @@ impl Server {
         */
     }
 
-    pub fn send(&self, mut message: Box<dyn MessageBase>) {
+    pub fn send(&self, mut message: &dyn MessageBase) {
         if let Some(server) = &self.server {
             //message.set_uid(self.kademlia.get_routing_table().lock().unwrap().get_derived_uid());
             //server.lock().unwrap().send_to(message.encode().encode().as_slice(), message.get_destination_address()).unwrap(); //probably should return if failed to send...
