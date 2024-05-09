@@ -161,7 +161,7 @@ impl Server {
                 match t {
                     MessageType::ReqMsg => {
 
-                        let do_steps = || -> Result<(), MessageException> {
+                        if let Err(_err) = || -> Result<(), MessageException> {
                             let x = ben.get_string(t.rpc_type_name())
                                 .map_err(|e| MessageException::new("Method Unknown", 204))?;
                             let message_key = MessageKey::new(x, t);
@@ -217,10 +217,11 @@ impl Server {
                             }
 
                             Ok(())
-                        };
-
-                        if let Err(_err) = do_steps() {
+                        }() {
                             println!("Failed to perform necessary steps");
+                        }
+
+                        //if let Err(_err) = do_steps() {
 
                             /*
                             ErrorResponse response = new ErrorResponse(ben.getBytes(TID_KEY));
@@ -230,7 +231,7 @@ impl Server {
                             response.setDescription(e.getMessage());
                             send(response);
                             */
-                        }
+                        //}
 
 
                         /*
