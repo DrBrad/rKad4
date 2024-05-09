@@ -216,12 +216,13 @@ impl Server {
                                 self.send(event.get_response().unwrap());
                             }
 
+                            if !self.kademlia.as_ref().unwrap().get_refresh_handler().lock().unwrap().is_running() {
+                                self.kademlia.as_ref().unwrap().get_refresh_handler().lock().unwrap().start();
+                            }
+
                             Ok(())
                         }() {
                             println!("Failed to perform necessary steps");
-                        }
-
-                        //if let Err(_err) = do_steps() {
 
                             /*
                             ErrorResponse response = new ErrorResponse(ben.getBytes(TID_KEY));
@@ -231,81 +232,7 @@ impl Server {
                             response.setDescription(e.getMessage());
                             send(response);
                             */
-                        //}
-
-
-                        /*
-                        let message_key = MessageKey::new(ben.get_string(t.rpc_type_name()).expect("Failed to find valid key."), t);
-
-                        //let message_key = ;
-
-                        if let Some(constructor) = self.messages.get(&message_key) {
-                            let mut m = constructor();
-
-                            let mut tid = [0u8; TID_LENGTH];
-                            tid.copy_from_slice(ben.get_bytes(TID_KEY).expect("Failed to find TID key."));
-
-                            m.set_transaction_id(tid);
-                            m.decode(&ben);
-                            m.set_origin(src_addr);
-                            //message.set_transaction_id(ben.get_bytes(TID_KEY).expect("Failed to find TID"));
-
-                            let node = Node::new(m.get_uid(), m.get_origin());
-                            self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap().insert(node);
-
-
-                            let k = ben.get_string(t.rpc_type_name()).unwrap().to_string();
-
-                            if self.request_mapping.contains_key(&k) {
-                                let mut event = RequestEvent::new(m.upcast());
-                                event.set_node(node);
-
-                                let callbacks = self.request_mapping.get(&k).unwrap();
-
-                                if !callbacks.is_empty() {
-                                    for callback in callbacks {
-                                        callback(&mut event);
-                                    }
-
-                                    if event.is_prevent_default() {
-                                        return;
-                                    }
-
-                                    if !event.has_response() {
-                                        //NO RESPONSE...
-                                        //throw new MessageException("Method Unknown", 204);
-                                    }
-
-                                    //REMOVE - ONLY FOR TESTING...
-                                    event.get_response().unwrap().set_uid(self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap().get_derived_uid());
-                                    //REMOVE ^^^^^^^^^^^
-
-                                    println!("RESPONSE: {}", event.get_response().unwrap().to_string());
-
-                                    self.send(event.get_response().unwrap());
-                                }
-                            }
-                            */
-
-
-
-                            /*
-                            }catch(MessageException e){
-                                ErrorResponse response = new ErrorResponse(ben.getBytes(TID_KEY));
-                                response.setDestination(packet.getAddress(), packet.getPort());
-                                response.setPublic(packet.getAddress(), packet.getPort());
-                                response.setCode(e.getCode());
-                                response.setDescription(e.getMessage());
-                                send(response);
-                            }
-                            */
-
-                            //println!("MESSAGE CREATED {}", m.to_string());
-
-                            if !self.kademlia.as_ref().unwrap().get_refresh_handler().lock().unwrap().is_running() {
-                                self.kademlia.as_ref().unwrap().get_refresh_handler().lock().unwrap().start();
-                            }
-                        //}
+                        }
                     },
                     MessageType::RspMsg => {
                         let mut tid = [0u8; TID_LENGTH];
