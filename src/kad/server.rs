@@ -13,6 +13,7 @@ use bencode::variables::inter::bencode_variable::BencodeVariable;
 use crate::kad::kademlia_base::KademliaBase;
 use crate::kademlia::Kademlia;
 use crate::messages::inter::message_base::{MessageBase, TID_KEY};
+use crate::messages::inter::message_exception::MessageException;
 use crate::messages::inter::message_key::MessageKey;
 use crate::messages::inter::message_type::{MessageType, TYPE_KEY};
 use crate::messages::inter::method_message_base::MethodMessageBase;
@@ -159,6 +160,71 @@ impl Server {
 
                 match t {
                     MessageType::ReqMsg => {
+
+                        let do_steps = || -> Result<(), MessageException> {
+                            let x = ben.get_string(t.rpc_type_name())
+                                .map_err(|e| MessageException::new("Method Unknown", 204))?;
+                            let message_key = MessageKey::new(x, t);
+
+                            let constructor = self.messages.get(&message_key).unwrap();
+
+                            let mut m = constructor();
+
+                            let mut tid = [0u8; TID_LENGTH];
+                            tid.copy_from_slice(ben.get_bytes(TID_KEY).map_err(|e| MessageException::new("Method Unknown", 204))?);
+
+                            m.set_transaction_id(tid);
+                            m.decode(&ben);
+                            m.set_origin(src_addr);
+
+                            let node = Node::new(m.get_uid(), m.get_origin());
+                            self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap().insert(node);
+
+
+                            let k = ben.get_string(t.rpc_type_name()).unwrap().to_string();
+
+                            if !self.request_mapping.contains_key(&k) {
+                                return Err(MessageException::new("Method Unknown", 204));
+                            }
+
+                            let mut event = RequestEvent::new(m.upcast());
+                            event.set_node(node);
+
+                            let callbacks = self.request_mapping.get(&k).unwrap();
+
+                            if !callbacks.is_empty() {
+                                for callback in callbacks {
+                                    callback(&mut event);
+                                }
+
+                                if event.is_prevent_default() {
+                                    return Err(MessageException::new("Method Unknown", 204));
+                                }
+
+                                if !event.has_response() {
+                                    //NO RESPONSE...
+                                    //throw new MessageException("Method Unknown", 204);
+                                    return Err(MessageException::new("Method Unknown", 204));
+                                }
+
+                                //REMOVE - ONLY FOR TESTING...
+                                event.get_response().unwrap().set_uid(self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap().get_derived_uid());
+                                //REMOVE ^^^^^^^^^^^
+
+                                println!("RESPONSE: {}", event.get_response().unwrap().to_string());
+
+                                self.send(event.get_response().unwrap());
+                            }
+
+                            Ok(())
+                        };
+
+                        if let Err(_err) = do_steps() {
+                            println!("Failed to perform necessary steps");
+                        }
+
+
+                        /*
                         let message_key = MessageKey::new(ben.get_string(t.rpc_type_name()).expect("Failed to find valid key."), t);
 
                         //let message_key = ;
@@ -208,43 +274,12 @@ impl Server {
 
                                     self.send(event.get_response().unwrap());
                                 }
-
-                                //let m = m.as_any().downcast_ref::<dyn MessageBase>().unwrap();
-                                /*
-                                if let Some(m2) = m.as_any().downcast_ref::<PingRequest>() {
-                                    //let mut event = RequestEvent::new(m2);
-                                    println!("SUCC TO CAST");
-                                }else{
-                                    println!("FAILED TO CAST");
-                                }//: Box<dyn MessageBase> = Box::new(m);
-                                */
-
-                                //event.set_node(node);
-
-                                //let callback = self.request_mapping.get(&k).unwrap();
-                                //callback(m);
                             }
+                            */
 
 
 
                             /*
-                                RequestEvent event = new RequestEvent(m, node);
-                                event.received();
-
-                                for(ReflectMethod r : requestMapping.get(m.getMethod())){
-                                    r.getMethod().invoke(r.getInstance(), event); //THROW ERROR - SEND ERROR MESSAGE
-                                }
-
-                                if(event.isPreventDefault()){
-                                    return;
-                                }
-
-                                if(!event.hasResponse()){
-                                    throw new MessageException("Method Unknown", 204);
-                                }
-
-                                send(event.getResponse());
-
                             }catch(MessageException e){
                                 ErrorResponse response = new ErrorResponse(ben.getBytes(TID_KEY));
                                 response.setDestination(packet.getAddress(), packet.getPort());
@@ -260,7 +295,7 @@ impl Server {
                             if !self.kademlia.as_ref().unwrap().get_refresh_handler().lock().unwrap().is_running() {
                                 self.kademlia.as_ref().unwrap().get_refresh_handler().lock().unwrap().start();
                             }
-                        }
+                        //}
                     },
                     MessageType::RspMsg => {
                         let mut tid = [0u8; TID_LENGTH];

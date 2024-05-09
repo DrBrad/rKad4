@@ -3,6 +3,7 @@ use std::net::SocketAddr;
 use bencode::variables::bencode_object::{BencodeObject, PutObject};
 use crate::kad::server::TID_LENGTH;
 use crate::messages::inter::message_base::{MessageBase, TID_KEY};
+use crate::messages::inter::message_exception::MessageException;
 use crate::messages::inter::message_type::{MessageType, TYPE_KEY};
 use crate::utils::net::address_utils::{pack_address, unpack_address};
 use crate::utils::uid::{ID_LENGTH, UID};
@@ -125,7 +126,7 @@ impl MessageBase for FindNodeRequest {
         ben
     }
 
-    fn decode(&mut self, ben: &BencodeObject) {
+    fn decode(&mut self, ben: &BencodeObject) -> Result<(), MessageException> {
         if !ben.contains_key(self.get_type().inner_key()) {
             //throw new MessageException("Protocol Error, such as a malformed packet.", 203);
         }
@@ -145,6 +146,8 @@ impl MessageBase for FindNodeRequest {
         let mut bid = [0u8; ID_LENGTH];
         bid.copy_from_slice(&ben.get_object(self.get_type().inner_key()).unwrap().get_bytes("target").unwrap()[..ID_LENGTH]);
         self.target = Some(UID::from(bid));
+
+        Ok(())
     }
 
     fn as_any(&self) -> &dyn Any {

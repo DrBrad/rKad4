@@ -4,6 +4,7 @@ use std::net::SocketAddr;
 use bencode::variables::bencode_object::BencodeObject;
 use bencode::variables::inter::bencode_variable::BencodeVariable;
 use crate::kad::server::TID_LENGTH;
+use crate::messages::inter::message_exception::MessageException;
 use crate::messages::inter::message_type::MessageType;
 
 pub const TID_KEY: &str = "t";
@@ -34,7 +35,7 @@ pub trait MessageBase {
 
     fn encode(&self) -> BencodeObject;
 
-    fn decode(&mut self, ben: &BencodeObject);
+    fn decode(&mut self, ben: &BencodeObject) -> Result<(), MessageException>;
 
     fn as_any(&self) -> &dyn Any;
 
