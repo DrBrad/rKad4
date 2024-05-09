@@ -221,6 +221,15 @@ impl Server {
 
                         if let Err(_err) = do_steps() {
                             println!("Failed to perform necessary steps");
+
+                            /*
+                            ErrorResponse response = new ErrorResponse(ben.getBytes(TID_KEY));
+                            response.setDestination(packet.getAddress(), packet.getPort());
+                            response.setPublic(packet.getAddress(), packet.getPort());
+                            response.setCode(e.getCode());
+                            response.setDescription(e.getMessage());
+                            send(response);
+                            */
                         }
 
 

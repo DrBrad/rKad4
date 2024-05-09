@@ -109,11 +109,11 @@ impl MessageBase for PingResponse {
 
     fn decode(&mut self, ben: &BencodeObject) -> Result<(), MessageException> {
         if !ben.contains_key(self.get_type().inner_key()) {
-            //throw new MessageException("Protocol Error, such as a malformed packet.", 203);
+            return Err(MessageException::new("Protocol Error, such as a malformed packet.", 203));
         }
 
         if !ben.get_object(self.get_type().inner_key()).unwrap().contains_key("id") {
-            //throw new MessageException("Protocol Error, such as a malformed packet.", 203);
+            return Err(MessageException::new("Protocol Error, such as a malformed packet.", 203));
         }
 
         let mut bid = [0u8; ID_LENGTH];
