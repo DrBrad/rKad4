@@ -200,7 +200,13 @@ impl Server {
                                         //throw new MessageException("Method Unknown", 204);
                                     }
 
-                                    self.send(event.get_response());
+                                    //REMOVE - ONLY FOR TESTING...
+                                    event.get_response().unwrap().set_uid(self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap().get_derived_uid());
+                                    //REMOVE ^^^^^^^^^^^
+
+                                    println!("RESPONSE: {}", event.get_response().unwrap().to_string());
+
+                                    self.send(event.get_response().unwrap());
                                 }
 
                                 //let m = m.as_any().downcast_ref::<dyn MessageBase>().unwrap();

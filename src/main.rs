@@ -22,6 +22,7 @@ use crate::messages::inter::message_key::MessageKey;
 use crate::messages::inter::message_type::MessageType;
 use crate::messages::inter::method_message_base::MethodMessageBase;
 use crate::messages::ping_request::PingRequest;
+use crate::messages::ping_response::PingResponse;
 //use crate::messages::ping_request::PingRequest;
 use crate::refresh::refresh_handler::RefreshHandler;
 use crate::refresh::tasks::bucket_refresh_task::BucketRefreshTask;
@@ -106,6 +107,11 @@ fn main() {
 
     let ping_callback: RequestCallback = |event| {
         println!("{}", event.get_message().to_string());
+
+        let mut response = PingResponse::default();
+        response.set_destination(event.get_message().get_origin());
+        response.set_public(event.get_message().get_origin());
+        event.set_response(Box::new(response));
     };
 
 

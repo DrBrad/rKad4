@@ -27,9 +27,11 @@ impl<'a> RequestEvent<'a> {
         false
     }
 
-    pub fn get_response(&self) -> &dyn MessageBase {
-        //self.response.as_ref().unwrap().as_any()
-        unimplemented!()
+    pub fn get_response(&mut self) -> Result<&mut dyn MessageBase, String> {
+        match self.response {
+            Some(ref mut response) => Ok(response.as_mut()),
+            None => Err("No response was set.".to_string())
+        }
     }
 
     pub fn set_response(&mut self, message: Box<dyn MessageBase>) {
