@@ -60,7 +60,6 @@ mod rpc;
 
 
 fn main() {
-
     /*
     let ping_callback = |message: Box<dyn MessageBase>| {
         println!("{}", message.to_string());
