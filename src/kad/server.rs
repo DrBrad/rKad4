@@ -51,9 +51,11 @@ impl Server {
         };
 
         self_.register_message(|| Box::new(PingRequest::default()));
+        self_.register_message(|| Box::new(PingResponse::default()));
         self_.register_message(|| Box::new(FindNodeRequest::default()));
+        //self_.register_message(|| Box::new(FindNodeResponse::default()));
 
-
+        //CAN THIS BE MOVED TO k_request_listener?
         let ping_callback: RequestCallback = |event| {
             println!("{}", event.get_message().to_string());
 
