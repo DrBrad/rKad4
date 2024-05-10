@@ -64,27 +64,7 @@ mod rpc;
 fn main() {
     let kad = Kademlia::new();
     kad.get_routing_table().lock().unwrap().set_secure(false);
-    kad.get_server().lock().unwrap().register_message(|| Box::new(PingRequest::default()));
-    kad.get_server().lock().unwrap().register_message(|| Box::new(FindNodeRequest::default()));
 
-
-    let ping_callback: RequestCallback = |event| {
-        println!("{}", event.get_message().to_string());
-
-        let mut response = PingResponse::default();
-        response.set_transaction_id(*event.get_message().get_transaction_id());
-        response.set_destination(event.get_message().get_origin());
-        response.set_public(event.get_message().get_origin());
-        event.set_response(Box::new(response));
-    };
-
-
-    let find_node_callback: RequestCallback = |event| {
-        println!("{}", event.get_message().to_string());
-    };
-
-    kad.get_server().lock().unwrap().register_request_listener("ping", ping_callback);
-    kad.get_server().lock().unwrap().register_request_listener("find_node", find_node_callback);
 
 
     kad.bind(8080);

@@ -12,12 +12,14 @@ use bencode::variables::bencode_object::BencodeObject;
 use bencode::variables::inter::bencode_variable::BencodeVariable;
 use crate::kad::kademlia_base::KademliaBase;
 use crate::kademlia::Kademlia;
+use crate::messages::find_node_request::FindNodeRequest;
 use crate::messages::inter::message_base::{MessageBase, TID_KEY};
 use crate::messages::inter::message_exception::MessageException;
 use crate::messages::inter::message_key::MessageKey;
 use crate::messages::inter::message_type::{MessageType, TYPE_KEY};
 use crate::messages::inter::method_message_base::MethodMessageBase;
 use crate::messages::ping_request::PingRequest;
+use crate::messages::ping_response::PingResponse;
 use crate::rpc::events::inter::event::Event;
 use crate::rpc::events::inter::message_event::MessageEvent;
 use crate::rpc::events::request_event::RequestEvent;
@@ -40,13 +42,37 @@ pub struct Server {
 impl Server {
 
     pub fn new(/*kademlia: Box<dyn KademliaBase>*/) -> Self {
-        Self {
+        let mut self_ = Self {
             kademlia: None,
             server: None,
             //running: Arc::new(AtomicBool::new(false)), //MAY NOT BE NEEDED
             request_mapping: HashMap::new(),
             messages: HashMap::new()
-        }
+        };
+
+        self_.register_message(|| Box::new(PingRequest::default()));
+        self_.register_message(|| Box::new(FindNodeRequest::default()));
+
+
+        let ping_callback: RequestCallback = |event| {
+            println!("{}", event.get_message().to_string());
+
+            let mut response = PingResponse::default();
+            response.set_transaction_id(*event.get_message().get_transaction_id());
+            response.set_destination(event.get_message().get_origin());
+            response.set_public(event.get_message().get_origin());
+            event.set_response(Box::new(response));
+        };
+
+
+        let find_node_callback: RequestCallback = |event| {
+            println!("{}", event.get_message().to_string());
+        };
+
+        self_.register_request_listener("ping", ping_callback);
+        self_.register_request_listener("find_node", find_node_callback);
+
+        self_
     }
 
     pub fn start(&mut self, port: u16) {
