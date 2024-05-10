@@ -280,11 +280,8 @@ impl Server {
 
     pub fn send(&self, message: &mut dyn MessageBase) {
         if let Some(server) = &self.server {
-            println!("SENDING: A");
             message.set_uid(self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap().get_derived_uid());
-            println!("SENDING: B");
             server.send_to(message.encode().encode().as_slice(), message.get_destination()).unwrap(); //probably should return if failed to send...
-            println!("SENT");
         }
     }
 

@@ -112,9 +112,6 @@ fn main() {
         response.set_destination(event.get_message().get_origin());
         response.set_public(event.get_message().get_origin());
         event.set_response(Box::new(response));
-
-        println!("{:?}", event.get_message().get_transaction_id());
-        println!("{:?}", event.get_response().unwrap().get_transaction_id());
     };
 
 
