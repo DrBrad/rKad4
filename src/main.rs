@@ -58,46 +58,10 @@ mod rpc;
 
 //Java version - register message as MethodMessageBase not MessageBase...
 
+//GENERATE RANDOM TIDS...
+
 
 fn main() {
-    /*
-    let ping_callback = |message: Box<dyn MessageBase>| {
-        println!("{}", message.to_string());
-    };
-
-    let mut map = HashMap::new();
-    map.insert(MessageKey::new("find_node", MessageType::ReqMsg), &ping_callback);
-
-
-    let mut request = FindNodeRequest::default();
-    request.set_target(UID::try_from("e5af5f5134c1e664b6f8260e9d99d7a8719254c3").unwrap());
-    request.set_destination(SocketAddr::from(([127, 2, 0, 1], 1080)));
-    request.set_uid(UID::try_from("6a677a188b9c209021eb185ed0c9d44a1347f1bb").unwrap());
-
-    let key = MessageKey::new("find_node", MessageType::ReqMsg);
-    if map.contains_key(&key) {
-        map.get(&key).unwrap()(Box::new(request));
-    }
-    */
-
-
-    /*
-    // Define a callback for Greeting messages
-    let greeting_callback = |msg: &str| {
-        println!("Received greeting: {}", msg);
-    };
-
-    // Define a callback for Farewell messages
-    let farewell_callback = |msg: &str| {
-        println!("Received farewell: {}", msg);
-    };
-
-    // Process messages with different callbacks
-    process_message(Message::Greeting("Hello".to_string()), &greeting_callback);
-    process_message(Message::Farewell("Goodbye".to_string()), &farewell_callback);
-    */
-
-
     let kad = Kademlia::new();
     kad.get_routing_table().lock().unwrap().set_secure(false);
     kad.get_server().lock().unwrap().register_message(|| Box::new(PingRequest::default()));
