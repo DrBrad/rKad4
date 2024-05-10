@@ -3,15 +3,16 @@ use crate::rpc::events::inter::event::Event;
 use crate::rpc::events::inter::message_event::MessageEvent;
 use crate::utils::node::Node;
 
-pub struct RequestEvent<'a> {
+pub struct ResponseEvent<'a> {
     prevent_default: bool,
     message: &'a dyn MessageBase,
     node: Option<Node>,
     received_time: u64,
-    response: Option<Box<dyn MessageBase>>
+    sent_time: u64,
+    request: Option<Box<dyn MessageBase>>
 }
 
-impl<'a> RequestEvent<'a> {
+impl<'a> ResponseEvent<'a> {
 
     pub fn new(message: &'a dyn MessageBase) -> Self {
         Self {
@@ -19,27 +20,28 @@ impl<'a> RequestEvent<'a> {
             message,
             node: None,
             received_time: 0,
-            response: None
+            sent_time: 0,
+            request: None
         }
     }
 
-    pub fn has_response(&self) -> bool {
-        self.response.is_some()
+    pub fn has_request(&self) -> bool {
+        self.request.is_some()
     }
 
-    pub fn get_response(&mut self) -> Result<&mut dyn MessageBase, String> {
-        match self.response {
+    pub fn get_request(&mut self) -> Result<&mut dyn MessageBase, String> {
+        match self.request {
             Some(ref mut response) => Ok(response.as_mut()),
             None => Err("No response was set.".to_string())
         }
     }
 
-    pub fn set_response(&mut self, message: Box<dyn MessageBase>) {
-        self.response = Some(message);
+    pub fn set_request(&mut self, message: Box<dyn MessageBase>) {
+        self.request = Some(message);
     }
 }
 
-impl<'a> Event for RequestEvent<'a> {
+impl<'a> Event for ResponseEvent<'a> {
 
     fn is_prevent_default(&self) -> bool {
         self.prevent_default
@@ -50,11 +52,11 @@ impl<'a> Event for RequestEvent<'a> {
     }
 }
 
-impl<'a> MessageEvent for RequestEvent<'a> {
+impl<'a> MessageEvent for ResponseEvent<'a> {
 
     fn get_message(&self) -> &dyn MessageBase {
         self.message
-       // self.response.as_ref().unwrap()
+        // self.response.as_ref().unwrap()
     }
 
     fn has_node(&self) -> bool {
