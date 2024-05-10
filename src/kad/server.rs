@@ -23,6 +23,7 @@ use crate::messages::ping_response::PingResponse;
 use crate::rpc::events::inter::event::Event;
 use crate::rpc::events::inter::message_event::MessageEvent;
 use crate::rpc::events::request_event::RequestEvent;
+use crate::rpc::events::response_event::ResponseEvent;
 use crate::rpc::request_listener::RequestCallback;
 use crate::utils::net::address_utils::is_bogon;
 use crate::utils::node::Node;
@@ -307,6 +308,13 @@ impl Server {
     }
 
     pub fn send(&self, message: &mut dyn MessageBase) {
+        if let Some(server) = &self.server {
+            message.set_uid(self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap().get_derived_uid());
+            server.send_to(message.encode().encode().as_slice(), message.get_destination()).unwrap(); //probably should return if failed to send...
+        }
+    }
+
+    pub fn send_with_callback<'a>(&self, message: &mut dyn MessageBase, callback: fn() -> ResponseEvent<'a>) {
         if let Some(server) = &self.server {
             message.set_uid(self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap().get_derived_uid());
             server.send_to(message.encode().encode().as_slice(), message.get_destination()).unwrap(); //probably should return if failed to send...
