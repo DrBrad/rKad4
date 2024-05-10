@@ -2,6 +2,8 @@ use std::net::SocketAddr;
 use std::sync::{Arc, Mutex};
 use crate::kad::kademlia_base::KademliaBase;
 use crate::kad::server::Server;
+use crate::messages::find_node_request::FindNodeRequest;
+use crate::messages::inter::message_base::MessageBase;
 use crate::refresh::refresh_handler::RefreshHandler;
 use crate::refresh::tasks::bucket_refresh_task::BucketRefreshTask;
 use crate::refresh::tasks::stale_refresh_task::StaleRefreshTask;
@@ -64,6 +66,11 @@ impl KademliaBase for Kademlia {
 
     fn join(&self, local_port: u16, addr: SocketAddr) {
         self.server.lock().unwrap().start(local_port);
+
+        let mut request = FindNodeRequest::default();
+        request.set_destination(addr);
+        request.set_target(self.routing_table.lock().unwrap().get_derived_uid());
+        self.server.lock().unwrap().send(&request);
         //self.refresh.lock().unwrap().start();
 
         //START JOIN HANDLING
