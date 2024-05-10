@@ -110,14 +110,9 @@ impl MessageBase for FindNodeRequest {
         ben.put("v", "1.0");
         ben.put(TYPE_KEY, self.get_type().rpc_type_name());
 
-        match self.get_type() {
-            MessageType::ReqMsg => {
-                ben.put(self.get_type().rpc_type_name(), self.get_method());
-                ben.put(self.get_type().inner_key(), BencodeObject::new());
-                ben.get_object_mut(self.get_type().inner_key()).unwrap().put("id", self.uid.unwrap().bid.clone());
-            },
-            _ => unimplemented!()
-        }
+        ben.put(self.get_type().rpc_type_name(), self.get_method());
+        ben.put(self.get_type().inner_key(), BencodeObject::new());
+        ben.get_object_mut(self.get_type().inner_key()).unwrap().put("id", self.uid.unwrap().bid.clone());
 
         if let Some(target) = self.target {
             ben.get_object_mut(self.get_type().inner_key()).unwrap().put("target", target.bid.clone());

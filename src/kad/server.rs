@@ -25,6 +25,7 @@ use crate::rpc::events::inter::message_event::MessageEvent;
 use crate::rpc::events::request_event::RequestEvent;
 use crate::rpc::events::response_event::ResponseEvent;
 use crate::rpc::request_listener::RequestCallback;
+use crate::utils;
 use crate::utils::net::address_utils::is_bogon;
 use crate::utils::node::Node;
 use crate::utils::uid::{ID_LENGTH, UID};
@@ -316,13 +317,13 @@ impl Server {
 
     pub fn send_with_callback<'a>(&self, message: &mut dyn MessageBase, callback: fn() -> ResponseEvent<'a>) {
         if let Some(server) = &self.server {
+            message.set_transaction_id(self.generate_transaction_id());
             message.set_uid(self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap().get_derived_uid());
             server.send_to(message.encode().encode().as_slice(), message.get_destination()).unwrap(); //probably should return if failed to send...
         }
     }
 
     pub fn generate_transaction_id(&self) -> [u8; TID_LENGTH] {
-        //let random = utils::random::gen();
-        [0u8; TID_LENGTH]
+        utils::random::gen_array::<TID_LENGTH>()
     }
 }

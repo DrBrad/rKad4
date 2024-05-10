@@ -81,7 +81,7 @@ impl RoutingTable for KRoutingTable {
         }
 
         //let mut rng = rand::thread_rng();
-        let rand: u8 = /*rng.gen::<u8>()*/utils::random::gen() & 0xFF;
+        let rand: u8 = /*rng.gen::<u8>()*/utils::random::gen::<u8>() & 0xFF;
         let r = rand & 0x7;
 
         ip[0] |= r << 5;
@@ -93,10 +93,10 @@ impl RoutingTable for KRoutingTable {
         let mut bid = [0u8; ID_LENGTH];
         bid[0] = (crc >> 24) as u8;
         bid[1] = (crc >> 16) as u8;
-        bid[2] = ((crc >> 8) as u8 & 0xF8) | (/*rng.gen::<u8>()*/utils::random::gen() & 0x7);
+        bid[2] = ((crc >> 8) as u8 & 0xF8) | (/*rng.gen::<u8>()*/utils::random::gen::<u8>() & 0x7);
 
         for i in 3..19 {
-            bid[i] = /*rng.gen::<u8>()*/utils::random::gen() & 0xFF;
+            bid[i] = /*rng.gen::<u8>()*/utils::random::gen::<u8>() & 0xFF;
         }
 
         bid[19] = rand & 0xFF;

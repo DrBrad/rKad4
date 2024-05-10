@@ -70,6 +70,8 @@ impl KademliaBase for Kademlia {
         let mut request = FindNodeRequest::default();
         request.set_destination(addr);
         request.set_target(self.routing_table.lock().unwrap().get_derived_uid());
+
+        //NEED TO SEND WITH CALLBACK...
         self.server.lock().unwrap().send(&mut request);
         //self.refresh.lock().unwrap().start();
 
