@@ -161,10 +161,9 @@ impl Server {
                 match t {
                     MessageType::ReqMsg => {
 
-                        if let Err(_err) = || -> Result<(), MessageException> {
-                            let x = ben.get_string(t.rpc_type_name())
-                                .map_err(|e| MessageException::new("Method Unknown", 204))?;
-                            let message_key = MessageKey::new(x, t);
+                        if let Err(e) = || -> Result<(), MessageException> {
+                            let message_key = MessageKey::new(ben.get_string(t.rpc_type_name())
+                                    .map_err(|e| MessageException::new("Method Unknown", 204))?, t);
 
                             let constructor = self.messages.get(&message_key).unwrap();
 
@@ -198,12 +197,11 @@ impl Server {
                                 }
 
                                 if event.is_prevent_default() {
+                                    //RETURN NOTHING - NO ERROR
                                     return Err(MessageException::new("Method Unknown", 204));
                                 }
 
                                 if !event.has_response() {
-                                    //NO RESPONSE...
-                                    //throw new MessageException("Method Unknown", 204);
                                     return Err(MessageException::new("Method Unknown", 204));
                                 }
 
@@ -222,7 +220,7 @@ impl Server {
 
                             Ok(())
                         }() {
-                            println!("Failed to perform necessary steps");
+                            println!("{}", e.get_message());
 
                             /*
                             ErrorResponse response = new ErrorResponse(ben.getBytes(TID_KEY));
