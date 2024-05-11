@@ -317,6 +317,7 @@ impl Server {
 
     pub fn send_with_callback<'a>(&self, message: &mut dyn MessageBase, callback: fn() -> ResponseEvent<'a>) {
         if let Some(server) = &self.server {
+            //add to tracker
             message.set_transaction_id(self.generate_transaction_id());
             message.set_uid(self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap().get_derived_uid());
             server.send_to(message.encode().encode().as_slice(), message.get_destination()).unwrap(); //probably should return if failed to send...
