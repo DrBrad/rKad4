@@ -37,7 +37,7 @@ impl<'a> Call<'a> {
     //response callback - has, set, get
 
     pub fn set_sent_time(&mut self, sent_time: u64) {
-        self.sent_time = self.sent_time;
+        self.sent_time = sent_time;
     }
 
     pub fn get_sent_time(&self) -> u64 {

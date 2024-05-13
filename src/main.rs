@@ -59,8 +59,6 @@ mod rpc;
 //Java version - register message as MethodMessageBase not MessageBase...
 //Java version no need for if has message callback
 
-//GENERATE RANDOM TIDS...
-
 
 fn main() {
     let kad = Kademlia::new();
