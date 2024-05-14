@@ -53,13 +53,6 @@ mod rpc;
 //echo -n "hello" >/dev/udp/localhost/8080
 //netcat -ul 8080
 
-//FIX ERROR HANDLING WITH THIS AND BENCODE SIDE - No panic - dont just unwrap - CHECK
-//REGISTER MESSAGE TYPES...
-
-//Java version - register message as MethodMessageBase not MessageBase...
-//Java version no need for if has message callback
-
-
 fn main() {
     let kad = Kademlia::new();
     kad.get_routing_table().lock().unwrap().set_secure(false);
