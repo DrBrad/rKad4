@@ -13,11 +13,11 @@ pub struct ByteWrapper {
 
 // Define your Call struct here
 
-pub struct ResponseTracker {
-    calls: HashMap<ByteWrapper, Call>,
+pub struct ResponseTracker<'a> {
+    calls: HashMap<ByteWrapper, Call<'a>>,
 }
 
-impl ResponseTracker {
+impl<'a> ResponseTracker<'a> {
 
     pub fn new() -> Self {
         ResponseTracker {

@@ -44,7 +44,7 @@ impl<'a> Call<'a> {
         self.sent_time
     }
 
-    pub fn is_stalled(&self) -> bool {
+    pub fn is_stalled(&self, now: u64) -> bool {
         false
         //return (now-sentTime > STALLED_TIME);
     }
