@@ -12,9 +12,9 @@ pub trait MessageEvent: Event {
 
     fn get_node(&self) -> Node;
 
-    fn set_received_time(&mut self, received_time: u64);
+    fn set_received_time(&mut self, received_time: u128);
 
-    fn get_received_time(&self) -> u64;
+    fn get_received_time(&self) -> u128;
 
     fn received(&mut self);
 }

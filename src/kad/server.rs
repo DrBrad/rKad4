@@ -20,8 +20,10 @@ use crate::messages::inter::message_type::{MessageType, TYPE_KEY};
 use crate::messages::inter::method_message_base::MethodMessageBase;
 use crate::messages::ping_request::PingRequest;
 use crate::messages::ping_response::PingResponse;
+use crate::rpc::call::Call;
 use crate::rpc::events::inter::event::Event;
 use crate::rpc::events::inter::message_event::MessageEvent;
+use crate::rpc::events::inter::response_callback::ResponseCallback;
 use crate::rpc::events::request_event::RequestEvent;
 use crate::rpc::events::response_event::ResponseEvent;
 use crate::rpc::request_listener::RequestCallback;
@@ -315,8 +317,9 @@ impl Server {
         }
     }
 
-    pub fn send_with_callback<'a>(&self, message: &mut dyn MessageBase, callback: fn() -> ResponseEvent<'a>) {
+    pub fn send_with_callback(&self, message: &mut dyn MessageBase, callback: &dyn ResponseCallback) {
         if let Some(server) = &self.server {
+            let call = Call::new(message, callback);
             //add to tracker
             message.set_transaction_id(self.generate_transaction_id());
             message.set_uid(self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap().get_derived_uid());

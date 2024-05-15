@@ -3,7 +3,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use crate::rpc::call::Call;
 
 pub const MAX_ACTIVE_CALLS: usize = 512;
-pub const STALLED_TIME: u64 = 60000;
+pub const STALLED_TIME: u128 = 60000;
 
 
 #[derive(Debug, Eq, PartialEq, Hash)]
@@ -25,7 +25,7 @@ impl<'a> ResponseTracker<'a> {
         }
     }
 
-    pub fn add(&mut self, tid: ByteWrapper, call: Call) {
+    pub fn add(&mut self, tid: ByteWrapper, call: Call<'a>) {
         self.calls.insert(tid, call);
     }
 
@@ -62,8 +62,8 @@ impl<'a> ResponseTracker<'a> {
         }
 
         for tid in stalled {
-            if let Some(call) = self.calls.remove(&tid) {
-                println!("STALLED {}", call.get_node().to_string());
+            //if let Some(call) = self.calls.remove(&tid) {
+            //    println!("STALLED {}", call.get_node().to_string());
 
                 /*
                 if let Some(response_callback) = call.get_response_callback() {
@@ -75,7 +75,7 @@ impl<'a> ResponseTracker<'a> {
                     response_callback.on_stalled(event);
                 }
                 */
-            }
+            //}
         }
     }
 }

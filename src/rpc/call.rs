@@ -1,19 +1,22 @@
 use crate::messages::inter::message_base::MessageBase;
+use crate::rpc::events::inter::response_callback::ResponseCallback;
+use crate::rpc::response_tracker::STALLED_TIME;
 use crate::utils::node::Node;
 
 pub struct Call<'a> {
     message: &'a dyn MessageBase,
     node: Option<Node>,
-    //callback: callback
+    callback: &'a dyn ResponseCallback,
     sent_time: u128
 }
 
 impl<'a> Call<'a> {
 
-    pub fn new(message: &'a dyn MessageBase) -> Self {
+    pub fn new(message: &'a dyn MessageBase, callback: &'a dyn ResponseCallback) -> Self {
         Self {
             message,
             node: None,
+            callback,
             sent_time: 0
         }
     }
@@ -45,7 +48,6 @@ impl<'a> Call<'a> {
     }
 
     pub fn is_stalled(&self, now: u128) -> bool {
-        false
-        //return (now-sentTime > STALLED_TIME);
+        (now-self.sent_time > STALLED_TIME)
     }
 }
