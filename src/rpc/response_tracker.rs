@@ -63,7 +63,7 @@ impl<'a> ResponseTracker<'a> {
 
         for tid in stalled {
             if let Some(call) = self.calls.remove(&tid) {
-                println!("STALLED {:?}", call.get_node());
+                println!("STALLED {}", call.get_node().to_string());
 
                 /*
                 if let Some(response_callback) = call.get_response_callback() {

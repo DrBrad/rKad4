@@ -7,8 +7,8 @@ pub struct ResponseEvent<'a> {
     prevent_default: bool,
     message: &'a dyn MessageBase,
     node: Option<Node>,
-    received_time: u64,
-    sent_time: u64,
+    received_time: u128,
+    sent_time: u128,
     request: Option<Box<dyn MessageBase>>
 }
 
@@ -71,11 +71,11 @@ impl<'a> MessageEvent for ResponseEvent<'a> {
         self.node.unwrap()
     }
 
-    fn set_received_time(&mut self, received_time: u64) {
+    fn set_received_time(&mut self, received_time: u128) {
         self.received_time = received_time;
     }
 
-    fn get_received_time(&self) -> u64 {
+    fn get_received_time(&self) -> u128 {
         self.received_time
     }
 

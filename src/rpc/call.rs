@@ -5,7 +5,7 @@ pub struct Call<'a> {
     message: &'a dyn MessageBase,
     node: Option<Node>,
     //callback: callback
-    sent_time: u64
+    sent_time: u128
 }
 
 impl<'a> Call<'a> {
@@ -36,15 +36,15 @@ impl<'a> Call<'a> {
 
     //response callback - has, set, get
 
-    pub fn set_sent_time(&mut self, sent_time: u64) {
+    pub fn set_sent_time(&mut self, sent_time: u128) {
         self.sent_time = sent_time;
     }
 
-    pub fn get_sent_time(&self) -> u64 {
+    pub fn get_sent_time(&self) -> u128 {
         self.sent_time
     }
 
-    pub fn is_stalled(&self, now: u64) -> bool {
+    pub fn is_stalled(&self, now: u128) -> bool {
         false
         //return (now-sentTime > STALLED_TIME);
     }
