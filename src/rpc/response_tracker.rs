@@ -13,19 +13,20 @@ pub struct ByteWrapper {
 
 // Define your Call struct here
 
-pub struct ResponseTracker<'a> {
-    calls: HashMap<ByteWrapper, Call<'a>>,
+pub struct ResponseTracker {
+    calls: HashMap<ByteWrapper, Call>,
 }
 
-impl<'a> ResponseTracker<'a> {
+impl ResponseTracker {
 
     pub fn new() -> Self {
         ResponseTracker {
+            //calls: HashMap::with_capacity(MAX_ACTIVE_CALLS),
             calls: HashMap::with_capacity(MAX_ACTIVE_CALLS),
         }
     }
 
-    pub fn add(&mut self, tid: ByteWrapper, call: Call<'a>) {
+    pub fn add(&mut self, tid: ByteWrapper, call: Call) {
         self.calls.insert(tid, call);
     }
 
@@ -53,7 +54,7 @@ impl<'a> ResponseTracker<'a> {
 
         let mut stalled = Vec::new();
 
-        for (tid, call) in &self.calls {
+        for (tid, call) in self.calls.iter() {
             if !call.is_stalled(now) {
                 break;
             }

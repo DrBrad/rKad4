@@ -27,6 +27,7 @@ use crate::rpc::events::inter::response_callback::ResponseCallback;
 use crate::rpc::events::request_event::RequestEvent;
 use crate::rpc::events::response_event::ResponseEvent;
 use crate::rpc::request_listener::RequestCallback;
+use crate::rpc::response_tracker::ResponseTracker;
 use crate::utils;
 use crate::utils::net::address_utils::is_bogon;
 use crate::utils::node::Node;
@@ -37,7 +38,7 @@ pub const TID_LENGTH: usize = 6;
 pub struct Server {
     pub(crate) kademlia: Option<Box<dyn KademliaBase>>,
     server: Option<Arc<UdpSocket>>,
-    //tracker: Arc<Mutex<ResponseTracker>>,
+    tracker: ResponseTracker,//Arc<Mutex<ResponseTracker>>,
     //running: Arc<AtomicBool>, //MAY NOT BE NEEDED
     request_mapping: HashMap<String, Vec<RequestCallback>>,
     messages: HashMap<MessageKey, fn() -> Box<dyn MethodMessageBase>>
@@ -49,6 +50,7 @@ impl Server {
         let mut self_ = Self {
             kademlia: None,
             server: None,
+            tracker: ResponseTracker::new(),
             //running: Arc::new(AtomicBool::new(false)), //MAY NOT BE NEEDED
             request_mapping: HashMap::new(),
             messages: HashMap::new()
@@ -319,7 +321,7 @@ impl Server {
 
     pub fn send_with_callback(&self, message: &mut dyn MessageBase, callback: &dyn ResponseCallback) {
         if let Some(server) = &self.server {
-            let call = Call::new(message, callback);
+            //let call = Call::new(message, callback);
             //add to tracker
             message.set_transaction_id(self.generate_transaction_id());
             message.set_uid(self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap().get_derived_uid());
