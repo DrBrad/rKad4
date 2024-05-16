@@ -27,7 +27,7 @@ use crate::rpc::events::inter::response_callback::ResponseCallback;
 use crate::rpc::events::request_event::RequestEvent;
 use crate::rpc::events::response_event::ResponseEvent;
 use crate::rpc::request_listener::RequestCallback;
-use crate::rpc::response_tracker::ResponseTracker;
+use crate::rpc::response_tracker::{ByteWrapper, ResponseTracker};
 use crate::utils;
 use crate::utils::net::address_utils::is_bogon;
 use crate::utils::node::Node;
@@ -321,6 +321,7 @@ impl Server {
 
     pub fn send_with_callback(&self, message: &mut dyn MessageBase, callback: &dyn ResponseCallback) {
         if let Some(server) = &self.server {
+            //self.tracker.add(ByteWrapper::from(self.generate_transaction_id()), None);
             //let call = Call::new(message, callback);
             //add to tracker
             message.set_transaction_id(self.generate_transaction_id());

@@ -2,9 +2,7 @@ use std::net::SocketAddr;
 use std::sync::{Arc, Mutex};
 use crate::kad::server::Server;
 use crate::refresh::refresh_handler::RefreshHandler;
-use crate::refresh::tasks::inter::task::Task;
 use crate::routing::inter::routing_table::RoutingTable;
-use crate::routing::kb::k_routing_table::KRoutingTable;
 
 pub trait KademliaBase: Send {
 
