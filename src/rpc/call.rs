@@ -14,7 +14,6 @@ pub struct Call {
 impl Call {
 
     pub fn new(message: &dyn MethodMessageBase, callback: Box<dyn ResponseCallback>) -> Self {
-        let message = message.dyn_clone();
         Self {
             message: message.dyn_clone(),
             node: None,
