@@ -9,6 +9,7 @@ use crate::utils::net::address_utils::{pack_address, unpack_address};
 use crate::utils::uid::{ID_LENGTH, UID};
 use super::inter::method_message_base::MethodMessageBase;
 
+#[derive(Clone)]
 pub struct PingResponse {
     uid: Option<UID>,
     tid: [u8; TID_LENGTH],
@@ -144,5 +145,9 @@ impl MethodMessageBase for PingResponse {
 
     fn upcast(&self) -> &dyn MessageBase {
         self
+    }
+
+    fn dyn_clone(&self) -> Box<dyn MethodMessageBase> {
+        Box::new(self.clone())
     }
 }

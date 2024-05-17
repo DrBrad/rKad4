@@ -1,10 +1,11 @@
 use crate::messages::inter::message_base::MessageBase;
+use crate::messages::inter::method_message_base::MethodMessageBase;
 use crate::rpc::events::inter::response_callback::ResponseCallback;
 use crate::rpc::response_tracker::STALLED_TIME;
 use crate::utils::node::Node;
 
 pub struct Call {
-    message: Box<dyn MessageBase>,
+    message: Box<dyn MethodMessageBase>,
     node: Option<Node>,
     callback: Box<dyn ResponseCallback>,
     sent_time: u128
@@ -12,20 +13,19 @@ pub struct Call {
 
 impl Call {
 
-    pub fn new(message: Box<dyn MessageBase>, callback: Box<dyn ResponseCallback>) -> Self {
+    pub fn new(message: &dyn MethodMessageBase, callback: Box<dyn ResponseCallback>) -> Self {
+        let message = message.dyn_clone();
         Self {
-            message,
+            message: message.dyn_clone(),
             node: None,
             callback,
             sent_time: 0
         }
     }
 
-    /*
-    pub fn get_message(&self) -> &dyn MessageBase {
-        self.message
+    pub fn get_message(&self) -> &dyn MethodMessageBase {
+        self.message.as_ref()
     }
-    */
 
     pub fn has_node(&self) -> bool {
         self.node.is_some()
@@ -39,7 +39,13 @@ impl Call {
         self.node.unwrap()
     }
 
-    //response callback - has, set, get
+    pub fn get_response_callback(&self) -> &dyn ResponseCallback {
+        self.callback.as_ref()
+    }
+
+    pub fn set_response_callback(&mut self, callback: Box<dyn ResponseCallback>) {
+        self.callback = callback;
+    }
 
     pub fn set_sent_time(&mut self, sent_time: u128) {
         self.sent_time = sent_time;

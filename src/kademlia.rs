@@ -10,6 +10,7 @@ use crate::refresh::tasks::stale_refresh_task::StaleRefreshTask;
 use crate::routing::bucket_types::BucketTypes;
 use crate::routing::inter::routing_table::RoutingTable;
 use crate::routing::kb::k_routing_table::KRoutingTable;
+use crate::rpc::join_node_listener::JoinNodeListener;
 
 #[derive(Clone)]
 pub struct Kademlia {
@@ -72,7 +73,7 @@ impl KademliaBase for Kademlia {
         request.set_target(self.routing_table.lock().unwrap().get_derived_uid());
 
         //NEED TO SEND WITH CALLBACK...
-        self.server.lock().unwrap().send(&mut request);
+        self.server.lock().unwrap().send_with_callback(&mut request, Box::new(JoinNodeListener::new()));
         //self.refresh.lock().unwrap().start();
 
         //START JOIN HANDLING
