@@ -67,8 +67,8 @@ impl Server {
 
             let mut response = PingResponse::default();
             response.set_transaction_id(*event.get_message().get_transaction_id());
-            response.set_destination(event.get_message().get_origin());
-            response.set_public(event.get_message().get_origin());
+            response.set_destination(event.get_message().get_origin().unwrap());
+            response.set_public(event.get_message().get_origin().unwrap());
             event.set_response(Box::new(response));
         };
 
@@ -175,7 +175,7 @@ impl Server {
         false
     }
 
-    pub fn on_receive(&self, data: &[u8], src_addr: SocketAddr) {
+    pub fn on_receive(&mut self, data: &[u8], src_addr: SocketAddr) {
         if is_bogon(src_addr) {
             //return;
         }
@@ -194,13 +194,11 @@ impl Server {
 
                 match t {
                     MessageType::ReqMsg => {
-
                         if let Err(e) = || -> Result<(), MessageException> {
                             let message_key = MessageKey::new(ben.get_string(t.rpc_type_name())
                                     .map_err(|e| MessageException::new("Method Unknown", 204))?, t);
 
                             let constructor = self.messages.get(&message_key).unwrap();
-
                             let mut m = constructor();
 
                             let mut tid = [0u8; TID_LENGTH];
@@ -210,7 +208,7 @@ impl Server {
                             m.decode(&ben);
                             m.set_origin(src_addr);
 
-                            let node = Node::new(m.get_uid(), m.get_origin());
+                            let node = Node::new(m.get_uid(), m.get_origin().unwrap());
                             self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap().insert(node);
 
 
@@ -267,15 +265,70 @@ impl Server {
                         }
                     },
                     MessageType::RspMsg => {
-                        let mut tid = [0u8; TID_LENGTH];
-                        tid.copy_from_slice(ben.get_bytes(TID_KEY).expect("Failed to find TID key."));
+                        if let Err(e) = || -> Result<(), MessageException> {
+                            let mut tid = [0u8; TID_LENGTH];
+                            tid.copy_from_slice(ben.get_bytes(TID_KEY).expect("Failed to find TID key."));
+
+                            let call = self.tracker.poll(&tid).ok_or(MessageException::new("Server Error", 202))?;
+
+                            //PROBLEM LINE BELOW... - NEED TO MAKE THE MESSAGE FIND_NODE_RESPONSE...
+                            let message_key = MessageKey::new(ben.get_string(t.rpc_type_name())
+                                    .map_err(|e| MessageException::new("Method Unknown", 204))?, t);
+
+                            let constructor = self.messages.get(&message_key).unwrap();
+                            let mut m = constructor();
+
+                            m.set_transaction_id(tid);
+                            m.decode(&ben);
+                            m.set_origin(src_addr);
+
+                            if m.get_public().is_some() {
+                                println!("UPDATE CONSENSUS IP");
+                            }
 
 
+                            /*
+                                if(m.getPublic() != null){
+                                    kademlia.getRoutingTable().updatePublicIPConsensus(m.getOriginAddress(), m.getPublicAddress());
+                                }
 
-                        self.tracker.get(&tid).unwrap().get_response_callback().test();
+                                if(!call.getMessage().getDestination().equals(m.getOrigin())){
+                                    throw new MessageException("Generic Error", 201);
+                                }
+
+                                ResponseEvent event;
+
+                                if(call.hasNode()){
+                                    if(!call.getNode().getUID().equals(m.getUID())){
+                                        throw new MessageException("Generic Error", 201);
+                                    }
+                                    event = new ResponseEvent(m, call.getNode());
+
+                                }else{
+                                    event = new ResponseEvent(m, new Node(m.getUID(), m.getOrigin()));
+                                }
+
+                                event.received();
+                                event.setSentTime(call.getSentTime());
+                                event.setRequest(call.getMessage());
+
+                                call.getResponseCallback().onResponse(event);
+
+                            }catch(MessageException e){
+                                e.printStackTrace();
+                            }
+                            */
 
 
-                        println!("RES  {}", ben.to_string());
+                            self.tracker.get(&tid).unwrap().get_response_callback().test();
+
+
+                            println!("RES  {}", ben.to_string());
+
+                            Ok(())
+                        }() {
+                            println!("{}", e.get_message());
+                        }
                     },
                     MessageType::ErrMsg => {
                         println!("ERR  {}", ben.to_string());
@@ -318,7 +371,7 @@ impl Server {
     pub fn send(&self, message: &mut dyn MessageBase) {
         if let Some(server) = &self.server {
             message.set_uid(self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap().get_derived_uid());
-            server.send_to(message.encode().encode().as_slice(), message.get_destination()).unwrap(); //probably should return if failed to send...
+            server.send_to(message.encode().encode().as_slice(), message.get_destination().unwrap()).unwrap(); //probably should return if failed to send...
         }
     }
 
@@ -333,7 +386,7 @@ impl Server {
             println!("{}", call.get_message().to_string());
             self.tracker.add(tid, call);
 
-            server.send_to(message.encode().encode().as_slice(), message.get_destination()).unwrap(); //probably should return if failed to send...
+            server.send_to(message.encode().encode().as_slice(), message.get_destination().unwrap()).unwrap(); //probably should return if failed to send...
         }
     }
 

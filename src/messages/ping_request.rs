@@ -67,24 +67,24 @@ impl MessageBase for PingRequest {
         self.public = Some(public);
     }
 
-    fn get_public(&self) -> SocketAddr {
-        self.public.unwrap()
+    fn get_public(&self) -> Option<SocketAddr> {
+        self.public
     }
 
     fn set_destination(&mut self, destination: SocketAddr) {
         self.destination = Some(destination);
     }
 
-    fn get_destination(&self) -> SocketAddr {
-        self.destination.unwrap()
+    fn get_destination(&self) -> Option<SocketAddr> {
+        self.destination
     }
 
     fn set_origin(&mut self, origin: SocketAddr) {
         self.origin = Some(origin);
     }
 
-    fn get_origin(&self) -> SocketAddr {
-        self.origin.unwrap()
+    fn get_origin(&self) -> Option<SocketAddr> {
+        self.origin
     }
 
     fn get_type(&self) -> MessageType {

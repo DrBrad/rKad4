@@ -21,15 +21,15 @@ pub trait MessageBase: Send {
 
     fn set_public(&mut self, public_address: SocketAddr);
 
-    fn get_public(&self) -> SocketAddr;
+    fn get_public(&self) -> Option<SocketAddr>;
 
     fn set_destination(&mut self, destination_address: SocketAddr);
 
-    fn get_destination(&self) -> SocketAddr;
+    fn get_destination(&self) -> Option<SocketAddr>;
 
     fn set_origin(&mut self, origin_address: SocketAddr);
 
-    fn get_origin(&self) -> SocketAddr;
+    fn get_origin(&self) -> Option<SocketAddr>;
 
     fn get_type(&self) -> MessageType;
 
