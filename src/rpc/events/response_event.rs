@@ -9,7 +9,7 @@ pub struct ResponseEvent<'a> {
     node: Option<Node>,
     received_time: u128,
     sent_time: u128,
-    request: Option<Box<dyn MessageBase>>
+    request: Option<&'a dyn MessageBase>
 }
 
 impl<'a> ResponseEvent<'a> {
@@ -29,14 +29,14 @@ impl<'a> ResponseEvent<'a> {
         self.request.is_some()
     }
 
-    pub fn get_request(&mut self) -> Result<&mut dyn MessageBase, String> {
+    pub fn get_request(&mut self) -> Result<&dyn MessageBase, String> {
         match self.request {
-            Some(ref mut response) => Ok(response.as_mut()),
+            Some(response) => Ok(response),
             None => Err("No response was set.".to_string())
         }
     }
 
-    pub fn set_request(&mut self, message: Box<dyn MessageBase>) {
+    pub fn set_request(&mut self, message: &'a dyn MessageBase) {
         self.request = Some(message);
     }
 
@@ -88,6 +88,6 @@ impl<'a> MessageEvent for ResponseEvent<'a> {
     }
 
     fn received(&mut self) {
-        todo!()
+        //todo!()
     }
 }

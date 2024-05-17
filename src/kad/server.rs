@@ -273,7 +273,7 @@ impl Server {
 
                             let call = self.tracker.poll(&tid).ok_or(MessageException::new("Server Error", 202))?;
 
-                            println!("SENT {}", call.get_message().to_string());
+                            //println!("SENT {}", call.get_message().to_string());
 
                             //PROBLEM LINE BELOW... - NEED TO MAKE THE MESSAGE FIND_NODE_RESPONSE...
                             let message_key = MessageKey::new(call.get_message().get_method(), t);
@@ -311,16 +311,11 @@ impl Server {
 
                             event.received();
                             event.set_sent_time(call.get_sent_time());
-                            let s = Box::new(call.get_message().upcast());
-                            event.set_request(call.get_message().dyn_clone());
+                            event.set_request(call.get_message().upcast());
 
+                            call.get_response_callback().on_response(event);
 
-                            //call.get_response_callback().on_response(event);
-
-                            call.get_response_callback().test();
-
-
-                            println!("RES  {}", ben.to_string());
+                            //println!("RES  {}", ben.to_string());
 
                             Ok(())
                         }() {

@@ -1,3 +1,4 @@
+use crate::rpc::events::inter::message_event::MessageEvent;
 use crate::rpc::events::inter::response_callback::ResponseCallback;
 use crate::rpc::events::response_event::ResponseEvent;
 
@@ -16,12 +17,9 @@ impl JoinNodeListener {
 
 impl ResponseCallback for JoinNodeListener {
 
-    fn test(&self) {
-        println!("RESPONSE RECEIVED TEST");
-    }
-
     fn on_response(&self, event: ResponseEvent) {
         println!("RESPONSE RECEIVED");
+        println!("RES  {}", event.get_message().to_string());
     }
 
     //fn on_error_response(&self, event: ErrorResponseEvent);
