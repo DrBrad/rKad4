@@ -14,11 +14,11 @@ pub struct ResponseEvent<'a> {
 
 impl<'a> ResponseEvent<'a> {
 
-    pub fn new(message: &'a dyn MessageBase) -> Self {
+    pub fn new(message: &'a dyn MessageBase, node: Node) -> Self {
         Self {
             prevent_default: false,
             message,
-            node: None,
+            node: Some(node),
             received_time: 0,
             sent_time: 0,
             request: None
@@ -38,6 +38,14 @@ impl<'a> ResponseEvent<'a> {
 
     pub fn set_request(&mut self, message: Box<dyn MessageBase>) {
         self.request = Some(message);
+    }
+
+    pub fn set_sent_time(&mut self, sent_time: u128) {
+        self.sent_time = sent_time;
+    }
+
+    pub fn get_sent_time(&self) -> u128 {
+        self.sent_time
     }
 }
 

@@ -6,8 +6,11 @@ use crate::messages::inter::message_base::{MessageBase, TID_KEY};
 use crate::messages::inter::message_exception::MessageException;
 use crate::messages::inter::message_type::{MessageType, TYPE_KEY};
 use crate::utils::net::address_utils::{pack_address, unpack_address};
+use crate::utils::node::Node;
 use crate::utils::uid::{ID_LENGTH, UID};
 use super::inter::method_message_base::MethodMessageBase;
+
+pub const NODE_CAP: usize = 20;
 
 #[derive(Clone)]
 pub struct FindNodeResponse {
@@ -18,7 +21,7 @@ pub struct FindNodeResponse {
     destination: Option<SocketAddr>,
     origin: Option<SocketAddr>,
     //method: String,
-    target: Option<UID>
+    nodes: Vec<Node>
 }
 
 impl FindNodeResponse {
@@ -30,10 +33,11 @@ impl FindNodeResponse {
             public: None,
             destination: None,
             origin: None,
-            target: None
+            nodes: Vec::new()
         }
     }
 
+    /*
     pub fn set_target(&mut self, target: UID) {
         self.target = Some(target);
     }
@@ -41,6 +45,7 @@ impl FindNodeResponse {
     pub fn get_target(&mut self) -> Result<&UID, ()> {
         self.target.as_ref().map_or_else(|| Err(()), |uid| Ok(uid))
     }
+    */
 }
 
 impl Default for FindNodeResponse {
@@ -52,7 +57,7 @@ impl Default for FindNodeResponse {
             public: None,
             destination: None,
             origin: None,
-            target: None
+            nodes: Vec::new()
         }
     }
 }
@@ -115,9 +120,11 @@ impl MessageBase for FindNodeResponse {
         ben.put(self.get_type().inner_key(), BencodeObject::new());
         ben.get_object_mut(self.get_type().inner_key()).unwrap().put("id", self.uid.unwrap().bid.clone());
 
+        /*
         if let Some(target) = self.target {
             ben.get_object_mut(self.get_type().inner_key()).unwrap().put("target", target.bid.clone());
         }
+        */
 
         ben
     }
@@ -139,9 +146,9 @@ impl MessageBase for FindNodeResponse {
             return Err(MessageException::new("Protocol Error, such as a malformed packet.", 203));
         }
 
-        let mut bid = [0u8; ID_LENGTH];
-        bid.copy_from_slice(&ben.get_object(self.get_type().inner_key()).unwrap().get_bytes("target").unwrap()[..ID_LENGTH]);
-        self.target = Some(UID::from(bid));
+        //let mut bid = [0u8; ID_LENGTH];
+        //bid.copy_from_slice(&ben.get_object(self.get_type().inner_key()).unwrap().get_bytes("target").unwrap()[..ID_LENGTH]);
+        //self.target = Some(UID::from(bid));
 
         Ok(())
     }

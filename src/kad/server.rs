@@ -273,9 +273,10 @@ impl Server {
 
                             let call = self.tracker.poll(&tid).ok_or(MessageException::new("Server Error", 202))?;
 
+                            println!("SENT {}", call.get_message().to_string());
+
                             //PROBLEM LINE BELOW... - NEED TO MAKE THE MESSAGE FIND_NODE_RESPONSE...
-                            let message_key = MessageKey::new(ben.get_string(t.rpc_type_name())
-                                    .map_err(|e| MessageException::new("Method Unknown", 204))?, t);
+                            let message_key = MessageKey::new(call.get_message().get_method(), t);
 
                             let constructor = self.messages.get(&message_key).unwrap();
                             let mut m = constructor();
@@ -289,37 +290,34 @@ impl Server {
                                 //kademlia.getRoutingTable().updatePublicIPConsensus(m.getOriginAddress(), m.getPublicAddress());
                             }
 
-
                             /*
-                                if(!call.getMessage().getDestination().equals(m.getOrigin())){
-                                    throw new MessageException("Generic Error", 201);
-                                }
-
-                                ResponseEvent event;
-
-                                if(call.hasNode()){
-                                    if(!call.getNode().getUID().equals(m.getUID())){
-                                        throw new MessageException("Generic Error", 201);
-                                    }
-                                    event = new ResponseEvent(m, call.getNode());
-
-                                }else{
-                                    event = new ResponseEvent(m, new Node(m.getUID(), m.getOrigin()));
-                                }
-
-                                event.received();
-                                event.setSentTime(call.getSentTime());
-                                event.setRequest(call.getMessage());
-
-                                call.getResponseCallback().onResponse(event);
-
-                            }catch(MessageException e){
-                                e.printStackTrace();
+                            if(!call.getMessage().getDestination().equals(m.getOrigin())){
+                                throw new MessageException("Generic Error", 201);
                             }
                             */
 
+                            let mut event;// = ResponseEvent::new();
 
-                            self.tracker.get(&tid).unwrap().get_response_callback().test();
+                            if call.has_node() {
+                                if call.get_node().uid == m.get_uid() {
+                                    //throw new MessageException("Generic Error", 201);
+                                }
+
+                                event = ResponseEvent::new(m.as_ref().upcast(), call.get_node());
+
+                            } else {
+                                event = ResponseEvent::new(m.as_ref().upcast(), Node::new(m.get_uid(), m.get_origin().unwrap()));
+                            }
+
+                            event.received();
+                            event.set_sent_time(call.get_sent_time());
+                            let s = Box::new(call.get_message().upcast());
+                            event.set_request(call.get_message().dyn_clone());
+
+
+                            //call.get_response_callback().on_response(event);
+
+                            call.get_response_callback().test();
 
 
                             println!("RES  {}", ben.to_string());
