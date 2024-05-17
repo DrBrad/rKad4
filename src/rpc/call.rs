@@ -4,16 +4,15 @@ use crate::rpc::response_tracker::STALLED_TIME;
 use crate::utils::node::Node;
 
 pub struct Call {
-    //message: &dyn MessageBase,
+    message: Box<dyn MessageBase>,
     node: Option<Node>,
-    //callback: &dyn ResponseCallback,
+    callback: Box<dyn ResponseCallback>,
     sent_time: u128
 }
 
 impl Call {
 
-    /*
-    pub fn new(message: &'a dyn MessageBase, callback: &'a dyn ResponseCallback) -> Self {
+    pub fn new(message: Box<dyn MessageBase>, callback: Box<dyn ResponseCallback>) -> Self {
         Self {
             message,
             node: None,
@@ -22,6 +21,7 @@ impl Call {
         }
     }
 
+    /*
     pub fn get_message(&self) -> &dyn MessageBase {
         self.message
     }

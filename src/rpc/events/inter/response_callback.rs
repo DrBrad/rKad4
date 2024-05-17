@@ -1,6 +1,6 @@
 use crate::rpc::events::response_event::ResponseEvent;
 
-pub trait ResponseCallback {
+pub trait ResponseCallback: Send {
 
     fn on_response(&self, event: ResponseEvent);
 

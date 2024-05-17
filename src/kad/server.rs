@@ -312,21 +312,26 @@ impl Server {
         */
     }
 
-    pub fn send(&self, message: &mut dyn MessageBase) {
+    fn send(&self, message: &mut dyn MessageBase) {
         if let Some(server) = &self.server {
             message.set_uid(self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap().get_derived_uid());
             server.send_to(message.encode().encode().as_slice(), message.get_destination()).unwrap(); //probably should return if failed to send...
         }
     }
 
-    pub fn send_with_callback(&self, message: &mut dyn MessageBase, callback: &dyn ResponseCallback) {
+    pub fn send_with_callback(&mut self, message: Box<dyn MessageBase>, callback: Box<dyn ResponseCallback>) {
         if let Some(server) = &self.server {
-            //self.tracker.add(ByteWrapper::from(self.generate_transaction_id()), None);
-            //let call = Call::new(message, callback);
+            //self.tracker.add(ByteWrapper::from(self.generate_transaction_id()), callback);
+            let tid = self.generate_transaction_id();
+
+            let call = Call::new(message, callback);
+            self.tracker.add(tid.clone(), call);
+
             //add to tracker
-            message.set_transaction_id(self.generate_transaction_id());
-            message.set_uid(self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap().get_derived_uid());
-            server.send_to(message.encode().encode().as_slice(), message.get_destination()).unwrap(); //probably should return if failed to send...
+            //message.set_transaction_id(self.generate_transaction_id());
+            //message.set_uid(self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap().get_derived_uid());
+            //server.send_to(message.encode().encode().as_slice(), message.get_destination()).unwrap(); //probably should return if failed to send...
+
         }
     }
 

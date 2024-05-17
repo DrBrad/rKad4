@@ -9,7 +9,7 @@ use crate::messages::inter::message_type::MessageType;
 
 pub const TID_KEY: &str = "t";
 
-pub trait MessageBase {
+pub trait MessageBase: Send {
 
     fn set_uid(&mut self, uid: UID);
 
