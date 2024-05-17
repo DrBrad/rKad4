@@ -13,6 +13,7 @@ use bencode::variables::inter::bencode_variable::BencodeVariable;
 use crate::kad::kademlia_base::KademliaBase;
 use crate::kademlia::Kademlia;
 use crate::messages::find_node_request::FindNodeRequest;
+use crate::messages::find_node_response::FindNodeResponse;
 use crate::messages::inter::message_base::{MessageBase, TID_KEY};
 use crate::messages::inter::message_exception::MessageException;
 use crate::messages::inter::message_key::MessageKey;
@@ -59,6 +60,7 @@ impl Server {
         self_.register_message(|| Box::new(PingRequest::default()));
         self_.register_message(|| Box::new(PingResponse::default()));
         self_.register_message(|| Box::new(FindNodeRequest::default()));
+        self_.register_message(|| Box::new(FindNodeResponse::default()));
         //self_.register_message(|| Box::new(FindNodeResponse::default()));
 
         //CAN THIS BE MOVED TO k_request_listener?
@@ -284,14 +286,11 @@ impl Server {
 
                             if m.get_public().is_some() {
                                 println!("UPDATE CONSENSUS IP");
+                                //kademlia.getRoutingTable().updatePublicIPConsensus(m.getOriginAddress(), m.getPublicAddress());
                             }
 
 
                             /*
-                                if(m.getPublic() != null){
-                                    kademlia.getRoutingTable().updatePublicIPConsensus(m.getOriginAddress(), m.getPublicAddress());
-                                }
-
                                 if(!call.getMessage().getDestination().equals(m.getOrigin())){
                                     throw new MessageException("Generic Error", 201);
                                 }
