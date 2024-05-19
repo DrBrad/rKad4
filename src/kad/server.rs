@@ -240,7 +240,7 @@ impl Server {
                                 }
 
                                 //REMOVE - ONLY FOR TESTING...
-                                event.get_response().unwrap().set_uid(self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap().get_derived_uid());
+                                //event.get_response().unwrap().set_uid(self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap().get_derived_uid());
                                 //REMOVE ^^^^^^^^^^^
 
                                 println!("RESPONSE: {}", event.get_response().unwrap().to_string());
