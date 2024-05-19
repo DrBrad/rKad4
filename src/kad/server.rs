@@ -287,6 +287,8 @@ impl Server {
 
                             if m.get_public().is_some() {
                                 println!("UPDATE CONSENSUS IP");
+                                self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap()
+                                    .update_public_ip_consensus(m.get_origin().unwrap().ip(), m.get_public().unwrap().ip());
                                 //kademlia.getRoutingTable().updatePublicIPConsensus(m.getOriginAddress(), m.getPublicAddress());
                             }
 
@@ -314,8 +316,6 @@ impl Server {
                             event.set_request(call.get_message().upcast());
 
                             call.get_response_callback().on_response(event);
-
-                            //println!("RES  {}", ben.to_string());
 
                             Ok(())
                         }() {
