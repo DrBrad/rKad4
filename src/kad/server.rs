@@ -186,9 +186,6 @@ impl Server {
             //return;
         }
 
-        //println!("RECEIVED: {}", self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap().get_derived_uid().to_string());
-
-
         match BencodeObject::decode(data) {
             Ok(ben) => {
                 if !ben.contains_key(TID_KEY) || !ben.contains_key(TYPE_KEY) {
@@ -329,33 +326,6 @@ impl Server {
                 println!("{}", e.to_string());
             }
         }
-
-        /*
-        if !ben.contains_key(TID_KEY) || !ben.contains_key(TYPE_KEY) {
-            //panic
-            return;
-        }
-
-        let t = MessageType::from_rpc_type_name(ben.get_string(TYPE_KEY).unwrap().to_string()).unwrap();
-
-        match t {
-            MessageType::ReqMsg => {
-                let k = ben.get_string(t.rpc_type_name()).unwrap(); //PROBABLY SHOULD ERR OUT IF NO RESULT...
-
-
-
-
-
-                println!("REQ  {}", k);
-            },
-            MessageType::RspMsg => {
-                println!("RES  {}", ben.to_string());
-            },
-            MessageType::ErrMsg => {
-                println!("ERR  {}", ben.to_string());
-            }
-        }
-        */
     }
 
     pub fn send(&self, message: &mut dyn MessageBase) {

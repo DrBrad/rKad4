@@ -1,7 +1,9 @@
 use crate::kad::kademlia_base::KademliaBase;
+use crate::rpc::events::error_response_event::ErrorResponseEvent;
 use crate::rpc::events::inter::message_event::MessageEvent;
 use crate::rpc::events::inter::response_callback::ResponseCallback;
 use crate::rpc::events::response_event::ResponseEvent;
+use crate::rpc::events::stalled_event::StalledEvent;
 
 pub struct JoinNodeListener {
     kademlia: Box<dyn KademliaBase>
@@ -25,7 +27,11 @@ impl ResponseCallback for JoinNodeListener {
         println!("RES  {}", event.get_message().to_string());
     }
 
-    //fn on_error_response(&self, event: ErrorResponseEvent);
+    fn on_error_response(&self, event: ErrorResponseEvent) {
 
-    //fn on_stalled(&self, event: StalledEvent);
+    }
+
+    fn on_stalled(&self, event: StalledEvent) {
+
+    }
 }
