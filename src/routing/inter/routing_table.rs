@@ -4,7 +4,7 @@ use crate::utils::uid::UID;
 
 pub trait RoutingTable: Send {
 
-    fn update_public_ip_consensus(&self, source: IpAddr, addr: IpAddr);
+    fn update_public_ip_consensus(&mut self, source: IpAddr, addr: IpAddr);
 
     fn insert(&mut self, n: Node);
 

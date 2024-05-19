@@ -253,6 +253,7 @@ impl Server {
                             }
 
                             Ok(())
+
                         }() {
                             println!("{}", e.get_message());
 
@@ -273,8 +274,6 @@ impl Server {
 
                             let call = self.tracker.poll(&tid).ok_or(MessageException::new("Server Error", 202))?;
 
-                            //println!("SENT {}", call.get_message().to_string());
-
                             //PROBLEM LINE BELOW... - NEED TO MAKE THE MESSAGE FIND_NODE_RESPONSE...
                             let message_key = MessageKey::new(call.get_message().get_method(), t);
 
@@ -286,23 +285,19 @@ impl Server {
                             m.set_origin(src_addr);
 
                             if m.get_public().is_some() {
-                                println!("UPDATE CONSENSUS IP");
                                 self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap()
                                     .update_public_ip_consensus(m.get_origin().unwrap().ip(), m.get_public().unwrap().ip());
-                                //kademlia.getRoutingTable().updatePublicIPConsensus(m.getOriginAddress(), m.getPublicAddress());
                             }
 
-                            /*
-                            if(!call.getMessage().getDestination().equals(m.getOrigin())){
-                                throw new MessageException("Generic Error", 201);
+                            if call.get_message().get_destination() != m.get_origin() {
+                                return Err(MessageException::new("Generic Error", 201));
                             }
-                            */
 
-                            let mut event;// = ResponseEvent::new();
+                            let mut event;
 
                             if call.has_node() {
                                 if call.get_node().uid == m.get_uid() {
-                                    //throw new MessageException("Generic Error", 201);
+                                    return Err(MessageException::new("Generic Error", 201));
                                 }
 
                                 event = ResponseEvent::new(m.as_ref().upcast(), call.get_node());
@@ -318,6 +313,7 @@ impl Server {
                             call.get_response_callback().on_response(event);
 
                             Ok(())
+
                         }() {
                             println!("{}", e.get_message());
                         }
