@@ -53,6 +53,19 @@ mod rpc;
 //echo -n "hello" >/dev/udp/localhost/8080
 //netcat -ul 8080
 
+/*
+TODO
+-----
+
+Join Node Listener
+Ping Response Listener
+Bucket Refresh
+Stale Refresh
+FindNodeResponse
+onReceive Error messages
+Message Tracker must evict old messages by doing eviction on receiver thread (tracker.remove_stalled();
+*/
+
 fn main() {
     let kad = Kademlia::new();
     kad.get_routing_table().lock().unwrap().set_secure(false);
