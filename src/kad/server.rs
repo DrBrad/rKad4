@@ -111,6 +111,9 @@ impl Server {
                     server.recv_from(&mut buf).expect("Failed to receive message")
                 };
 
+                sender.send((buf[..size].to_vec(), src_addr));
+
+                /*
                 let data = &buf[..size];
 
                 let bytes = data.as_ptr();
@@ -120,6 +123,7 @@ impl Server {
                 unsafe {
                     sender.send((from_raw_parts(bytes, len), src_addr)).expect("Failed to send packet to handler");
                 }
+                */
             }
         });
 
@@ -136,7 +140,7 @@ impl Server {
                         //let message = String::from_utf8_lossy(data);
                         //println!("Received message '{}' from {}", message, src_addr);
 
-                        kademlia.as_ref().unwrap().get_server().lock().unwrap().on_receive(data, src_addr);
+                        kademlia.as_ref().unwrap().get_server().lock().unwrap().on_receive(data.as_slice(), src_addr);
                         //Server::on_receive(data, src_addr);
                         //kademlia.get_server().lock().unwrap().is_running();
 
@@ -247,7 +251,7 @@ impl Server {
                             self.send(event.get_response().unwrap());
 
                             if !self.kademlia.as_ref().unwrap().get_refresh_handler().lock().unwrap().is_running() {
-                                //self.kademlia.as_ref().unwrap().get_refresh_handler().lock().unwrap().start();
+                                self.kademlia.as_ref().unwrap().get_refresh_handler().lock().unwrap().start();
                             }
 
                             Ok(())
