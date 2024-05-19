@@ -5,6 +5,7 @@ use core::array::from_fn;
 use crate::routing::inter::routing_table::RoutingTable;
 use crate::utils;
 use crate::utils::hash::crc32c::CRC32c;
+use crate::utils::net::address_utils::is_global_unicast;
 use super::k_bucket::KBucket;
 use super::k_comparator::KComparator;
 use crate::utils::node::{Node, V4_MASK, V6_MASK};
@@ -35,7 +36,38 @@ impl KRoutingTable {
 impl RoutingTable for KRoutingTable {
 
     fn update_public_ip_consensus(&self, source: IpAddr, addr: IpAddr) {
-        todo!()
+        if is_global_unicast(addr) {
+            return;
+        }
+
+        /*
+        synchronized(originPairs){
+            originPairs.put(source, addr);
+            //System.err.println("CONSENSUS UPDATE: "+originPairs.size()+"  "+source.getHostAddress()+"  "+addr.getHostAddress());
+            if(originPairs.size() > 20 && !addr.equals(consensusExternalAddress)){
+                List<InetAddress> k = new ArrayList<>(originPairs.values());
+                short res = 0, count = 1;
+
+                for(short i = 1; i < k.size(); i++){
+                    count += (k.get(i).equals(k.get(res))) ? 1 : -1;
+
+                    if(count == 0){
+                        res = i;
+                        count = 1;
+                    }
+                }
+
+                //CHANGE - TO AUTO UPDATE UID BASED OFF OF IP CONSENSUS CHANGES
+                if(!consensusExternalAddress.equals(k.get(res))){
+                    consensusExternalAddress = k.get(res);
+                    deriveUID();
+                    restart();
+                }
+
+                //consensusExternalAddress = k.get(res);
+            }
+        }
+        */
     }
 
     fn insert(&mut self, n: Node) {
