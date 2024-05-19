@@ -47,7 +47,7 @@ impl RoutingTable for KRoutingTable {
         self.origin_pairs.insert(source, addr);
 
         if self.origin_pairs.len() > 20 && addr != self.consensus_external_address {
-            let k: Vec<IpAddr> = self.origin_pairs.values().cloned().collect();
+            let k: Vec<IpAddr> = self.origin_pairs.values();
             let mut res = 0;
             let mut count: i16 = 1;
 

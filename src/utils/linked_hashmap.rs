@@ -8,7 +8,7 @@ pub struct LinkedHashMap<K: Eq + Hash, V> {
     capacity: usize,
 }
 
-impl<K, V> LinkedHashMap<K, V> where K: Eq + Hash + Clone {
+impl<K, V> LinkedHashMap<K, V> where K: Eq + Hash + Clone, V: Clone {
 
     pub fn new(capacity: usize) -> Self {
         Self {

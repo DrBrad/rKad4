@@ -52,11 +52,12 @@ mod rpc;
 //MAYBE MAKE ROUTING TABLE A BASE SET - IE ABSTRACT - NOT TRAIT
 //echo -n "hello" >/dev/udp/localhost/8080
 //netcat -ul 8080
+//why is java version pinging already checked nodes... IE after bucket refresh it is pinging us...
 
 fn main() {
     let kad = Kademlia::new();
     kad.get_routing_table().lock().unwrap().set_secure(false);
-    kad.join(8080, SocketAddr::new(IpAddr::from([127, 0, 1, 1]), 6881));
+    kad.join(8080, SocketAddr::new(IpAddr::from([127, 0, 0, 1]), 8070));
     //kad.bind(8080);
     println!("{}", kad.get_routing_table().lock().unwrap().get_derived_uid().to_string());
     sleep(Duration::from_secs(5));

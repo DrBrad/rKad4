@@ -76,7 +76,7 @@ impl Server {
 
 
         let find_node_callback: RequestCallback = |event| {
-            println!("{}", event.get_message().to_string());
+            println!("- No Response z5 error {}", event.get_message().to_string());
         };
 
         self_.register_request_listener("ping", ping_callback);
@@ -182,7 +182,7 @@ impl Server {
             //return;
         }
 
-        println!("RECEIVED: {}", self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap().get_derived_uid().to_string());
+        //println!("RECEIVED: {}", self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap().get_derived_uid().to_string());
 
 
         match BencodeObject::decode(data) {
@@ -225,31 +225,29 @@ impl Server {
 
                             let callbacks = self.request_mapping.get(&k).unwrap();
 
-                            if !callbacks.is_empty() {
-                                for callback in callbacks {
-                                    callback(&mut event);
-                                }
-
-                                if event.is_prevent_default() {
-                                    //RETURN NOTHING - NO ERROR
-                                    return Err(MessageException::new("Method Unknown", 204));
-                                }
-
-                                if !event.has_response() {
-                                    return Err(MessageException::new("Method Unknown", 204));
-                                }
-
-                                //REMOVE - ONLY FOR TESTING...
-                                //event.get_response().unwrap().set_uid(self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap().get_derived_uid());
-                                //REMOVE ^^^^^^^^^^^
-
-                                println!("RESPONSE: {}", event.get_response().unwrap().to_string());
-
-                                self.send(event.get_response().unwrap());
+                            for callback in callbacks {
+                                callback(&mut event);
                             }
 
+                            if event.is_prevent_default() {
+                                //RETURN NOTHING - NO ERROR
+                                return Err(MessageException::new("Method Unknown", 204));
+                            }
+
+                            if !event.has_response() {
+                                return Err(MessageException::new("Method Unknown", 204));
+                            }
+
+                            //REMOVE - ONLY FOR TESTING...
+                            //event.get_response().unwrap().set_uid(self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap().get_derived_uid());
+                            //REMOVE ^^^^^^^^^^^
+
+                            //println!("RESPONSE: {}", event.get_response().unwrap().to_string());
+
+                            self.send(event.get_response().unwrap());
+
                             if !self.kademlia.as_ref().unwrap().get_refresh_handler().lock().unwrap().is_running() {
-                                self.kademlia.as_ref().unwrap().get_refresh_handler().lock().unwrap().start();
+                                //self.kademlia.as_ref().unwrap().get_refresh_handler().lock().unwrap().start();
                             }
 
                             Ok(())
