@@ -5,7 +5,7 @@ use std::slice::from_raw_parts;
 use std::sync::{Arc, Mutex};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
-use std::sync::mpsc::{channel, Receiver, Sender};
+use std::sync::mpsc::{channel, Receiver, Sender, TryRecvError};
 use std::thread::sleep;
 use std::time::Duration;
 use bencode::variables::bencode_object::BencodeObject;
@@ -130,23 +130,18 @@ impl Server {
 
         let kademlia = self.kademlia.clone();
 
-        // Start the handler thread
         let handler_handle = thread::spawn(move || {
             loop {
-                // Receive packets from the receiver
-                match rx.recv() {
+                match rx.try_recv() {
                     Ok((data, src_addr)) => {
-                        // Process the received packet (e.g., parse, handle, etc.)
-                        //let message = String::from_utf8_lossy(data);
-                        //println!("Received message '{}' from {}", message, src_addr);
-
                         kademlia.as_ref().unwrap().get_server().lock().unwrap().on_receive(data.as_slice(), src_addr);
-                        //Server::on_receive(data, src_addr);
-                        //kademlia.get_server().lock().unwrap().is_running();
-
                     }
-                    Err(_) => break, // Break the loop if the channel is closed
+                    Err(TryRecvError::Empty) => {
+                    }
+                    Err(TryRecvError::Disconnected) => break
                 }
+
+                kademlia.as_ref().unwrap().get_server().lock().unwrap().tracker.remove_stalled();
             }
         });
 
@@ -208,7 +203,7 @@ impl Server {
                             tid.copy_from_slice(ben.get_bytes(TID_KEY).map_err(|e| MessageException::new("Method Unknown", 204))?);
 
                             m.set_transaction_id(tid);
-                            m.decode(&ben);
+                            m.decode(&ben).map_err(|e| MessageException::new("Generic Error", 201))?;
                             m.set_origin(src_addr);
 
                             let node = Node::new(m.get_uid(), m.get_origin().unwrap());
@@ -280,7 +275,7 @@ impl Server {
                             let mut m = constructor();
 
                             m.set_transaction_id(tid);
-                            m.decode(&ben);
+                            m.decode(&ben).map_err(|e| MessageException::new("Generic Error", 201))?;
                             m.set_origin(src_addr);
 
                             if m.get_public().is_some() {
