@@ -86,19 +86,7 @@ impl Server {
     }
 
     pub fn start(&mut self, port: u16) {
-        //self.running.store(true, Ordering::Relaxed);
-        //let running = Arc::clone(&self.running);
-
-        /*
-        let handle = thread::spawn(move || {
-            while running.load(Ordering::Relaxed) {
-                println!("{}", kademlia.get_routing_table().lock().unwrap().get_derived_uid().to_string());
-                sleep(Duration::from_secs(1));
-            }
-        });
-        */
-
-        self.server = Some(Arc::new(UdpSocket::bind("127.0.0.1:8080").expect("Failed to bind socket")));
+        self.server = Some(Arc::new(UdpSocket::bind(SocketAddr::from(([127, 0, 0, 1], port))).expect("Failed to bind socket")));
         let (tx, rx) = channel();
         let sender = tx.clone();
         let server = Arc::clone(self.server.as_ref().unwrap());
