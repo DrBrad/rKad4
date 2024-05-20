@@ -63,7 +63,6 @@ Bucket Refresh
 Stale Refresh
 FindNodeResponse
 onReceive Error messages
-Message Tracker must evict old messages by doing eviction on receiver thread (tracker.remove_stalled();
 */
 
 fn main() {

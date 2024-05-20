@@ -69,7 +69,7 @@ impl ResponseTracker {
             if let Some(call) = self.calls.remove(&tid) {
                 //println!("STALLED {}", call.get_node().to_string());
 
-                let mut event = StalledEvent::new(call.get_message());
+                let mut event = StalledEvent::new(call.get_message().upcast());
                 event.set_sent_time(call.get_sent_time());
 
                 if call.has_node() {
