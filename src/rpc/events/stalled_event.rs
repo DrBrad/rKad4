@@ -13,11 +13,11 @@ pub struct StalledEvent<'a> {
 
 impl<'a> StalledEvent<'a> {
 
-    pub fn new(message: &'a dyn MessageBase, node: Node) -> Self {
+    pub fn new(message: &'a dyn MessageBase) -> Self {
         Self {
             prevent_default: false,
             message,
-            node: Some(node),
+            node: None,
             received_time: 0,
             sent_time: 0
         }

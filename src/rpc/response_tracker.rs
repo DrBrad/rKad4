@@ -2,6 +2,8 @@ use std::collections::{HashMap, LinkedList};
 use std::time::{SystemTime, UNIX_EPOCH};
 use crate::kad::server::TID_LENGTH;
 use crate::rpc::call::Call;
+use crate::rpc::events::inter::message_event::MessageEvent;
+use crate::rpc::events::stalled_event::StalledEvent;
 
 pub const MAX_ACTIVE_CALLS: usize = 512;
 pub const STALLED_TIME: u128 = 60000;
@@ -23,7 +25,6 @@ impl ResponseTracker {
 
     pub fn new() -> Self {
         ResponseTracker {
-            //calls: HashMap::with_capacity(MAX_ACTIVE_CALLS),
             calls: HashMap::with_capacity(MAX_ACTIVE_CALLS),
         }
     }
@@ -65,20 +66,18 @@ impl ResponseTracker {
         }
 
         for tid in stalled {
-            //if let Some(call) = self.calls.remove(&tid) {
-            //    println!("STALLED {}", call.get_node().to_string());
+            if let Some(call) = self.calls.remove(&tid) {
+                //println!("STALLED {}", call.get_node().to_string());
 
-                /*
-                if let Some(response_callback) = call.get_response_callback() {
-                    let event = StalledEvent {
-                        message: call.get_message(),
-                        sent_time: call.get_sent_time(),
-                        node: call.get_node(),
-                    };
-                    response_callback.on_stalled(event);
+                let mut event = StalledEvent::new(call.get_message());
+                event.set_sent_time(call.get_sent_time());
+
+                if call.has_node() {
+                    event.set_node(call.get_node());
                 }
-                */
-            //}
+
+                call.get_response_callback().on_stalled(event);
+            }
         }
     }
 }
