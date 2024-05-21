@@ -320,15 +320,11 @@ impl Server {
 
     pub fn send_with_callback(&mut self, message: &mut dyn MethodMessageBase, callback: Box<dyn ResponseCallback>) {
         if let Some(server) = &self.server {
-            //self.tracker.add(ByteWrapper::from(self.generate_transaction_id()), callback);
             let tid = self.generate_transaction_id();
             message.set_transaction_id(tid);
             message.set_uid(self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap().get_derived_uid());
 
-            let call = Call::new(message, callback);
-            println!("{}", call.get_message().to_string());
-            self.tracker.add(tid, call);
-
+            self.tracker.add(tid, Call::new(message, callback));
             server.send_to(message.encode().encode().as_slice(), message.get_destination().unwrap()).unwrap(); //probably should return if failed to send...
         }
     }
