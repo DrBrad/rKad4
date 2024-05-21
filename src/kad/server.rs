@@ -57,6 +57,7 @@ impl Server {
             messages: HashMap::new()
         };
 
+        /*
         self_.register_message(|| Box::new(PingRequest::default()));
         self_.register_message(|| Box::new(PingResponse::default()));
         self_.register_message(|| Box::new(FindNodeRequest::default()));
@@ -100,7 +101,7 @@ impl Server {
 
         self_.register_request_listener("ping", ping_callback);
         self_.register_request_listener("find_node", find_node_callback);
-
+        */
         self_
     }
 

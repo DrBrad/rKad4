@@ -3,14 +3,20 @@ use std::sync::{Arc, Mutex};
 use crate::kad::kademlia_base::KademliaBase;
 use crate::kad::server::Server;
 use crate::messages::find_node_request::FindNodeRequest;
+use crate::messages::find_node_response::FindNodeResponse;
 use crate::messages::inter::message_base::MessageBase;
+use crate::messages::ping_request::PingRequest;
+use crate::messages::ping_response::PingResponse;
 use crate::refresh::refresh_handler::RefreshHandler;
 use crate::refresh::tasks::bucket_refresh_task::BucketRefreshTask;
 use crate::refresh::tasks::stale_refresh_task::StaleRefreshTask;
 use crate::routing::bucket_types::BucketTypes;
 use crate::routing::inter::routing_table::RoutingTable;
 use crate::routing::kb::k_routing_table::KRoutingTable;
+use crate::rpc::events::inter::event::Event;
+use crate::rpc::events::inter::message_event::MessageEvent;
 use crate::rpc::join_node_listener::JoinNodeListener;
+use crate::rpc::request_listener::RequestCallback;
 
 #[derive(Clone)]
 pub struct Kademlia {
@@ -26,9 +32,54 @@ impl Kademlia {
         refresh.add_operation(Box::new(BucketRefreshTask::new()));
         refresh.add_operation(Box::new(StaleRefreshTask::new()));
 
+        let mut server = Server::new();
+
+        server.register_message(|| Box::new(PingRequest::default()));
+        server.register_message(|| Box::new(PingResponse::default()));
+        server.register_message(|| Box::new(FindNodeRequest::default()));
+        server.register_message(|| Box::new(FindNodeResponse::default()));
+        //self_.register_message(|| Box::new(FindNodeResponse::default()));
+
+        //CAN THIS BE MOVED TO k_request_listener?
+        let ping_callback: RequestCallback = |event| {
+            println!("{}", event.get_message().to_string());
+
+            let mut response = PingResponse::default();
+            response.set_transaction_id(*event.get_message().get_transaction_id());
+            response.set_destination(event.get_message().get_origin().unwrap());
+            response.set_public(event.get_message().get_origin().unwrap());
+            event.set_response(Box::new(response));
+        };
+
+        let find_node_callback: RequestCallback = |event| {
+            println!("- No Response z5 error {}", event.get_message().to_string());
+            //println!("{}", self_.get_routing_table().lock().unwrap().get_derived_uid().to_string());
+
+            if event.is_prevent_default() {
+                return;
+            }
+
+            let request = event.get_message().as_any().downcast_ref::<FindNodeRequest>().unwrap();
+
+            let mut nodes = Vec::new();/*self_.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap()
+                    .find_closest(request.get_target().unwrap(), MAX_BUCKET_SIZE);*/
+            //nodes.retain(|&x| x != event.get_node());
+
+            if !nodes.is_empty() {
+                let mut response = FindNodeResponse::default();
+                response.set_destination(event.get_message().get_origin().unwrap());
+                response.set_public(event.get_message().get_public().unwrap());
+                response.add_nodes(nodes);
+                event.set_response(Box::new(response));
+            }
+        };
+
+        server.register_request_listener("ping", ping_callback);
+        server.register_request_listener("find_node", find_node_callback);
+
         let mut self_ = Self {
             routing_table: Arc::new(Mutex::new(KRoutingTable::new())),
-            server: Arc::new(Mutex::new(Server::new())),
+            server: Arc::new(Mutex::new(server)),
             refresh: Arc::new(Mutex::new(refresh))
         };
 
@@ -46,9 +97,57 @@ impl From<String> for Kademlia {
         refresh.add_operation(Box::new(BucketRefreshTask::new()));
         refresh.add_operation(Box::new(StaleRefreshTask::new()));
 
+        let mut server = Server::new();
+
+        server.register_message(|| Box::new(PingRequest::default()));
+        server.register_message(|| Box::new(PingResponse::default()));
+        server.register_message(|| Box::new(FindNodeRequest::default()));
+        server.register_message(|| Box::new(FindNodeResponse::default()));
+        //self_.register_message(|| Box::new(FindNodeResponse::default()));
+
+        /*
+        //CAN THIS BE MOVED TO k_request_listener?
+        let ping_callback: RequestCallback = |event| {
+            println!("{}", event.get_message().to_string());
+
+            let mut response = PingResponse::default();
+            response.set_transaction_id(*event.get_message().get_transaction_id());
+            response.set_destination(event.get_message().get_origin().unwrap());
+            response.set_public(event.get_message().get_origin().unwrap());
+            event.set_response(Box::new(response));
+        };
+
+
+        let find_node_callback: RequestCallback = |event| {
+            println!("- No Response z5 error {}", event.get_message().to_string());
+            //println!("{}", kademlia.get_routing_table().lock().unwrap().get_derived_uid().to_string());
+
+            if event.is_prevent_default() {
+                return;
+            }
+
+            let request = event.get_message().as_any().downcast_ref::<FindNodeRequest>().unwrap();
+
+            let mut nodes = Vec::new();/*self_.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap()
+                    .find_closest(request.get_target().unwrap(), MAX_BUCKET_SIZE);*/
+            //nodes.retain(|&x| x != event.get_node());
+
+            if !nodes.is_empty() {
+                let mut response = FindNodeResponse::default();
+                response.set_destination(event.get_message().get_origin().unwrap());
+                response.set_public(event.get_message().get_public().unwrap());
+                response.add_nodes(nodes);
+                event.set_response(Box::new(response));
+            }
+        };
+
+        server.register_request_listener("ping", ping_callback);
+        server.register_request_listener("find_node", find_node_callback);
+        */
+
         let mut self_ = Self {
             routing_table: BucketTypes::from_string(value).unwrap().routing_table(),
-            server: Arc::new(Mutex::new(Server::new())),
+            server: Arc::new(Mutex::new(server)),
             refresh: Arc::new(Mutex::new(refresh))
         };
 
