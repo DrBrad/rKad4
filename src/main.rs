@@ -55,6 +55,16 @@ mod rpc;
 //netcat -ul 8080
 
 /*
+java FindNodeResponse
+Line 47 make a new line
+
+java Node Utils UnpackNodes
+
+        if position + ID_LENGTH + addr_length + 2 > buf.len() {
+            break;
+        }
+
+
 TODO
 -----
 
