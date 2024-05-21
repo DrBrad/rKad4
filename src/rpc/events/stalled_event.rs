@@ -1,3 +1,4 @@
+use std::time::{SystemTime, UNIX_EPOCH};
 use crate::messages::inter::message_base::MessageBase;
 use crate::rpc::events::inter::event::Event;
 use crate::rpc::events::inter::message_event::MessageEvent;
@@ -47,7 +48,6 @@ impl<'a> MessageEvent for StalledEvent<'a> {
 
     fn get_message(&self) -> &dyn MessageBase {
         self.message
-        // self.response.as_ref().unwrap()
     }
 
     fn has_node(&self) -> bool {
@@ -71,6 +71,9 @@ impl<'a> MessageEvent for StalledEvent<'a> {
     }
 
     fn received(&mut self) {
-        //todo!()
+        self.received_time = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("Time went backwards")
+            .as_millis();
     }
 }

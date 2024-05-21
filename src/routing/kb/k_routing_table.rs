@@ -146,7 +146,7 @@ impl RoutingTable for KRoutingTable {
         self.secure_only = secure_only;
     }
 
-    fn has_queried(&self, n: &Node, now: u64) -> bool {
+    fn has_queried(&self, n: &Node, now: u128) -> bool {
         let id = self.bucket_uid(&n.uid);
 
         if !self.k_buckets[id].contains_uid(n) {
@@ -197,8 +197,10 @@ impl RoutingTable for KRoutingTable {
     fn all_unqueried_nodes(&self) -> Vec<Node> {
         let mut nodes = Vec::new();
 
-        let time = SystemTime::now().duration_since(UNIX_EPOCH).expect("Time went backwards");
-        let now = time.as_secs() * 1000 + time.subsec_millis() as u64;
+        let now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("Time went backwards")
+            .as_millis();
 
         for b in &self.k_buckets {
             nodes.extend(&b.unqueried_nodes(now));

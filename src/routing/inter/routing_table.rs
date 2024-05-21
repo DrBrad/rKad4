@@ -23,7 +23,7 @@ pub trait RoutingTable: Send {
 
     //fn is_secure_only() -> bool; - NOT NEEDED
 
-    fn has_queried(&self, n: &Node, now: u64) -> bool;
+    fn has_queried(&self, n: &Node, now: u128) -> bool;
 
     fn bucket_uid(&self, k: &UID) -> usize;
 

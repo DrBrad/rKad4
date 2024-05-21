@@ -70,7 +70,7 @@ impl KBucket {
         self.nodes.iter().any(|c| c.verify(&n)) || self.cache.iter().any(|c| c.verify(&n))
     }
 
-    pub fn has_queried(&self, n: &Node, now: u64) -> bool {
+    pub fn has_queried(&self, n: &Node, now: u128) -> bool {
         for c in &self.nodes {
             if c.eq(&n) {
                 return c.has_queried(now);
@@ -86,7 +86,7 @@ impl KBucket {
     }
     */
 
-    pub fn unqueried_nodes(&self, now: u64) -> Vec<Node> {
+    pub fn unqueried_nodes(&self, now: u128) -> Vec<Node> {
         self.nodes.iter().filter(|&n| !n.has_queried(now)).cloned().collect()
     }
 

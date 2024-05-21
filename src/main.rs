@@ -81,8 +81,6 @@ TODO
 [ ] Bucket Refresh
 [ ] Stale Refresh
 [ ] onReceive Error messages
-
-ensure the time within join_node_listener, node, events, response_tracker, call are using the same millis type...
 */
 
 fn main() {

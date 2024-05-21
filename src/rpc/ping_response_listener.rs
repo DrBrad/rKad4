@@ -1,4 +1,5 @@
 use crate::kad::kademlia_base::KademliaBase;
+use crate::kad::server::Server;
 use crate::rpc::events::error_response_event::ErrorResponseEvent;
 use crate::rpc::events::inter::response_callback::ResponseCallback;
 use crate::rpc::events::response_event::ResponseEvent;
@@ -20,11 +21,11 @@ impl PingResponseListener {
 
 impl ResponseCallback for PingResponseListener {
 
-    fn on_response(&self, event: ResponseEvent) {
+    fn on_response(&self, server: &mut Server, event: ResponseEvent) {
         todo!()
     }
 
-    fn on_error_response(&self, event: ErrorResponseEvent) {
+    fn on_error_response(&self, server: &mut Server, event: ErrorResponseEvent) {
         todo!()
     }
 

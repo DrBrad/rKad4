@@ -6,14 +6,14 @@ use super::hash::crc32c::CRC32c;
 
 pub const V4_MASK: [u8; 4] = [0x03, 0x0f, 0x3f, 0xff];
 pub const V6_MASK: [u8; 8] = [0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0xff];
-const QUERY_TIME: u64 = 3600000;
+const QUERY_TIME: u128 = 3600000;
 
 #[derive(Copy, Clone)]
 pub struct Node {
     pub(crate) uid: UID,
     pub(crate) address: SocketAddr,
     pub(crate) stale: u32,
-    pub(crate) last_seen: u64,
+    pub(crate) last_seen: u128,
 }
 
 impl Node {
@@ -23,7 +23,7 @@ impl Node {
             uid,
             address,
             stale: 0,
-            last_seen: SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs(),
+            last_seen: 0,
         }
     }
 
@@ -61,14 +61,17 @@ impl Node {
 
     pub fn seen(&mut self) {
         self.stale = 0;
-        self.last_seen = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
+        self.last_seen = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("Time went backwards")
+            .as_millis();;
     }
 
     pub fn mark_stale(&mut self) {
         self.stale += 1;
     }
 
-    pub fn has_queried(&self, now: u64) -> bool {
+    pub fn has_queried(&self, now: u128) -> bool {
         self.last_seen > 0 && now - self.last_seen < QUERY_TIME
     }
 

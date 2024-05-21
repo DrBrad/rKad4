@@ -1,10 +1,9 @@
-use std::collections::{HashMap, LinkedList};
+use std::collections::HashMap;
 use std::time::{SystemTime, UNIX_EPOCH};
 use crate::kad::server::TID_LENGTH;
 use crate::rpc::call::Call;
 use crate::rpc::events::inter::message_event::MessageEvent;
 use crate::rpc::events::stalled_event::StalledEvent;
-use crate::utils::byte_wrapper::ByteWrapper;
 
 pub const MAX_ACTIVE_CALLS: usize = 512;
 pub const STALLED_TIME: u128 = 60000;

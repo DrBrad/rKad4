@@ -292,7 +292,7 @@ impl Server {
                             event.set_sent_time(call.get_sent_time());
                             event.set_request(call.get_message().upcast());
 
-                            call.get_response_callback().on_response(event);
+                            call.get_response_callback().on_response(self, event);
 
                             Ok(())
 
