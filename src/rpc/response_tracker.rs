@@ -8,15 +8,6 @@ use crate::rpc::events::stalled_event::StalledEvent;
 pub const MAX_ACTIVE_CALLS: usize = 512;
 pub const STALLED_TIME: u128 = 60000;
 
-
-#[derive(Debug, Eq, PartialEq, Hash)]
-pub struct ByteWrapper {
-    // Define your ByteWrapper struct here
-    pub(crate) b: [u8]
-}
-
-// Define your Call struct here
-
 pub struct ResponseTracker {
     calls: HashMap<[u8; TID_LENGTH], Call>,
 }

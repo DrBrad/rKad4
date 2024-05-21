@@ -28,7 +28,7 @@ use crate::rpc::events::inter::response_callback::ResponseCallback;
 use crate::rpc::events::request_event::RequestEvent;
 use crate::rpc::events::response_event::ResponseEvent;
 use crate::rpc::request_listener::RequestCallback;
-use crate::rpc::response_tracker::{ByteWrapper, ResponseTracker};
+use crate::rpc::response_tracker::ResponseTracker;
 use crate::utils;
 use crate::utils::net::address_utils::is_bogon;
 use crate::utils::node::Node;
