@@ -12,6 +12,7 @@ use crate::refresh::tasks::bucket_refresh_task::BucketRefreshTask;
 use crate::refresh::tasks::stale_refresh_task::StaleRefreshTask;
 use crate::routing::bucket_types::BucketTypes;
 use crate::routing::inter::routing_table::RoutingTable;
+use crate::routing::kb::k_bucket::MAX_BUCKET_SIZE;
 use crate::routing::kb::k_routing_table::KRoutingTable;
 use crate::rpc::events::inter::event::Event;
 use crate::rpc::events::inter::message_event::MessageEvent;
@@ -59,11 +60,15 @@ impl Kademlia {
                 return;
             }
 
-            let request = event.get_message().as_any().downcast_ref::<FindNodeRequest>().unwrap();
+            let mut request = event.get_message().as_any().downcast_ref::<FindNodeRequest>().unwrap();
 
-            let mut nodes = Vec::new();/*self_.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap()
-                    .find_closest(request.get_target().unwrap(), MAX_BUCKET_SIZE);*/
-            //nodes.retain(|&x| x != event.get_node());
+            let mut nodes = Vec::new();
+
+            /*
+            let mut nodes = kademlia.get_routing_table().lock().unwrap()
+                    .find_closest(request.get_target().unwrap(), MAX_BUCKET_SIZE);
+            nodes.retain(|&x| x != event.get_node());
+            */
 
             if !nodes.is_empty() {
                 let mut response = FindNodeResponse::default();
