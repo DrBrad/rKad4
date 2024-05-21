@@ -36,8 +36,8 @@ impl FindNodeRequest {
         self.target = Some(target);
     }
 
-    pub fn get_target(&mut self) -> Result<&UID, ()> {
-        self.target.as_ref().map_or_else(|| Err(()), |uid| Ok(uid))
+    pub fn get_target(&self) -> UID {
+        self.target.unwrap()
     }
 }
 

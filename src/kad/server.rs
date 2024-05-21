@@ -228,8 +228,9 @@ impl Server {
                             let mut event = RequestEvent::new(m.upcast());
                             event.set_node(node);
 
-                            for callback in kademlia.get_server().lock().as_ref().unwrap().request_mapping.get(&k).unwrap() {
-                                callback(&mut event);
+                            let callbacks = kademlia.get_server().lock().as_ref().unwrap().request_mapping.get(&k).unwrap().clone();
+                            for callback in callbacks {
+                                callback(kademlia, &mut event);
                             }
 
                             if event.is_prevent_default() {
