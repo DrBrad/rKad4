@@ -70,7 +70,7 @@ TODO
 
 [x] FindNodeResponse
 [x] unpack_nodes
-[-] Join Node Listener
+[x] Join Node Listener
 [-] sending messages with server
 [ ] Ping Response Listener
 [ ] Bucket Refresh
