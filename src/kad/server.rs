@@ -77,6 +77,25 @@ impl Server {
 
         let find_node_callback: RequestCallback = |event| {
             println!("- No Response z5 error {}", event.get_message().to_string());
+            //println!("{}", kademlia.get_routing_table().lock().unwrap().get_derived_uid().to_string());
+
+            if event.is_prevent_default() {
+                return;
+            }
+
+            let request = event.get_message().as_any().downcast_ref::<FindNodeRequest>().unwrap();
+
+            let mut nodes = Vec::new();/*self_.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap()
+                    .find_closest(request.get_target().unwrap(), MAX_BUCKET_SIZE);*/
+            //nodes.retain(|&x| x != event.get_node());
+
+            if !nodes.is_empty() {
+                let mut response = FindNodeResponse::default();
+                response.set_destination(event.get_message().get_origin().unwrap());
+                response.set_public(event.get_message().get_public().unwrap());
+                response.add_nodes(nodes);
+                event.set_response(Box::new(response));
+            }
         };
 
         self_.register_request_listener("ping", ping_callback);
