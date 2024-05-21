@@ -70,6 +70,13 @@ java bytewrapper change to
         return Arrays.hashCode(b);
     }
 
+ping_response_callback - does this even work (java and rust)
+    fn on_stalled(&self, event: StalledEvent) {
+        if event.has_node() {
+            event.get_node().mark_stale(); //WILL THIS ACT CORRECTLY...? - THIS GOES FOR JAVA AS WELL...
+        }
+    }
+
 TODO
 -----
 
@@ -77,7 +84,7 @@ TODO
 [x] unpack_nodes
 [x] Join Node Listener
 [-] sending messages with server
-[ ] Ping Response Listener
+[x] Ping Response Listener
 [ ] Bucket Refresh
 [ ] Stale Refresh
 [ ] onReceive Error messages

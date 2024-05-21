@@ -34,7 +34,7 @@ impl ResponseCallback for JoinNodeListener {
         if response.has_nodes() {
             let nodes = response.get_all_nodes();
 
-            let ping_response_listener = PingResponseListener::new(self.kademlia.as_ref());
+            let ping_response_listener = PingResponseListener::new(self.kademlia.get_routing_table().clone());
 
             let now = SystemTime::now()
                 .duration_since(UNIX_EPOCH)
