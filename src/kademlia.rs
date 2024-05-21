@@ -39,7 +39,6 @@ impl Kademlia {
         server.register_message(|| Box::new(PingResponse::default()));
         server.register_message(|| Box::new(FindNodeRequest::default()));
         server.register_message(|| Box::new(FindNodeResponse::default()));
-        //self_.register_message(|| Box::new(FindNodeResponse::default()));
 
         //CAN THIS BE MOVED TO k_request_listener?
         let ping_callback: RequestCallback = |kademlia, event| {
@@ -61,7 +60,7 @@ impl Kademlia {
 
             let mut nodes = kademlia.get_routing_table().lock().unwrap()
                     .find_closest(&request.get_target(), MAX_BUCKET_SIZE);
-            nodes.retain(|&x| x != event.get_node());
+            nodes.retain(|&n| n != event.get_node());
 
             if !nodes.is_empty() {
                 let mut response = FindNodeResponse::default();
@@ -101,11 +100,9 @@ impl From<String> for Kademlia {
         server.register_message(|| Box::new(PingResponse::default()));
         server.register_message(|| Box::new(FindNodeRequest::default()));
         server.register_message(|| Box::new(FindNodeResponse::default()));
-        //self_.register_message(|| Box::new(FindNodeResponse::default()));
 
-        /*
         //CAN THIS BE MOVED TO k_request_listener?
-        let ping_callback: RequestCallback = |event| {
+        let ping_callback: RequestCallback = |kademlia, event| {
             println!("{}", event.get_message().to_string());
 
             let mut response = PingResponse::default();
@@ -115,20 +112,16 @@ impl From<String> for Kademlia {
             event.set_response(Box::new(response));
         };
 
-
-        let find_node_callback: RequestCallback = |event| {
-            println!("- No Response z5 error {}", event.get_message().to_string());
-            //println!("{}", kademlia.get_routing_table().lock().unwrap().get_derived_uid().to_string());
-
+        let find_node_callback: RequestCallback = |kademlia, event| {
             if event.is_prevent_default() {
                 return;
             }
 
             let request = event.get_message().as_any().downcast_ref::<FindNodeRequest>().unwrap();
 
-            let mut nodes = Vec::new();/*self_.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap()
-                    .find_closest(request.get_target().unwrap(), MAX_BUCKET_SIZE);*/
-            //nodes.retain(|&x| x != event.get_node());
+            let mut nodes = kademlia.get_routing_table().lock().unwrap()
+                .find_closest(&request.get_target(), MAX_BUCKET_SIZE);
+            nodes.retain(|&n| n != event.get_node());
 
             if !nodes.is_empty() {
                 let mut response = FindNodeResponse::default();
@@ -141,7 +134,6 @@ impl From<String> for Kademlia {
 
         server.register_request_listener("ping", ping_callback);
         server.register_request_listener("find_node", find_node_callback);
-        */
 
         let mut self_ = Self {
             routing_table: BucketTypes::from_string(value).unwrap().routing_table(),
