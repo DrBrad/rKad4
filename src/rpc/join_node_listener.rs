@@ -1,6 +1,5 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 use crate::kad::kademlia_base::KademliaBase;
-use crate::kad::server::Server;
 use crate::messages::find_node_response::FindNodeResponse;
 use crate::messages::inter::message_base::MessageBase;
 use crate::messages::ping_request::PingRequest;
@@ -26,7 +25,7 @@ impl JoinNodeListener {
 
 impl ResponseCallback for JoinNodeListener {
 
-    fn on_response(&self, server: &mut Server, event: ResponseEvent) {
+    fn on_response(&self, event: ResponseEvent) {
         self.kademlia.get_routing_table().lock().unwrap().insert(event.get_node());
         println!("JOINED {}", event.get_node().to_string());
 
@@ -50,7 +49,7 @@ impl ResponseCallback for JoinNodeListener {
                 let mut req = PingRequest::default();
                 req.set_destination(node.address);
 
-                server.send_with_callback(&mut req, Box::new(ping_response_listener.clone()));
+                self.kademlia.get_server().lock().unwrap().send_with_callback(&mut req, Box::new(ping_response_listener.clone()));
             }
         }
 
@@ -59,7 +58,7 @@ impl ResponseCallback for JoinNodeListener {
         }
     }
 
-    fn on_error_response(&self, server: &mut Server, event: ErrorResponseEvent) {
+    fn on_error_response(&self, event: ErrorResponseEvent) {
 
     }
 

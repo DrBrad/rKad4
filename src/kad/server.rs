@@ -116,20 +116,21 @@ impl Server {
         });
 
 
-        let kademlia = self.kademlia.clone();
+        let mut kademlia = self.kademlia.clone();
 
         let handler_handle = thread::spawn(move || {
+            let mut kademlia = kademlia.unwrap();
             loop {
                 match rx.try_recv() {
                     Ok((data, src_addr)) => {
-                        kademlia.as_ref().unwrap().get_server().lock().unwrap().on_receive(data.as_slice(), src_addr);
+                        Self::on_receive(kademlia.as_mut(), data.as_slice(), src_addr);
                     }
                     Err(TryRecvError::Empty) => {
                     }
                     Err(TryRecvError::Disconnected) => break
                 }
 
-                kademlia.as_ref().unwrap().get_server().lock().unwrap().tracker.remove_stalled();
+                kademlia.get_server().lock().unwrap().tracker.remove_stalled();
             }
         });
 
@@ -164,7 +165,144 @@ impl Server {
         false
     }
 
-    pub fn on_receive(&mut self, data: &[u8], src_addr: SocketAddr) {
+    pub fn on_receive(kademlia: &mut dyn KademliaBase, data: &[u8], src_addr: SocketAddr) {
+        if is_bogon(src_addr) {
+            //return;
+        }
+
+        match BencodeObject::decode(data) {
+            Ok(ben) => {
+                if !ben.contains_key(TID_KEY) || !ben.contains_key(TYPE_KEY) {
+                    //panic
+                    return;
+                }
+
+                let t = MessageType::from_rpc_type_name(ben.get_string(TYPE_KEY).unwrap().to_string()).unwrap();
+
+                match t {
+                    MessageType::ReqMsg => {
+                        if let Err(e) = || -> Result<(), MessageException> {
+                            let message_key = MessageKey::new(ben.get_string(t.rpc_type_name())
+                                                                  .map_err(|e| MessageException::new("Method Unknown", 204))?, t);
+
+                            let mut m = kademlia.get_server().lock().as_ref().unwrap().messages.get(&message_key).unwrap()();
+                            //let mut m = constructor();
+
+                            let mut tid = [0u8; TID_LENGTH];
+                            tid.copy_from_slice(ben.get_bytes(TID_KEY).map_err(|e| MessageException::new("Method Unknown", 204))?);
+
+                            m.set_transaction_id(tid);
+                            m.decode(&ben).map_err(|e| MessageException::new("Generic Error", 201))?;
+                            m.set_origin(src_addr);
+
+                            let node = Node::new(m.get_uid(), m.get_origin().unwrap());
+                            kademlia.get_routing_table().lock().unwrap().insert(node);
+
+
+                            let k = ben.get_string(t.rpc_type_name()).unwrap().to_string();
+
+                            if !kademlia.get_server().lock().as_ref().unwrap().request_mapping.contains_key(&k) {
+                                return Err(MessageException::new("Method Unknown", 204));
+                            }
+
+                            let mut event = RequestEvent::new(m.upcast());
+                            event.set_node(node);
+
+                            for callback in kademlia.get_server().lock().as_ref().unwrap().request_mapping.get(&k).unwrap() {
+                                callback(&mut event);
+                            }
+
+                            if event.is_prevent_default() {
+                                //RETURN NOTHING - NO ERROR
+                                return Err(MessageException::new("Method Unknown", 204));
+                            }
+
+                            if !event.has_response() {
+                                return Err(MessageException::new("Method Unknown", 204));
+                            }
+
+                            kademlia.get_server().lock().as_ref().unwrap().send(event.get_response().unwrap());
+
+                            if !kademlia.get_refresh_handler().lock().unwrap().is_running() {
+                                kademlia.get_refresh_handler().lock().unwrap().start();
+                            }
+
+                            Ok(())
+
+                        }() {
+                            println!("{}", e.get_message());
+
+                            /*
+                            ErrorResponse response = new ErrorResponse(ben.getBytes(TID_KEY));
+                            response.setDestination(packet.getAddress(), packet.getPort());
+                            response.setPublic(packet.getAddress(), packet.getPort());
+                            response.setCode(e.getCode());
+                            response.setDescription(e.getMessage());
+                            send(response);
+                            */
+                        }
+                    },
+                    MessageType::RspMsg => {
+                        if let Err(e) = || -> Result<(), MessageException> {
+                            let mut tid = [0u8; TID_LENGTH];
+                            tid.copy_from_slice(ben.get_bytes(TID_KEY).expect("Failed to find TID key."));
+
+                            let call = kademlia.get_server().lock().as_mut().unwrap().tracker.poll(&tid).ok_or(MessageException::new("Server Error", 202))?;
+
+                            //PROBLEM LINE BELOW... - NEED TO MAKE THE MESSAGE FIND_NODE_RESPONSE...
+                            let message_key = MessageKey::new(call.get_message().get_method(), t);
+
+                            let mut m = kademlia.get_server().lock().as_ref().unwrap().messages.get(&message_key).unwrap()();
+
+                            m.set_transaction_id(tid);
+                            m.decode(&ben).map_err(|e| MessageException::new("Generic Error", 201))?;
+                            m.set_origin(src_addr);
+
+                            if m.get_public().is_some() {
+                                kademlia.get_routing_table().lock().unwrap()
+                                    .update_public_ip_consensus(m.get_origin().unwrap().ip(), m.get_public().unwrap().ip());
+                            }
+
+                            if call.get_message().get_destination() != m.get_origin() {
+                                return Err(MessageException::new("Generic Error", 201));
+                            }
+
+                            let mut event;
+
+                            if call.has_node() {
+                                if call.get_node().uid == m.get_uid() {
+                                    return Err(MessageException::new("Generic Error", 201));
+                                }
+
+                                event = ResponseEvent::new(m.as_ref().upcast(), call.get_node());
+
+                            } else {
+                                event = ResponseEvent::new(m.as_ref().upcast(), Node::new(m.get_uid(), m.get_origin().unwrap()));
+                            }
+
+                            event.received();
+                            event.set_sent_time(call.get_sent_time());
+                            event.set_request(call.get_message().upcast());
+
+                            call.get_response_callback().on_response(event);
+
+                            Ok(())
+
+                        }() {
+                            println!("RESP {}", e.get_message());
+                        }
+                    },
+                    MessageType::ErrMsg => {
+                        println!("ERR  {}", ben.to_string());
+                    }
+                }
+            },
+            Err(e) => {
+                println!("{}", e.to_string());
+            }
+        }
+
+        /*
         if is_bogon(src_addr) {
             //return;
         }
@@ -221,12 +359,6 @@ impl Server {
                             if !event.has_response() {
                                 return Err(MessageException::new("Method Unknown", 204));
                             }
-
-                            //REMOVE - ONLY FOR TESTING...
-                            //event.get_response().unwrap().set_uid(self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap().get_derived_uid());
-                            //REMOVE ^^^^^^^^^^^
-
-                            //println!("RESPONSE: {}", event.get_response().unwrap().to_string());
 
                             self.send(event.get_response().unwrap());
 
@@ -309,6 +441,7 @@ impl Server {
                 println!("{}", e.to_string());
             }
         }
+        */
     }
 
     pub fn send(&self, message: &mut dyn MessageBase) {
