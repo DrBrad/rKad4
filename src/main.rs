@@ -15,6 +15,7 @@ use bencode::variables::inter::bencode_variable::BencodeVariable;
 use crate::kad::kademlia_base::KademliaBase;
 use crate::kademlia::Kademlia;
 use crate::messages::find_node_request::FindNodeRequest;
+use crate::messages::find_node_response::FindNodeResponse;
 //use crate::messages::ping_request::PingRequest;
 //use crate::messages::find_node_response::FindNodeResponse;
 use crate::messages::inter::message_base::MessageBase;
@@ -57,15 +58,31 @@ mod rpc;
 TODO
 -----
 
-Join Node Listener
-Ping Response Listener
-Bucket Refresh
-Stale Refresh
-FindNodeResponse
-onReceive Error messages
+[x] FindNodeResponse
+[x] unpack_nodes
+[-] Join Node Listener
+[-] sending messages with server
+[ ] Ping Response Listener
+[ ] Bucket Refresh
+[ ] Stale Refresh
+[ ] onReceive Error messages
 */
 
 fn main() {
+    let mut response = FindNodeResponse::new([0, 0, 0, 0, 0, 0]);
+    response.add_node(Node::new(UID::try_from("cb8cd9357541814e1b5b284d8d5a276733004028").unwrap(), SocketAddr::new(IpAddr::from([245, 245, 245, 245]), 8070)));
+    response.set_uid(UID::try_from("cb8cd9357541814e1b5b284d8d5a276733004028").unwrap());
+    response.set_destination(SocketAddr::new(IpAddr::from([127, 0, 0, 1]), 8070));
+
+    let encoded = response.encode();
+
+    let mut decoded = FindNodeResponse::default();
+    decoded.decode(&encoded);
+
+    println!("{}", response.to_string());
+    println!("{}", decoded.to_string());
+
+    /*
     let kad = Kademlia::new();
     kad.get_routing_table().lock().unwrap().set_secure(false);
     kad.join(8080, SocketAddr::new(IpAddr::from([127, 0, 0, 1]), 8070));
@@ -74,4 +91,5 @@ fn main() {
     sleep(Duration::from_secs(5));
     println!("{}", kad.get_routing_table().lock().unwrap().all_nodes().len());
     sleep(Duration::from_secs(30));
+    */
 }

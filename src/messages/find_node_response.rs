@@ -5,8 +5,10 @@ use crate::kad::server::TID_LENGTH;
 use crate::messages::inter::message_base::{MessageBase, TID_KEY};
 use crate::messages::inter::message_exception::MessageException;
 use crate::messages::inter::message_type::{MessageType, TYPE_KEY};
+use crate::utils::net::address_type::AddressType;
 use crate::utils::net::address_utils::{pack_address, unpack_address};
 use crate::utils::node::Node;
+use crate::utils::node_utils::{pack_nodes, unpack_nodes};
 use crate::utils::uid::{ID_LENGTH, UID};
 use super::inter::method_message_base::MethodMessageBase;
 
@@ -16,11 +18,9 @@ pub const NODE_CAP: usize = 20;
 pub struct FindNodeResponse {
     uid: Option<UID>,
     tid: [u8; TID_LENGTH],
-    //type_: MessageType,
     public: Option<SocketAddr>,
     destination: Option<SocketAddr>,
     origin: Option<SocketAddr>,
-    //method: String,
     nodes: Vec<Node>
 }
 
@@ -37,15 +37,60 @@ impl FindNodeResponse {
         }
     }
 
-    /*
-    pub fn set_target(&mut self, target: UID) {
-        self.target = Some(target);
+    pub fn add_node(&mut self, node: Node) {
+        self.nodes.push(node);
     }
 
-    pub fn get_target(&mut self) -> Result<&UID, ()> {
-        self.target.as_ref().map_or_else(|| Err(()), |uid| Ok(uid))
+    pub fn get_node(&self, i: usize) -> Option<&Node> {
+        self.nodes.get(i)
     }
-    */
+
+    pub fn remove_node(&mut self, i: usize) {
+        self.nodes.remove(i);
+    }
+
+    pub fn contains_node(&self, node: &Node) -> bool {
+        self.nodes.contains(node)
+    }
+
+    pub fn has_nodes(&self) -> bool {
+        !self.nodes.is_empty()
+    }
+
+    pub fn add_nodes(&mut self, nodes: Vec<Node>) {
+        if nodes.len()+self.nodes.len() > NODE_CAP {
+            //throw new IllegalArgumentException("Adding nodes would exceed Node Cap of "+NODE_CAP);
+        }
+        self.nodes.extend(nodes);
+    }
+
+    pub fn get_all_nodes(&self) -> Vec<Node> {
+        self.nodes.clone()
+    }
+
+    pub fn get_all_ipv4_nodes(&self) -> Vec<Node> {
+        let mut r = Vec::new();
+
+        for node in &self.nodes {
+            if node.address.is_ipv4() {
+                r.push(node.clone());
+            }
+        }
+
+        r
+    }
+
+    pub fn get_all_ipv6_nodes(&self) -> Vec<Node> {
+        let mut r = Vec::new();
+
+        for node in &self.nodes {
+            if node.address.is_ipv6() {
+                r.push(node.clone());
+            }
+        }
+
+        r
+    }
 }
 
 impl Default for FindNodeResponse {
@@ -124,6 +169,20 @@ impl MessageBase for FindNodeResponse {
             ben.put("ip", pack_address(&public));
         }
 
+        if self.nodes.is_empty() {
+            return ben;
+        }
+
+        let nodes = self.get_all_ipv4_nodes();
+        if !nodes.is_empty() {
+            ben.get_object_mut(self.get_type().inner_key()).unwrap().put("nodes", pack_nodes(nodes, AddressType::Ipv4));
+        }
+
+        let nodes = self.get_all_ipv6_nodes();
+        if !nodes.is_empty() {
+            ben.get_object_mut(self.get_type().inner_key()).unwrap().put("nodes", pack_nodes(nodes, AddressType::Ipv6));
+        }
+
         ben
     }
 
@@ -142,6 +201,19 @@ impl MessageBase for FindNodeResponse {
 
         if ben.contains_key("ip") {
             self.public = unpack_address(ben.get_bytes("ip").unwrap());
+        }
+
+        if !ben.get_object(self.get_type().inner_key()).unwrap().contains_key("nodes") &&
+                !ben.get_object(self.get_type().inner_key()).unwrap().contains_key("nodes6") {
+            return Err(MessageException::new("Protocol Error, such as a malformed packet.", 203));
+        }
+
+        if ben.get_object(self.get_type().inner_key()).unwrap().contains_key("nodes") {
+            self.nodes.extend(unpack_nodes(ben.get_object(self.get_type().inner_key()).unwrap().get_bytes("nodes").unwrap(), AddressType::Ipv4));
+        }
+
+        if ben.get_object(self.get_type().inner_key()).unwrap().contains_key("nodes6") {
+            self.nodes.extend(unpack_nodes(ben.get_object(self.get_type().inner_key()).unwrap().get_bytes("nodes6").unwrap(), AddressType::Ipv4));
         }
 
         Ok(())

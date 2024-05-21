@@ -13,11 +13,9 @@ use super::inter::method_message_base::MethodMessageBase;
 pub struct FindNodeRequest {
     uid: Option<UID>,
     tid: [u8; TID_LENGTH],
-    //type_: MessageType,
     public: Option<SocketAddr>,
     destination: Option<SocketAddr>,
     origin: Option<SocketAddr>,
-    //method: String,
     target: Option<UID>
 }
 
