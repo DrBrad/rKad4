@@ -23,7 +23,6 @@ impl ResponseTracker {
 
     pub fn add(&mut self, tid: [u8; TID_LENGTH], call: Call) {
         self.calls.insert(tid, call);
-        println!("ADDING: {:?}", tid);
     }
 
     pub fn get(&self, tid: &[u8; TID_LENGTH]) -> Option<&Call> {
@@ -39,7 +38,6 @@ impl ResponseTracker {
     }
 
     pub fn poll(&mut self, tid: &[u8; TID_LENGTH]) -> Option<Call> {
-        println!("{} {:?}", self.calls.len(), tid);
         self.calls.remove(tid)
     }
 
