@@ -138,11 +138,11 @@ impl RoutingTable for KRoutingTable {
         self.uid.unwrap()
     }
 
-    fn is_secure(&self) -> bool {
+    fn is_secure_only(&self) -> bool {
         self.secure_only
     }
 
-    fn set_secure(&mut self, secure_only: bool) {
+    fn set_secure_only(&mut self, secure_only: bool) {
         self.secure_only = secure_only;
     }
 

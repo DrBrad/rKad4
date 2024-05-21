@@ -12,9 +12,9 @@ pub trait RoutingTable: Send {
 
     fn get_derived_uid(&self) -> UID;
 
-    fn is_secure(&self) -> bool;
+    fn is_secure_only(&self) -> bool;
 
-    fn set_secure(&mut self, secure_only: bool);
+    fn set_secure_only(&mut self, secure_only: bool);
 
     //getDerivedUID - NOT NEEDED
 

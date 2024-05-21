@@ -76,11 +76,13 @@ TODO
 [ ] Bucket Refresh
 [ ] Stale Refresh
 [ ] onReceive Error messages
+
+ensure the time within join_node_listener, node, events, response_tracker are using the same millis type...
 */
 
 fn main() {
     let kad = Kademlia::new();
-    kad.get_routing_table().lock().unwrap().set_secure(false);
+    kad.get_routing_table().lock().unwrap().set_secure_only(false);
     kad.join(8080, SocketAddr::new(IpAddr::from([127, 0, 0, 1]), 8070));
     //kad.bind(8080);
     println!("{}", kad.get_routing_table().lock().unwrap().get_derived_uid().to_string());

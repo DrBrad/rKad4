@@ -1,6 +1,8 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 use crate::kad::kademlia_base::KademliaBase;
 use crate::messages::find_node_response::FindNodeResponse;
+use crate::messages::inter::message_base::MessageBase;
+use crate::messages::ping_request::PingRequest;
 use crate::rpc::events::error_response_event::ErrorResponseEvent;
 use crate::rpc::events::inter::message_event::MessageEvent;
 use crate::rpc::events::inter::response_callback::ResponseCallback;
@@ -32,15 +34,27 @@ impl ResponseCallback for JoinNodeListener {
         if response.has_nodes() {
             let nodes = response.get_all_nodes();
 
-            let ping_response_listener = PingResponseListener::new(/*kademlia.get_routing_table()*/);
+            let ping_response_listener = PingResponseListener::new(self.kademlia.as_ref());
 
             let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();//current time in millis
             for node in nodes {
+                if (self.kademlia.get_routing_table().lock().unwrap().is_secure_only() && !node.has_secure_id()) || node.has_queried(now) {
+                    //System.out.println("SKIPPING "+now+"  "+n.getLastSeen()+"  "+n);
+                    continue;
+                }
 
+                let mut req = PingRequest::default();
+                req.set_destination(node.address);
+
+                self.kademlia.get_server().lock().unwrap().send_with_callback(&mut req, Box::new(ping_response_listener.clone()));
             }
         }
 
-        println!("RES  {}", event.get_message().to_string());
+        if !self.kademlia.get_refresh_handler().lock().unwrap().is_running() {
+            self.kademlia.get_refresh_handler().lock().unwrap().start();
+        }
+
+        //println!("RES  {}", event.get_message().to_string());
     }
 
     fn on_error_response(&self, event: ErrorResponseEvent) {
