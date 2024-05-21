@@ -1,3 +1,4 @@
+use std::time::{SystemTime, UNIX_EPOCH};
 use crate::messages::inter::message_base::MessageBase;
 use crate::messages::inter::method_message_base::MethodMessageBase;
 use crate::rpc::events::inter::response_callback::ResponseCallback;
@@ -14,11 +15,16 @@ pub struct Call {
 impl Call {
 
     pub fn new(message: &dyn MethodMessageBase, callback: Box<dyn ResponseCallback>) -> Self {
+        let now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("Time went backwards")
+            .as_millis();
+
         Self {
             message: message.dyn_clone(),
             node: None,
             callback,
-            sent_time: 0
+            sent_time: now
         }
     }
 

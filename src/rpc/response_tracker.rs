@@ -4,6 +4,7 @@ use crate::kad::server::TID_LENGTH;
 use crate::rpc::call::Call;
 use crate::rpc::events::inter::message_event::MessageEvent;
 use crate::rpc::events::stalled_event::StalledEvent;
+use crate::utils::byte_wrapper::ByteWrapper;
 
 pub const MAX_ACTIVE_CALLS: usize = 512;
 pub const STALLED_TIME: u128 = 60000;
@@ -22,6 +23,7 @@ impl ResponseTracker {
 
     pub fn add(&mut self, tid: [u8; TID_LENGTH], call: Call) {
         self.calls.insert(tid, call);
+        println!("ADDING: {:?}", tid);
     }
 
     pub fn get(&self, tid: &[u8; TID_LENGTH]) -> Option<&Call> {
@@ -37,6 +39,7 @@ impl ResponseTracker {
     }
 
     pub fn poll(&mut self, tid: &[u8; TID_LENGTH]) -> Option<Call> {
+        println!("{} {:?}", self.calls.len(), tid);
         self.calls.remove(tid)
     }
 
@@ -48,12 +51,12 @@ impl ResponseTracker {
 
         let mut stalled = Vec::new();
 
-        for (tid, call) in self.calls.iter() {
+        for (&tid, call) in self.calls.iter() {
             if !call.is_stalled(now) {
                 break;
             }
 
-            stalled.push(tid.clone());
+            stalled.push(tid);
         }
 
         for tid in stalled {

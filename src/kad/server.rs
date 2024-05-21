@@ -99,7 +99,7 @@ impl Server {
                     server.recv_from(&mut buf).expect("Failed to receive message")
                 };
 
-                sender.send((buf[..size].to_vec(), src_addr));
+                sender.send((buf[..size].to_vec(), src_addr)).unwrap();
 
                 /*
                 let data = &buf[..size];
@@ -254,7 +254,7 @@ impl Server {
                             let mut tid = [0u8; TID_LENGTH];
                             tid.copy_from_slice(ben.get_bytes(TID_KEY).expect("Failed to find TID key."));
 
-                            let call = self.tracker.poll(&tid).ok_or(MessageException::new("Server Error", 202))?; //ERRORING SECOND RUN TIME...?
+                            let call = self.tracker.poll(&tid).ok_or(MessageException::new("Server Error", 202))?;
 
                             //PROBLEM LINE BELOW... - NEED TO MAKE THE MESSAGE FIND_NODE_RESPONSE...
                             let message_key = MessageKey::new(call.get_message().get_method(), t);
