@@ -93,29 +93,6 @@ TODO
 */
 
 fn main() {
-    let z = "asdasdasd".to_string();
-    //CAN THIS BE MOVED TO k_request_listener?
-    //let ping_callback: RequestCallback = |kademlia, event| {
-    //    let z = z.clone();
-        //move |kademlia: &mut dyn KademliaBase, event: &mut RequestEvent| {
-        //    println!("{} {}", event.get_message().to_string(), z);
-        //}
-    //};
-
-
-    /*
-    let z = "asdasdasd".to_string();
-    let ping_callback: RequestCallback = Box::new(move |event| {
-        println!("{} {}", z, event.get_message().to_string());
-    });
-
-    let mut req = PingRequest::default();
-    req.set_uid(UID::try_from("b70f9251915e2a6a375c29693603d010dca976bb").unwrap());
-    let mut event = RequestEvent::new(&req);
-
-    ping_callback(&mut event);
-    */
-
     let kad = Kademlia::new();
     kad.get_routing_table().lock().unwrap().set_secure_only(false);
     kad.join(8080, SocketAddr::new(IpAddr::from([127, 0, 0, 1]), 8070));
