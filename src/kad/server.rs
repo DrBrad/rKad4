@@ -213,7 +213,7 @@ impl Server {
                             tid.copy_from_slice(ben.get_bytes(TID_KEY).map_err(|e| MessageException::new("Method Unknown", 204))?);
 
                             m.set_transaction_id(tid);
-                            m.decode(&ben).map_err(|e| MessageException::new("Generic Error", 201))?;
+                            m.decode(&ben)?;
                             m.set_origin(src_addr);
 
                             let node = Node::new(m.get_uid(), m.get_origin().unwrap());
@@ -276,7 +276,7 @@ impl Server {
                             let mut m = kademlia.get_server().lock().as_ref().unwrap().messages.get(&message_key).unwrap()();
 
                             m.set_transaction_id(tid);
-                            m.decode(&ben).map_err(|e| MessageException::new("Generic Error", 201))?;
+                            m.decode(&ben)?;
                             m.set_origin(src_addr);
 
                             if m.get_public().is_some() {
