@@ -86,7 +86,7 @@ TODO
 [x] Join Node Listener
 [-] sending messages with server
 [x] Ping Response Listener
-[-] KRequestListener
+[x] KRequestListener
 [ ] Bucket Refresh
 [ ] Stale Refresh
 [ ] onReceive Error messages
