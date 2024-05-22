@@ -1,4 +1,4 @@
 use crate::kad::kademlia_base::KademliaBase;
 use crate::rpc::events::request_event::RequestEvent;
 
-pub type RequestCallback = fn(&mut dyn KademliaBase, &mut RequestEvent);
+pub type RequestCallback = Box<dyn Fn(&mut RequestEvent) + Send>;

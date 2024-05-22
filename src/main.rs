@@ -33,6 +33,7 @@ use crate::routing::inter::routing_table::RoutingTable;
 use crate::routing::kb::k_bucket::KBucket;
 use crate::routing::kb::k_routing_table::KRoutingTable;
 use crate::rpc::events::inter::message_event::MessageEvent;
+use crate::rpc::events::request_event::RequestEvent;
 use crate::rpc::request_listener::RequestCallback;
 use crate::utils::net::address_type::AddressType;
 use crate::utils::net::address_utils::{pack_address, unpack_address};
@@ -92,6 +93,29 @@ TODO
 */
 
 fn main() {
+    let z = "asdasdasd".to_string();
+    //CAN THIS BE MOVED TO k_request_listener?
+    //let ping_callback: RequestCallback = |kademlia, event| {
+    //    let z = z.clone();
+        //move |kademlia: &mut dyn KademliaBase, event: &mut RequestEvent| {
+        //    println!("{} {}", event.get_message().to_string(), z);
+        //}
+    //};
+
+
+    /*
+    let z = "asdasdasd".to_string();
+    let ping_callback: RequestCallback = Box::new(move |event| {
+        println!("{} {}", z, event.get_message().to_string());
+    });
+
+    let mut req = PingRequest::default();
+    req.set_uid(UID::try_from("b70f9251915e2a6a375c29693603d010dca976bb").unwrap());
+    let mut event = RequestEvent::new(&req);
+
+    ping_callback(&mut event);
+    */
+
     let kad = Kademlia::new();
     kad.get_routing_table().lock().unwrap().set_secure_only(false);
     kad.join(8080, SocketAddr::new(IpAddr::from([127, 0, 0, 1]), 8070));

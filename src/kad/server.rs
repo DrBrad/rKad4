@@ -170,6 +170,7 @@ impl Server {
         let key = key.to_string();
         if self.request_mapping.contains_key(&key) {
             self.request_mapping.get_mut(&key).unwrap().push(callback);
+            return;
         }
         let mut mapping = Vec::new();
         mapping.push(callback);
@@ -228,9 +229,8 @@ impl Server {
                             let mut event = RequestEvent::new(m.upcast());
                             event.set_node(node);
 
-                            let callbacks = kademlia.get_server().lock().as_ref().unwrap().request_mapping.get(&k).unwrap().clone();
-                            for callback in callbacks {
-                                callback(kademlia, &mut event);
+                            for callback in kademlia.get_server().lock().as_ref().unwrap().request_mapping.get(&k).unwrap() {
+                                callback(&mut event);
                             }
 
                             if event.is_prevent_default() {
