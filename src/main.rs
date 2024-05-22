@@ -72,7 +72,7 @@ TODO
 [-] sending messages with server - node specification...
 [x] Ping Response Listener
 [x] KRequestListener
-[ ] Bucket Refresh
+[-] Bucket Refresh
 [ ] Stale Refresh
 [ ] onReceive Error messages
 */
