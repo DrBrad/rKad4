@@ -75,7 +75,7 @@ TODO
 [x] Ping Response Listener
 [x] KRequestListener
 [-] Bucket Refresh
-[-] Stale Refresh
+[x] Stale Refresh
 [ ] onReceive Error messages
 */
 
@@ -87,6 +87,7 @@ struct XX {
 fn main() {
     let kad = Kademlia::new();
     kad.get_routing_table().lock().unwrap().set_secure_only(false);
+    //kad.bind(8080);
     kad.join(8080, SocketAddr::new(IpAddr::from([127, 0, 0, 1]), 8070));
     //kad.get_refresh_handler().lock().unwrap().start();
     //kad.bind(8080);

@@ -89,7 +89,6 @@ impl ResponseCallback for FindNodeResponseListener {
         println!("SEEN FN {}", event.get_node().to_string());
         let response = event.get_message().as_any().downcast_ref::<FindNodeResponse>().unwrap();
 
-        /*
         if response.has_nodes() {
             let mut nodes = response.get_all_nodes();
 
@@ -98,8 +97,11 @@ impl ResponseCallback for FindNodeResponseListener {
                 .expect("Time went backwards")
                 .as_millis();
 
+            let uid = self.kademlia.get_routing_table().lock().unwrap().get_derived_uid();
             nodes.retain(|node| {
-                if self.queries.lock().unwrap().contains(node) || self.kademlia.get_routing_table().lock().unwrap().has_queried(node, now) {
+                if uid == node.uid ||
+                        self.queries.lock().unwrap().contains(node) ||
+                        self.kademlia.get_routing_table().lock().unwrap().has_queried(node, now) {
                     false // remove this node
                 } else {
                     true // keep this node
@@ -122,7 +124,6 @@ impl ResponseCallback for FindNodeResponseListener {
                 self.kademlia.get_server().lock().unwrap().send_with_callback(&mut req, Box::new(self.listener.clone())); //ADD NODE...
             }
         }
-        */
     }
 
     fn on_error_response(&self, event: ErrorResponseEvent) {

@@ -40,8 +40,12 @@ impl ResponseCallback for JoinNodeListener {
                 .duration_since(UNIX_EPOCH)
                 .expect("Time went backwards")
                 .as_millis();
+            let uid = self.kademlia.get_routing_table().lock().unwrap().get_derived_uid();
+
             for node in nodes {
-                if (self.kademlia.get_routing_table().lock().unwrap().is_secure_only() && !node.has_secure_id()) || node.has_queried(now) {
+                if uid == node.uid ||
+                        (self.kademlia.get_routing_table().lock().unwrap().is_secure_only() && !node.has_secure_id()) ||
+                        node.has_queried(now) {
                     //System.out.println("SKIPPING "+now+"  "+n.getLastSeen()+"  "+n);
                     continue;
                 }

@@ -69,6 +69,7 @@ impl Kademlia {
 
             //if !nodes.is_empty() {
                 let mut response = FindNodeResponse::default();
+                response.set_transaction_id(*event.get_message().get_transaction_id());
                 response.set_destination(event.get_message().get_origin().unwrap());
                 response.set_public(event.get_message().get_origin().unwrap());
                 response.add_nodes(nodes);
@@ -127,6 +128,7 @@ impl From<String> for Kademlia {
 
             //if !nodes.is_empty() {
                 let mut response = FindNodeResponse::default();
+                response.set_transaction_id(*event.get_message().get_transaction_id());
                 response.set_destination(event.get_message().get_origin().unwrap());
                 response.set_public(event.get_message().get_origin().unwrap());
                 response.add_nodes(nodes);
