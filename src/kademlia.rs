@@ -36,7 +36,7 @@ impl Kademlia {
         server.register_message(|| Box::new(FindNodeResponse::default()));
 
         server.register_request_listener("ping", Box::new(move |event| {
-            println!("{}", event.get_message().to_string());
+            //println!("{}", event.get_message().to_string());
 
             let mut response = PingResponse::default();
             response.set_transaction_id(*event.get_message().get_transaction_id());
@@ -56,7 +56,7 @@ impl Kademlia {
 
         let self_clone = self_.clone();
         self_.server.lock().unwrap().register_request_listener("find_node", Box::new(move |event| {
-            println!("{}", event.get_message().to_string());
+            //println!("{}", event.get_message().to_string());
             if event.is_prevent_default() {
                 return;
             }
@@ -67,13 +67,13 @@ impl Kademlia {
                 .find_closest(&request.get_target(), MAX_BUCKET_SIZE);
             nodes.retain(|&n| n != event.get_node());
 
-            if !nodes.is_empty() {
+            //if !nodes.is_empty() {
                 let mut response = FindNodeResponse::default();
                 response.set_destination(event.get_message().get_origin().unwrap());
-                response.set_public(event.get_message().get_public().unwrap());
+                response.set_public(event.get_message().get_origin().unwrap());
                 response.add_nodes(nodes);
                 event.set_response(Box::new(response));
-            }
+            //}
         }));
 
         self_.server.lock().unwrap().kademlia = Some(self_.clone_dyn());
@@ -94,7 +94,7 @@ impl From<String> for Kademlia {
         server.register_message(|| Box::new(FindNodeResponse::default()));
 
         server.register_request_listener("ping", Box::new(move |event| {
-            println!("{}", event.get_message().to_string());
+            //println!("{}", event.get_message().to_string());
 
             let mut response = PingResponse::default();
             response.set_transaction_id(*event.get_message().get_transaction_id());
@@ -114,7 +114,7 @@ impl From<String> for Kademlia {
 
         let self_clone = self_.clone();
         self_.server.lock().unwrap().register_request_listener("find_node", Box::new(move |event| {
-            println!("{}", event.get_message().to_string());
+            //println!("{}", event.get_message().to_string());
             if event.is_prevent_default() {
                 return;
             }
@@ -125,13 +125,13 @@ impl From<String> for Kademlia {
                 .find_closest(&request.get_target(), MAX_BUCKET_SIZE);
             nodes.retain(|&n| n != event.get_node());
 
-            if !nodes.is_empty() {
+            //if !nodes.is_empty() {
                 let mut response = FindNodeResponse::default();
                 response.set_destination(event.get_message().get_origin().unwrap());
-                response.set_public(event.get_message().get_public().unwrap());
+                response.set_public(event.get_message().get_origin().unwrap());
                 response.add_nodes(nodes);
                 event.set_response(Box::new(response));
-            }
+            //}
         }));
 
         self_.server.lock().unwrap().kademlia = Some(self_.clone_dyn());

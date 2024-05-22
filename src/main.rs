@@ -88,6 +88,7 @@ fn main() {
     let kad = Kademlia::new();
     kad.get_routing_table().lock().unwrap().set_secure_only(false);
     kad.join(8080, SocketAddr::new(IpAddr::from([127, 0, 0, 1]), 8070));
+    //kad.get_refresh_handler().lock().unwrap().start();
     //kad.bind(8080);
     println!("{}", kad.get_routing_table().lock().unwrap().get_derived_uid().to_string());
     sleep(Duration::from_secs(5));
