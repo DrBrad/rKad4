@@ -56,33 +56,12 @@ mod rpc;
 //netcat -ul 8080
 
 /*
-java FindNodeResponse
-Line 47 make a new line
-
-java Node Utils UnpackNodes
-
-        if position + ID_LENGTH + addr_length + 2 > buf.len() {
-            break;
-        }
-
-java bytewrapper change to
-    @Override
-    public int hashCode(){
-        return Arrays.hashCode(b);
-    }
-
 ping_response_callback - does this even work (java and rust)
     fn on_stalled(&self, event: StalledEvent) {
         if event.has_node() {
             event.get_node().mark_stale(); //WILL THIS ACT CORRECTLY...? - THIS GOES FOR JAVA AS WELL...
         }
     }
-
-java server (make sure to return after send statement
-    public void send(MethodMessageBase message, ResponseCallback callback)throws IOException {
-        if(message.getType() != MessageType.REQ_MSG){
-            send(message);
-        }
 
 TODO
 -----

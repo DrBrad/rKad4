@@ -489,14 +489,10 @@ impl Server {
             return;
         }
 
-        if let Some(server) = &self.server {
-            let tid = self.generate_transaction_id();
-            message.set_transaction_id(tid);
-            message.set_uid(self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap().get_derived_uid());
-
-            self.tracker.add(tid, Call::new(message, callback));
-            server.send_to(message.encode().encode().as_slice(), message.get_destination().unwrap()).unwrap(); //probably should return if failed to send...
-        }
+        let tid = self.generate_transaction_id();
+        message.set_transaction_id(tid);
+        self.tracker.add(tid, Call::new(message, callback));
+        self.send(message.upcast_mut());
     }
 
     pub fn generate_transaction_id(&self) -> [u8; TID_LENGTH] {
