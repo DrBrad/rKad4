@@ -6,6 +6,8 @@ pub trait MethodMessageBase: MessageBase {
 
     fn upcast(&self) -> &dyn MessageBase;
 
+    fn upcast_mut(&mut self) -> &mut dyn MessageBase;
+
     fn dyn_clone(&self) -> Box<dyn MethodMessageBase>;
 }
 

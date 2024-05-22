@@ -78,13 +78,19 @@ ping_response_callback - does this even work (java and rust)
         }
     }
 
+java server (make sure to return after send statement
+    public void send(MethodMessageBase message, ResponseCallback callback)throws IOException {
+        if(message.getType() != MessageType.REQ_MSG){
+            send(message);
+        }
+
 TODO
 -----
 
 [x] FindNodeResponse
 [x] unpack_nodes
 [x] Join Node Listener
-[-] sending messages with server
+[-] sending messages with server - node specification...
 [x] Ping Response Listener
 [x] KRequestListener
 [ ] Bucket Refresh

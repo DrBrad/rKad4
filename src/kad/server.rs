@@ -466,13 +466,29 @@ impl Server {
     }
 
     pub fn send(&self, message: &mut dyn MessageBase) {
-        if let Some(server) = &self.server {
+        if message.get_destination().is_none() {
+            //throw new IllegalArgumentException("Message destination set to null");
+        }
+
+        if is_bogon(message.get_destination().unwrap()) {
+            //throw new IllegalArgumentException("Message destination set to bogon");
+        }
+
+        if message.get_type() != MessageType::ErrMsg {
             message.set_uid(self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap().get_derived_uid());
+        }
+
+        if let Some(server) = &self.server {
             server.send_to(message.encode().encode().as_slice(), message.get_destination().unwrap()).unwrap(); //probably should return if failed to send...
         }
     }
 
     pub fn send_with_callback(&mut self, message: &mut dyn MethodMessageBase, callback: Box<dyn ResponseCallback>) {
+        if message.get_type() != MessageType::ReqMsg {
+            self.send(message.upcast_mut());
+            return;
+        }
+
         if let Some(server) = &self.server {
             let tid = self.generate_transaction_id();
             message.set_transaction_id(tid);

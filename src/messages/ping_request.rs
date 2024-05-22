@@ -139,6 +139,10 @@ impl MethodMessageBase for PingRequest {
         self
     }
 
+    fn upcast_mut(&mut self) -> &mut dyn MessageBase {
+        self
+    }
+
     fn dyn_clone(&self) -> Box<dyn MethodMessageBase> {
         Box::new(self.clone())
     }
