@@ -17,7 +17,6 @@ use crate::routing::kb::k_routing_table::KRoutingTable;
 use crate::rpc::events::inter::event::Event;
 use crate::rpc::events::inter::message_event::MessageEvent;
 use crate::rpc::join_node_listener::JoinNodeListener;
-use crate::rpc::request_listener::RequestCallback;
 
 #[derive(Clone)]
 pub struct Kademlia {
