@@ -3,21 +3,21 @@ use super::inter::task::Task;
 
 #[derive(Clone)]
 pub struct StaleRefreshTask {
-
+    kademlia: Box<dyn KademliaBase>
 }
 
 impl StaleRefreshTask {
 
-    pub fn new() -> Self {
+    pub fn new(kademlia: &dyn KademliaBase) -> Self {
         Self {
-
+            kademlia: kademlia.clone_dyn()
         }
     }
 }
 
 impl Task for StaleRefreshTask {
 
-    fn execute(&self, kademlia: &Box<dyn KademliaBase>) {
+    fn execute(&self) {
         println!("StaleRefresh");
     }
 

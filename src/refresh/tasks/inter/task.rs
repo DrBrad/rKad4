@@ -1,8 +1,6 @@
-use crate::kad::kademlia_base::KademliaBase;
+pub trait Task: Send {
 
-pub trait Task: Send + Sync {
-
-    fn execute(&self, kademlia: &Box<dyn KademliaBase>);
+    fn execute(&self);
 
     fn clone_dyn(&self) -> Box<dyn Task>;
 }

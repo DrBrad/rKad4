@@ -28,10 +28,6 @@ pub struct Kademlia {
 impl Kademlia {
 
     pub fn new() -> Self {
-        let mut refresh = RefreshHandler::new();
-        refresh.add_operation(Box::new(BucketRefreshTask::new()));
-        refresh.add_operation(Box::new(StaleRefreshTask::new()));
-
         let mut server = Server::new();
 
         server.register_message(|| Box::new(PingRequest::default()));
@@ -52,8 +48,11 @@ impl Kademlia {
         let mut self_ = Self {
             routing_table: Arc::new(Mutex::new(KRoutingTable::new())),
             server: Arc::new(Mutex::new(server)),
-            refresh: Arc::new(Mutex::new(refresh))
+            refresh: Arc::new(Mutex::new(RefreshHandler::new()))
         };
+
+        self_.refresh.lock().unwrap().add_operation(Box::new(BucketRefreshTask::new(&self_)));
+        self_.refresh.lock().unwrap().add_operation(Box::new(StaleRefreshTask::new(&self_)));
 
         let self_clone = self_.clone();
         self_.server.lock().unwrap().register_request_listener("find_node", Box::new(move |event| {
@@ -77,8 +76,8 @@ impl Kademlia {
             }
         }));
 
-        self_.server.lock().unwrap().kademlia = Some(Box::new(self_.clone()));
-        self_.refresh.lock().unwrap().kademlia = Some(Box::new(self_.clone()));
+        self_.server.lock().unwrap().kademlia = Some(self_.clone_dyn());
+        //self_.refresh.lock().unwrap().kademlia = Some(self_.clone_dyn());
 
         self_
     }
@@ -87,10 +86,6 @@ impl Kademlia {
 impl From<String> for Kademlia {
 
     fn from(value: String) -> Self {
-        let mut refresh = RefreshHandler::new();
-        refresh.add_operation(Box::new(BucketRefreshTask::new()));
-        refresh.add_operation(Box::new(StaleRefreshTask::new()));
-
         let mut server = Server::new();
 
         server.register_message(|| Box::new(PingRequest::default()));
@@ -111,8 +106,11 @@ impl From<String> for Kademlia {
         let mut self_ = Self {
             routing_table: BucketTypes::from_string(value).unwrap().routing_table(),
             server: Arc::new(Mutex::new(server)),
-            refresh: Arc::new(Mutex::new(refresh))
+            refresh: Arc::new(Mutex::new(RefreshHandler::new()))
         };
+
+        self_.refresh.lock().unwrap().add_operation(Box::new(BucketRefreshTask::new(&self_)));
+        self_.refresh.lock().unwrap().add_operation(Box::new(StaleRefreshTask::new(&self_)));
 
         let self_clone = self_.clone();
         self_.server.lock().unwrap().register_request_listener("find_node", Box::new(move |event| {
@@ -136,8 +134,8 @@ impl From<String> for Kademlia {
             }
         }));
 
-        self_.server.lock().unwrap().kademlia = Some(Box::new(self_.clone()));
-        self_.refresh.lock().unwrap().kademlia = Some(Box::new(self_.clone()));
+        self_.server.lock().unwrap().kademlia = Some(self_.clone_dyn());
+        //self_.refresh.lock().unwrap().kademlia = Some(self_.clone_dyn());
 
         self_
     }

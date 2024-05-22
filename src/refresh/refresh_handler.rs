@@ -8,7 +8,7 @@ use crate::refresh::tasks::inter::task::Task;
 //use std::old_io::Timer;
 
 pub struct RefreshHandler {
-    pub(crate) kademlia: Option<Box<dyn KademliaBase>>,
+    //pub(crate) kademlia: Option<Box<dyn KademliaBase>>,
     tasks: Vec<Box<dyn Task>>,
     refresh_time: Arc<AtomicU64>,
     running: Arc<AtomicBool>
@@ -18,7 +18,7 @@ impl RefreshHandler {
 
     pub fn new() -> Self {
         Self {
-            kademlia: None,
+            //kademlia: None,
             tasks: Vec::new(),
             refresh_time: Arc::new(AtomicU64::new(3600000)),
             running: Arc::new(AtomicBool::new(false))
@@ -40,12 +40,12 @@ impl RefreshHandler {
         let tasks = self.tasks.clone();
         let refresh_time = Arc::clone(&self.refresh_time);
         let running = Arc::clone(&self.running);
-        let kademlia = self.kademlia.as_ref().unwrap().clone();
+        //let kademlia = self.kademlia.as_ref().unwrap().clone();
 
         let handle = thread::spawn(move || {
             while running.load(Ordering::Relaxed) { //self.is_running()
                 for task in &tasks {
-                    task.execute(&kademlia);
+                    task.execute();
                 }
 
                 sleep(Duration::from_millis(refresh_time.load(Ordering::SeqCst)));
