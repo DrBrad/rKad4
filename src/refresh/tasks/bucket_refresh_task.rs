@@ -1,12 +1,20 @@
+use std::cell::RefCell;
+use std::rc::Rc;
+use std::sync::{Arc, Mutex};
+use std::time::{SystemTime, UNIX_EPOCH};
 use crate::kad::kademlia_base::KademliaBase;
 use crate::messages::find_node_request::FindNodeRequest;
+use crate::messages::find_node_response::FindNodeResponse;
 use crate::messages::inter::message_base::MessageBase;
+use crate::messages::ping_request::PingRequest;
 use crate::routing::kb::k_bucket::MAX_BUCKET_SIZE;
 use crate::rpc::events::error_response_event::ErrorResponseEvent;
 use crate::rpc::events::inter::message_event::MessageEvent;
 use crate::rpc::events::inter::response_callback::ResponseCallback;
 use crate::rpc::events::response_event::ResponseEvent;
 use crate::rpc::events::stalled_event::StalledEvent;
+use crate::rpc::ping_response_listener::PingResponseListener;
+use crate::utils::node::Node;
 use crate::utils::uid::ID_LENGTH;
 use super::inter::task::Task;
 
@@ -58,14 +66,18 @@ impl Task for BucketRefreshTask {
 
 #[derive(Clone)]
 pub struct FindNodeResponseListener {
-    kademlia: Box<dyn KademliaBase>
+    kademlia: Box<dyn KademliaBase>,
+    listener: PingResponseListener,
+    queries: Arc<Mutex<Vec<Node>>> //MAY NEED TO BE RC
 }
 
 impl FindNodeResponseListener {
 
     pub fn new(kademlia: &dyn KademliaBase) -> Self {
         Self {
-            kademlia: kademlia.clone_dyn()
+            kademlia: kademlia.clone_dyn(),
+            listener: PingResponseListener::new(kademlia.get_routing_table().clone()),
+            queries: Arc::new(Mutex::new(Vec::new()))
         }
     }
 }
@@ -73,72 +85,49 @@ impl FindNodeResponseListener {
 impl ResponseCallback for FindNodeResponseListener {
 
     fn on_response(&self, event: ResponseEvent) {
-        println!("RESPONSE CALLBACK - BUCKET REFRESH {}", event.get_message().to_string());
+        event.get_node().seen();
+        println!("SEEN FN {}", event.get_node().to_string());
+        let response = event.get_message().as_any().downcast_ref::<FindNodeResponse>().unwrap();
+
+        if response.has_nodes() {
+            let mut nodes = response.get_all_nodes();
+
+            let now = SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .expect("Time went backwards")
+                .as_millis();
+
+            nodes.retain(|node| {
+                if self.queries.lock().unwrap().contains(node) || self.kademlia.get_routing_table().lock().unwrap().has_queried(node, now) {
+                    false // remove this node
+                } else {
+                    true // keep this node
+                }
+            });
+
+            for node in &nodes {
+                self.queries.lock().unwrap().push(node.clone()); // assuming Node implements Clone
+            }
+
+            // Iterate over nodes and send PingRequest if conditions are met
+            for node in &nodes {
+                if self.kademlia.get_routing_table().lock().unwrap().is_secure_only() && !node.has_secure_id() {
+                    println!("SKIPPING {}  {}  {}", now, node.last_seen, node.to_string());
+                    continue;
+                }
+
+                let mut req = PingRequest::default();
+                req.set_destination(node.address);
+                self.kademlia.get_server().lock().unwrap().send_with_callback(&mut req, Box::new(self.listener.clone())); //ADD NODE...
+            }
+        }
     }
 
     fn on_error_response(&self, event: ErrorResponseEvent) {
-
+        event.get_node().seen();
     }
 
     fn on_stalled(&self, event: StalledEvent) {
-
+        event.get_node().mark_stale();
     }
 }
-
-/*
-    private class FindNodeResponseListener extends ResponseCallback {
-
-        private PingResponseListener listener;
-        private List<Node> queries;
-
-        public FindNodeResponseListener(){
-            listener = new PingResponseListener(getRoutingTable());
-            queries = new ArrayList<>();
-        }
-
-        @Override
-        public void onResponse(ResponseEvent event){
-            event.getNode().setSeen();
-            System.out.println("SEEN FN "+event.getNode());
-            FindNodeResponse response = (FindNodeResponse) event.getMessage();
-
-            if(response.hasNodes()){
-                List<Node> nodes = response.getAllNodes();
-
-                long now = System.currentTimeMillis();
-                for(int i = nodes.size()-1; i > -1; i--){
-                    if(queries.contains(nodes.get(i)) || getRoutingTable().hasQueried(nodes.get(i), now)){
-                        nodes.remove(nodes.get(i));
-                    }
-                }
-
-                queries.addAll(nodes);
-
-                for(Node n : nodes){
-                    if(getRoutingTable().isSecureOnly() && !n.hasSecureID()){
-                        System.out.println("SKIPPING "+now+"  "+n.getLastSeen()+"  "+n);
-                        continue;
-                    }
-
-                    PingRequest req = new PingRequest();
-                    req.setDestination(n.getAddress());
-                    try{
-                        getServer().send(req, n, listener);
-                    }catch(IOException e){
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-
-        @Override
-        public void onErrorResponse(ErrorResponseEvent event){
-            event.getNode().setSeen();
-        }
-
-        @Override
-        public void onStalled(StalledEvent event){
-            event.getNode().markStale();
-        }
-    }
-*/

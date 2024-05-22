@@ -4,8 +4,10 @@ mod routing;
 mod kad;
 mod kademlia;
 
+use std::cell::RefCell;
 use std::collections::HashMap;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
+use std::rc::Rc;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::thread::sleep;
@@ -76,6 +78,11 @@ TODO
 [-] Stale Refresh
 [ ] onReceive Error messages
 */
+
+#[derive(Clone)]
+struct XX {
+    v: Rc<RefCell<Vec<u32>>>
+}
 
 fn main() {
     let kad = Kademlia::new();
