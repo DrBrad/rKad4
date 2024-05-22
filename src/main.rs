@@ -73,7 +73,7 @@ TODO
 [x] Ping Response Listener
 [x] KRequestListener
 [-] Bucket Refresh
-[ ] Stale Refresh
+[-] Stale Refresh
 [ ] onReceive Error messages
 */
 

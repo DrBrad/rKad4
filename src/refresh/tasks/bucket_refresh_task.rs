@@ -44,7 +44,7 @@ impl Task for BucketRefreshTask {
                     request.set_destination(node.address);
                     request.set_target(k);
 
-                    self.kademlia.get_server().lock().unwrap().send_with_callback(&mut request, listener.clone());
+                    self.kademlia.get_server().lock().unwrap().send_with_callback(&mut request, listener.clone()); //ADD NODE...
                 }
             }
         }
