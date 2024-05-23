@@ -242,7 +242,7 @@ impl Server {
                                 return Err(MessageException::new("Method Unknown", 204));
                             }
 
-                            kademlia.get_server().lock().as_ref().unwrap().send(event.get_response().unwrap());
+                            kademlia.get_server().lock().as_ref().unwrap().send(event.get_response().unwrap()).unwrap();
 
                             if !kademlia.get_refresh_handler().lock().unwrap().is_running() {
                                 kademlia.get_refresh_handler().lock().unwrap().start();

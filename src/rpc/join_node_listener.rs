@@ -53,7 +53,7 @@ impl ResponseCallback for JoinNodeListener {
                 let mut req = PingRequest::default();
                 req.set_destination(node.address);
 
-                self.kademlia.get_server().lock().unwrap().send_with_node_callback(&mut req, node, Box::new(listener.clone()));
+                self.kademlia.get_server().lock().unwrap().send_with_node_callback(&mut req, node, Box::new(listener.clone())).unwrap();
             }
         }
 
