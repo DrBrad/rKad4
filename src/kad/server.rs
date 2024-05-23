@@ -276,6 +276,46 @@ impl Server {
             },
             Err(e) => {
                 println!("{}", e.to_string());
+                /*
+                        byte[] tid = ben.getBytes(TID_KEY);
+                        Call call = tracker.poll(new ByteWrapper(tid));
+
+                        try{
+                            if(call == null){
+                                throw new MessageException("Server Error", 202);
+                            }
+
+                            ErrorResponse m = new ErrorResponse(tid);
+                            m.decode(ben);
+                            m.setOrigin(packet.getAddress(), packet.getPort());
+
+                            if(m.getPublic() != null){
+                                kademlia.getRoutingTable().updatePublicIPConsensus(m.getOriginAddress(), m.getPublicAddress());
+                            }
+
+                            if(!call.getMessage().getDestination().equals(m.getOrigin())){
+                                throw new MessageException("Generic Error", 201);
+                            }
+
+                            ErrorResponseEvent event;
+
+                            if(call.hasNode()){
+                                event = new ErrorResponseEvent(m, call.getNode());
+
+                            }else{
+                                event = new ErrorResponseEvent(m);
+                            }
+
+                            event.received();
+                            event.setSentTime(call.getSentTime());
+                            event.setRequest(call.getMessage());
+
+                            call.getResponseCallback().onErrorResponse(event);
+
+                        }catch(MessageException e){
+                            e.printStackTrace();
+                        }
+                */
             }
         }
     }
