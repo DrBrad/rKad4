@@ -24,7 +24,7 @@ TODO
 [x] KRequestListener
 [x] Bucket Refresh
 [x] Stale Refresh
-[ ] onReceive Error messages
+[x] onReceive Error messages
 [ ] restart listener (from consensus IP change)
 
 we need to figure out a way to not error out on genesis as gen will respond no nodes... (we dont want to have to genesis with 3 nodes)

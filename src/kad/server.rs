@@ -14,6 +14,7 @@ use crate::messages::inter::message_key::MessageKey;
 use crate::messages::inter::message_type::{MessageType, TYPE_KEY};
 use crate::messages::inter::method_message_base::MethodMessageBase;
 use crate::rpc::call::Call;
+use crate::rpc::events::error_response_event::ErrorResponseEvent;
 use crate::rpc::events::inter::event::Event;
 use crate::rpc::events::inter::message_event::MessageEvent;
 use crate::rpc::events::inter::response_callback::ResponseCallback;
@@ -271,51 +272,48 @@ impl Server {
                     },
                     MessageType::ErrMsg => {
                         println!("ERR  {}", ben.to_string());
+
+                        if let Err(e) = || -> Result<(), MessageException> {
+                            let mut tid = [0u8; TID_LENGTH];
+                            tid.copy_from_slice(ben.get_bytes(TID_KEY).expect("Failed to find TID key."));
+
+                            let call = kademlia.get_server().lock().as_mut().unwrap().tracker.poll(&tid).ok_or(MessageException::new("Server Error", 202))?;
+
+                            let mut m = ErrorResponse::new(tid);
+                            m.decode(&ben)?;
+                            m.set_origin(src_addr);
+
+                            if m.get_public().is_some() {
+                                kademlia.get_routing_table().lock().unwrap()
+                                    .update_public_ip_consensus(m.get_origin().unwrap().ip(), m.get_public().unwrap().ip());
+                            }
+
+                            if call.get_message().get_destination() != m.get_origin() {
+                                return Err(MessageException::new("Generic Error", 201));
+                            }
+
+                            let mut event = ErrorResponseEvent::new(&m);
+
+                            if call.has_node() {
+                                event.set_node(call.get_node());
+                            }
+
+                            event.received();
+                            event.set_sent_time(call.get_sent_time());
+                            event.set_request(call.get_message().upcast());
+
+                            call.get_response_callback().on_error_response(event);
+
+                            Ok(())
+
+                        }() {
+                            println!("{}", e.get_message());
+                        }
                     }
                 }
             },
             Err(e) => {
                 println!("{}", e.to_string());
-                /*
-                        byte[] tid = ben.getBytes(TID_KEY);
-                        Call call = tracker.poll(new ByteWrapper(tid));
-
-                        try{
-                            if(call == null){
-                                throw new MessageException("Server Error", 202);
-                            }
-
-                            ErrorResponse m = new ErrorResponse(tid);
-                            m.decode(ben);
-                            m.setOrigin(packet.getAddress(), packet.getPort());
-
-                            if(m.getPublic() != null){
-                                kademlia.getRoutingTable().updatePublicIPConsensus(m.getOriginAddress(), m.getPublicAddress());
-                            }
-
-                            if(!call.getMessage().getDestination().equals(m.getOrigin())){
-                                throw new MessageException("Generic Error", 201);
-                            }
-
-                            ErrorResponseEvent event;
-
-                            if(call.hasNode()){
-                                event = new ErrorResponseEvent(m, call.getNode());
-
-                            }else{
-                                event = new ErrorResponseEvent(m);
-                            }
-
-                            event.received();
-                            event.setSentTime(call.getSentTime());
-                            event.setRequest(call.getMessage());
-
-                            call.getResponseCallback().onErrorResponse(event);
-
-                        }catch(MessageException e){
-                            e.printStackTrace();
-                        }
-                */
             }
         }
     }
