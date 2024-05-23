@@ -1,8 +1,6 @@
 use std::net::IpAddr;
 use std::time::{SystemTime, UNIX_EPOCH};
 use core::array::from_fn;
-use std::collections::HashMap;
-//use rand::Rng;
 use crate::routing::inter::routing_table::RoutingTable;
 use crate::utils;
 use crate::utils::hash::crc32c::CRC32c;
@@ -14,11 +12,11 @@ use crate::utils::node::{Node, V4_MASK, V6_MASK};
 use crate::utils::uid::{ UID, ID_LENGTH };
 
 pub struct KRoutingTable {
-    pub(crate) uid: Option<UID>,
-    pub(crate) consensus_external_address: IpAddr,
-    pub(crate) origin_pairs: LinkedHashMap<IpAddr, IpAddr>,
-    pub(crate) secure_only: bool,
-    pub(crate) k_buckets: [KBucket; ID_LENGTH*8]
+    uid: Option<UID>,
+    consensus_external_address: IpAddr,
+    origin_pairs: LinkedHashMap<IpAddr, IpAddr>,
+    secure_only: bool,
+    k_buckets: [KBucket; ID_LENGTH*8]
 }
 
 impl KRoutingTable {
@@ -66,6 +64,10 @@ impl RoutingTable for KRoutingTable {
                 self.restart();
             }
         }
+    }
+
+    fn get_consensus_external_address(&self) -> IpAddr {
+        self.consensus_external_address
     }
 
     fn insert(&mut self, n: Node) {

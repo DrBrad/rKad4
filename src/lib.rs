@@ -25,6 +25,9 @@ TODO
 [x] Bucket Refresh
 [x] Stale Refresh
 [ ] onReceive Error messages
+[ ] restart listener (from consensus IP change)
+
+we need to figure out a way to not error out on genesis as gen will respond no nodes... (we dont want to have to genesis with 3 nodes)
 */
 
 #[cfg(test)]
@@ -38,16 +41,19 @@ mod tests {
 
     #[test]
     fn test() {
-        println!("TEST");
-        let kad = Kademlia::new();
+        let kad = Kademlia::try_from("Kademlia").unwrap();
         kad.get_routing_table().lock().unwrap().set_secure_only(false);
         //kad.bind(8080);
         kad.join(8080, SocketAddr::new(IpAddr::from([127, 0, 0, 1]), 8070));
-        //kad.get_refresh_handler().lock().unwrap().start();
-        //kad.bind(8080);
-        println!("{}", kad.get_routing_table().lock().unwrap().get_derived_uid().to_string());
-        sleep(Duration::from_secs(5));
-        println!("{}", kad.get_routing_table().lock().unwrap().all_nodes().len());
-        sleep(Duration::from_secs(30));
+        //kad.join(6881, SocketAddr::new(IpAddr::from("router.bittorrent.com"), 6881)); //- not sure how to use domains yet...
+
+        loop {
+            sleep(Duration::from_secs(10));
+            let routing_table = kad.get_routing_table().lock().unwrap();
+            println!("CONSENSUS: {}  {}  {}",
+                     routing_table.get_derived_uid().to_string(),
+                     routing_table.get_consensus_external_address().to_string(),
+                     routing_table.all_nodes().len());
+        }
     }
 }

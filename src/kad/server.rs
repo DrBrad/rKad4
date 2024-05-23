@@ -40,7 +40,7 @@ pub struct Server {
     pub(crate) kademlia: Option<Box<dyn KademliaBase>>,
     server: Option<Arc<UdpSocket>>,
     tracker: ResponseTracker,//Arc<Mutex<ResponseTracker>>,
-    //running: Arc<AtomicBool>, //MAY NOT BE NEEDED
+    running: Arc<AtomicBool>, //MAY NOT BE NEEDED
     request_mapping: HashMap<String, Vec<RequestCallback>>,
     messages: HashMap<MessageKey, fn() -> Box<dyn MethodMessageBase>>
 }
@@ -52,69 +52,32 @@ impl Server {
             kademlia: None,
             server: None,
             tracker: ResponseTracker::new(),
-            //running: Arc::new(AtomicBool::new(false)), //MAY NOT BE NEEDED
+            running: Arc::new(AtomicBool::new(false)), //MAY NOT BE NEEDED
             request_mapping: HashMap::new(),
             messages: HashMap::new()
         };
 
-        /*
-        self_.register_message(|| Box::new(PingRequest::default()));
-        self_.register_message(|| Box::new(PingResponse::default()));
-        self_.register_message(|| Box::new(FindNodeRequest::default()));
-        self_.register_message(|| Box::new(FindNodeResponse::default()));
-        //self_.register_message(|| Box::new(FindNodeResponse::default()));
-
-        //CAN THIS BE MOVED TO k_request_listener?
-        let ping_callback: RequestCallback = |event| {
-            println!("{}", event.get_message().to_string());
-
-            let mut response = PingResponse::default();
-            response.set_transaction_id(*event.get_message().get_transaction_id());
-            response.set_destination(event.get_message().get_origin().unwrap());
-            response.set_public(event.get_message().get_origin().unwrap());
-            event.set_response(Box::new(response));
-        };
-
-
-        let find_node_callback: RequestCallback = |event| {
-            println!("- No Response z5 error {}", event.get_message().to_string());
-            //println!("{}", kademlia.get_routing_table().lock().unwrap().get_derived_uid().to_string());
-
-            if event.is_prevent_default() {
-                return;
-            }
-
-            let request = event.get_message().as_any().downcast_ref::<FindNodeRequest>().unwrap();
-
-            let mut nodes = Vec::new();/*self_.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap()
-                    .find_closest(request.get_target().unwrap(), MAX_BUCKET_SIZE);*/
-            //nodes.retain(|&x| x != event.get_node());
-
-            if !nodes.is_empty() {
-                let mut response = FindNodeResponse::default();
-                response.set_destination(event.get_message().get_origin().unwrap());
-                response.set_public(event.get_message().get_public().unwrap());
-                response.add_nodes(nodes);
-                event.set_response(Box::new(response));
-            }
-        };
-
-        self_.register_request_listener("ping", ping_callback);
-        self_.register_request_listener("find_node", find_node_callback);
-        */
         self_
     }
 
     pub fn start(&mut self, port: u16) {
+        if self.is_running() {
+            //panic or something...
+            return;
+        }
+
+        self.running.store(true, Ordering::Relaxed);
+
         self.server = Some(Arc::new(UdpSocket::bind(SocketAddr::from(([127, 0, 0, 1], port))).expect("Failed to bind socket")));
         let (tx, rx) = channel();
         let sender = tx.clone();
         let server = Arc::clone(self.server.as_ref().unwrap());
+        let running = Arc::clone(&self.running);
 
         let receiver_handle = thread::spawn(move || {
             let mut buf = [0u8; 65535];
 
-            loop {
+            while running.load(Ordering::Relaxed) {
                 let (size, src_addr) = {
                     server.recv_from(&mut buf).expect("Failed to receive message")
                 };
@@ -135,12 +98,12 @@ impl Server {
             }
         });
 
-
         let mut kademlia = self.kademlia.clone();
+        let running = Arc::clone(&self.running);
 
         let handler_handle = thread::spawn(move || {
             let mut kademlia = kademlia.unwrap();
-            loop {
+            while running.load(Ordering::Relaxed) {
                 match rx.try_recv() {
                     Ok((data, src_addr)) => {
                         Self::on_receive(kademlia.as_mut(), data.as_slice(), src_addr);
@@ -161,7 +124,7 @@ impl Server {
     }
 
     pub fn stop(&self) {
-        //self.running.store(false, Ordering::Relaxed);
+        self.running.store(false, Ordering::Relaxed);
     }
 
     //REGISTER MESSAGES...
@@ -183,7 +146,7 @@ impl Server {
     }
 
     pub fn is_running(&self) -> bool {
-        false
+        self.running.load(Ordering::Relaxed)
     }
 
     pub fn on_receive(kademlia: &mut dyn KademliaBase, data: &[u8], src_addr: SocketAddr) {

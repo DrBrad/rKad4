@@ -6,6 +6,8 @@ pub trait RoutingTable: Send {
 
     fn update_public_ip_consensus(&mut self, source: IpAddr, addr: IpAddr);
 
+    fn get_consensus_external_address(&self) -> IpAddr;
+
     fn insert(&mut self, n: Node);
 
     fn derive_uid(&mut self);
@@ -16,12 +18,8 @@ pub trait RoutingTable: Send {
 
     fn set_secure_only(&mut self, secure_only: bool);
 
-    //getDerivedUID - NOT NEEDED
-
     //fn add_restart_listener()
     //fn remove_restart_listener()
-
-    //fn is_secure_only() -> bool; - NOT NEEDED
 
     fn has_queried(&self, n: &Node, now: u128) -> bool;
 

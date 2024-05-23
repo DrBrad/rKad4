@@ -78,15 +78,16 @@ impl Kademlia {
         }));
 
         self_.server.lock().unwrap().kademlia = Some(self_.clone_dyn());
-        //self_.refresh.lock().unwrap().kademlia = Some(self_.clone_dyn());
 
         self_
     }
 }
 
-impl From<String> for Kademlia {
+impl TryFrom<&str> for Kademlia {
 
-    fn from(value: String) -> Self {
+    type Error = String;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
         let mut server = Server::new();
 
         server.register_message(|| Box::new(PingRequest::default()));
@@ -105,7 +106,7 @@ impl From<String> for Kademlia {
         }));
 
         let mut self_ = Self {
-            routing_table: BucketTypes::from_string(value).unwrap().routing_table(),
+            routing_table: BucketTypes::from_string(value)?.routing_table(),
             server: Arc::new(Mutex::new(server)),
             refresh: Arc::new(Mutex::new(RefreshHandler::new()))
         };
@@ -137,9 +138,8 @@ impl From<String> for Kademlia {
         }));
 
         self_.server.lock().unwrap().kademlia = Some(self_.clone_dyn());
-        //self_.refresh.lock().unwrap().kademlia = Some(self_.clone_dyn());
 
-        self_
+        Ok(self_)
     }
 }
 

@@ -9,7 +9,7 @@ pub enum BucketTypes {
 
 impl BucketTypes {
 
-    pub fn from_string(name: String) -> Result<Self, String> {
+    pub fn from_string(name: &str) -> Result<Self, String> {
         for value in [BucketTypes::MainLine, BucketTypes::Kademlia] {
             if value.value() == name {
                 return Ok(value);
@@ -19,10 +19,10 @@ impl BucketTypes {
         Err(format!("No enum constant {}", name))
     }
 
-    pub fn value(&self) -> String {
+    pub fn value(&self) -> &str {
         match self {
-            BucketTypes::MainLine => "MainLine".to_string(),
-            BucketTypes::Kademlia => "Kademlia".to_string()
+            BucketTypes::MainLine => "MainLine",
+            BucketTypes::Kademlia => "Kademlia"
         }
     }
 
