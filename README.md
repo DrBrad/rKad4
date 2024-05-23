@@ -3,7 +3,7 @@
 
 # rKad4
 Kademlia DHT compatible with BitTorrent protocol that uses Rust
-- If your looking for a version for Java try [rKad4](https://github.com/DrBrad/Kad4).
+- If your looking for a version for Java try [Kad4](https://github.com/DrBrad/Kad4).
 > [!IMPORTANT]
 > For more info go to [Project Website](https://kademlia.rs)
 
