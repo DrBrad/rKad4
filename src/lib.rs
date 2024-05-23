@@ -38,6 +38,7 @@ mod tests {
     use std::time::Duration;
     use crate::kad::kademlia_base::KademliaBase;
     use crate::kademlia::Kademlia;
+    use crate::messages::inter::message_base::MessageBase;
 
     #[test]
     fn test() {

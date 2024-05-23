@@ -1,26 +1,18 @@
 use std::collections::HashMap;
-use std::mem::forget;
 use std::net::{SocketAddr, UdpSocket};
-use std::slice::from_raw_parts;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
-use std::sync::mpsc::{channel, Receiver, Sender, TryRecvError};
-use std::thread::sleep;
-use std::time::Duration;
+use std::sync::mpsc::{channel, TryRecvError};
 use bencode::variables::bencode_object::BencodeObject;
 use bencode::variables::inter::bencode_variable::BencodeVariable;
 use crate::kad::kademlia_base::KademliaBase;
-use crate::kademlia::Kademlia;
-use crate::messages::find_node_request::FindNodeRequest;
-use crate::messages::find_node_response::FindNodeResponse;
+use crate::messages::error_response::ErrorResponse;
 use crate::messages::inter::message_base::{MessageBase, TID_KEY};
 use crate::messages::inter::message_exception::MessageException;
 use crate::messages::inter::message_key::MessageKey;
 use crate::messages::inter::message_type::{MessageType, TYPE_KEY};
 use crate::messages::inter::method_message_base::MethodMessageBase;
-use crate::messages::ping_request::PingRequest;
-use crate::messages::ping_response::PingResponse;
 use crate::rpc::call::Call;
 use crate::rpc::events::inter::event::Event;
 use crate::rpc::events::inter::message_event::MessageEvent;
@@ -32,7 +24,6 @@ use crate::rpc::response_tracker::ResponseTracker;
 use crate::utils;
 use crate::utils::net::address_utils::is_bogon;
 use crate::utils::node::Node;
-use crate::utils::uid::{ID_LENGTH, UID};
 
 pub const TID_LENGTH: usize = 6;
 
@@ -216,14 +207,16 @@ impl Server {
                         }() {
                             println!("{}", e.get_message());
 
-                            /*
-                            ErrorResponse response = new ErrorResponse(ben.getBytes(TID_KEY));
-                            response.setDestination(packet.getAddress(), packet.getPort());
-                            response.setPublic(packet.getAddress(), packet.getPort());
-                            response.setCode(e.getCode());
-                            response.setDescription(e.getMessage());
-                            send(response);
-                            */
+                            let mut tid = [0u8; TID_LENGTH];
+                            tid.copy_from_slice(ben.get_bytes(TID_KEY).map_err(|e| MessageException::new("Method Unknown", 204)).unwrap());
+
+                            let mut response = ErrorResponse::new(tid);
+                            response.set_destination(src_addr);
+                            response.set_public(src_addr);
+                            response.set_code(e.get_code());
+                            response.set_description(e.get_message());
+
+                            kademlia.get_server().lock().as_ref().unwrap().send(&mut response).unwrap();
                         }
                     },
                     MessageType::RspMsg => {

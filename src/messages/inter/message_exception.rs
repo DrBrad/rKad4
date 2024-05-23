@@ -1,4 +1,5 @@
 
+#[derive(Debug)]
 pub struct MessageException {
     message: String,
     code: i32

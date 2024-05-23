@@ -127,14 +127,14 @@ impl TryFrom<&str> for Kademlia {
                 .find_closest(&request.get_target(), MAX_BUCKET_SIZE);
             nodes.retain(|&n| n != event.get_node());
 
-            //if !nodes.is_empty() {
+            if !nodes.is_empty() {
                 let mut response = FindNodeResponse::default();
                 response.set_transaction_id(*event.get_message().get_transaction_id());
                 response.set_destination(event.get_message().get_origin().unwrap());
                 response.set_public(event.get_message().get_origin().unwrap());
                 response.add_nodes(nodes);
                 event.set_response(Box::new(response));
-            //}
+            }
         }));
 
         self_.server.lock().unwrap().kademlia = Some(self_.clone_dyn());
