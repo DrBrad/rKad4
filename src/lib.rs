@@ -26,8 +26,6 @@ TODO
 [x] Stale Refresh
 [x] onReceive Error messages
 [ ] restart listener (from consensus IP change)
-
-we need to figure out a way to not error out on genesis as gen will respond no nodes... (we dont want to have to genesis with 3 nodes)
 */
 
 #[cfg(test)]
@@ -44,6 +42,7 @@ mod tests {
     fn test() {
         let kad = Kademlia::try_from("Kademlia").unwrap();
         kad.get_routing_table().lock().unwrap().set_secure_only(false);
+        kad.get_server().lock().unwrap().set_allow_bogon(true);
         //kad.bind(8080);
         kad.join(8080, SocketAddr::new(IpAddr::from([127, 0, 0, 1]), 8070));
         //kad.join(6881, SocketAddr::new(IpAddr::from("router.bittorrent.com"), 6881)); //- not sure how to use domains yet...

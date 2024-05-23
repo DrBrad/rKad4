@@ -31,6 +31,7 @@ pub const TID_LENGTH: usize = 6;
 pub struct Server {
     pub(crate) kademlia: Option<Box<dyn KademliaBase>>,
     server: Option<Arc<UdpSocket>>,
+    allow_bogon: bool,
     tracker: ResponseTracker,//Arc<Mutex<ResponseTracker>>,
     running: Arc<AtomicBool>, //MAY NOT BE NEEDED
     request_mapping: HashMap<String, Vec<RequestCallback>>,
@@ -43,6 +44,7 @@ impl Server {
         let mut self_ = Self {
             kademlia: None,
             server: None,
+            allow_bogon: false,
             tracker: ResponseTracker::new(),
             running: Arc::new(AtomicBool::new(false)), //MAY NOT BE NEEDED
             request_mapping: HashMap::new(),
@@ -141,9 +143,17 @@ impl Server {
         self.running.load(Ordering::Relaxed)
     }
 
+    pub fn is_allow_bogon(&self) -> bool {
+        self.allow_bogon
+    }
+
+    pub fn set_allow_bogon(&mut self, allow_bogon: bool) {
+        self.allow_bogon = allow_bogon;
+    }
+
     pub fn on_receive(kademlia: &mut dyn KademliaBase, data: &[u8], src_addr: SocketAddr) {
-        if is_bogon(src_addr) {
-            //return;
+        if !kademlia.get_server().lock().unwrap().allow_bogon && is_bogon(src_addr) {
+            return;
         }
 
         match BencodeObject::decode(data) {
@@ -323,8 +333,8 @@ impl Server {
             return Err("Message destination set to null".to_string());
         }
 
-        if is_bogon(message.get_destination().unwrap()) {
-            //return Err("Message destination set to bogon".to_string());
+        if !self.allow_bogon && is_bogon(message.get_destination().unwrap()) {
+            return Err("Message destination set to bogon".to_string());
         }
 
         if message.get_type() != MessageType::ErrMsg {
