@@ -1,7 +1,7 @@
 use std::net::IpAddr;
 use std::time::{SystemTime, UNIX_EPOCH};
 use core::array::from_fn;
-use crate::routing::inter::routing_table::RoutingTable;
+use crate::routing::inter::routing_table::{RestartListener, RoutingTable};
 use crate::utils;
 use crate::utils::hash::crc32c::CRC32c;
 use crate::utils::linked_hashmap::LinkedHashMap;
@@ -13,6 +13,7 @@ use crate::utils::uid::{ UID, ID_LENGTH };
 
 pub struct KRoutingTable {
     uid: Option<UID>,
+    listeners: Vec<RestartListener>,
     consensus_external_address: IpAddr,
     origin_pairs: LinkedHashMap<IpAddr, IpAddr>,
     secure_only: bool,
@@ -24,6 +25,7 @@ impl KRoutingTable {
     pub fn new() -> Self {
         let mut routing_table = Self {
             uid: None,
+            listeners: Vec::new(),
             consensus_external_address: IpAddr::from([127, 0, 1, 1]),
             origin_pairs: LinkedHashMap::new(64),
             secure_only: true,
@@ -148,6 +150,14 @@ impl RoutingTable for KRoutingTable {
         self.secure_only = secure_only;
     }
 
+    fn add_restart_listener(&mut self, listener: RestartListener) {
+        self.listeners.push(listener);
+    }
+
+    fn remove_restart_listener(&mut self, index: usize) {
+        self.listeners.remove(index);
+    }
+
     fn has_queried(&self, n: &Node, now: u128) -> bool {
         let id = self.bucket_uid(&n.uid);
 
@@ -211,7 +221,20 @@ impl RoutingTable for KRoutingTable {
         nodes
     }
 
-    fn restart(&self) {
-        todo!()
+    fn restart(&mut self) {
+        let nodes = self.all_nodes();
+        self.k_buckets = from_fn(|_| KBucket::new());
+
+        for node in nodes {
+            self.insert(node);
+        }
+
+        if self.listeners.is_empty() {
+            return;
+        }
+
+        for listener in &self.listeners {
+            listener();
+        }
     }
 }

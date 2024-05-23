@@ -12,22 +12,6 @@ extern crate bencode;
 //netcat -ul 8080
 //test --package kad4 --lib tests -- --nocapture
 
-/*
-TODO
------
-
-[x] FindNodeResponse
-[x] unpack_nodes
-[x] Join Node Listener
-[x] sending messages with server - node specification...
-[x] Ping Response Listener
-[x] KRequestListener
-[x] Bucket Refresh
-[x] Stale Refresh
-[x] onReceive Error messages
-[ ] restart listener (from consensus IP change)
-*/
-
 #[cfg(test)]
 mod tests {
 

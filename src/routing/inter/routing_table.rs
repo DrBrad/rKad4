@@ -18,8 +18,9 @@ pub trait RoutingTable: Send {
 
     fn set_secure_only(&mut self, secure_only: bool);
 
-    //fn add_restart_listener()
-    //fn remove_restart_listener()
+    fn add_restart_listener(&mut self, listener: RestartListener);
+
+    fn remove_restart_listener(&mut self, index: usize);
 
     fn has_queried(&self, n: &Node, now: u128) -> bool;
 
@@ -33,7 +34,7 @@ pub trait RoutingTable: Send {
 
     fn all_unqueried_nodes(&self) -> Vec<Node>;
 
-    fn restart(&self);
-
-    //RESTART LISTENER
+    fn restart(&mut self);
 }
+
+pub type RestartListener = Box<dyn Fn() + Send>;
