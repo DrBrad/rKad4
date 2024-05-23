@@ -291,7 +291,7 @@ impl Server {
                             let mut event;
 
                             if call.has_node() {
-                                if call.get_node().uid == m.get_uid() {
+                                if call.get_node().uid != m.get_uid() {
                                     return Err(MessageException::new("Generic Error", 201));
                                 }
 
@@ -322,156 +322,15 @@ impl Server {
                 println!("{}", e.to_string());
             }
         }
-
-        /*
-        if is_bogon(src_addr) {
-            //return;
-        }
-
-        match BencodeObject::decode(data) {
-            Ok(ben) => {
-                if !ben.contains_key(TID_KEY) || !ben.contains_key(TYPE_KEY) {
-                    //panic
-                    return;
-                }
-
-                let t = MessageType::from_rpc_type_name(ben.get_string(TYPE_KEY).unwrap().to_string()).unwrap();
-
-                match t {
-                    MessageType::ReqMsg => {
-                        if let Err(e) = || -> Result<(), MessageException> {
-                            let message_key = MessageKey::new(ben.get_string(t.rpc_type_name())
-                                    .map_err(|e| MessageException::new("Method Unknown", 204))?, t);
-
-                            let constructor = self.messages.get(&message_key).unwrap();
-                            let mut m = constructor();
-
-                            let mut tid = [0u8; TID_LENGTH];
-                            tid.copy_from_slice(ben.get_bytes(TID_KEY).map_err(|e| MessageException::new("Method Unknown", 204))?);
-
-                            m.set_transaction_id(tid);
-                            m.decode(&ben).map_err(|e| MessageException::new("Generic Error", 201))?;
-                            m.set_origin(src_addr);
-
-                            let node = Node::new(m.get_uid(), m.get_origin().unwrap());
-                            self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap().insert(node);
-
-
-                            let k = ben.get_string(t.rpc_type_name()).unwrap().to_string();
-
-                            if !self.request_mapping.contains_key(&k) {
-                                return Err(MessageException::new("Method Unknown", 204));
-                            }
-
-                            let mut event = RequestEvent::new(m.upcast());
-                            event.set_node(node);
-
-                            let callbacks = self.request_mapping.get(&k).unwrap();
-
-                            for callback in callbacks {
-                                callback(&mut event);
-                            }
-
-                            if event.is_prevent_default() {
-                                //RETURN NOTHING - NO ERROR
-                                return Err(MessageException::new("Method Unknown", 204));
-                            }
-
-                            if !event.has_response() {
-                                return Err(MessageException::new("Method Unknown", 204));
-                            }
-
-                            self.send(event.get_response().unwrap());
-
-                            if !self.kademlia.as_ref().unwrap().get_refresh_handler().lock().unwrap().is_running() {
-                                self.kademlia.as_ref().unwrap().get_refresh_handler().lock().unwrap().start();
-                            }
-
-                            Ok(())
-
-                        }() {
-                            println!("{}", e.get_message());
-
-                            /*
-                            ErrorResponse response = new ErrorResponse(ben.getBytes(TID_KEY));
-                            response.setDestination(packet.getAddress(), packet.getPort());
-                            response.setPublic(packet.getAddress(), packet.getPort());
-                            response.setCode(e.getCode());
-                            response.setDescription(e.getMessage());
-                            send(response);
-                            */
-                        }
-                    },
-                    MessageType::RspMsg => {
-                        if let Err(e) = || -> Result<(), MessageException> {
-                            let mut tid = [0u8; TID_LENGTH];
-                            tid.copy_from_slice(ben.get_bytes(TID_KEY).expect("Failed to find TID key."));
-
-                            let call = self.tracker.poll(&tid).ok_or(MessageException::new("Server Error", 202))?;
-
-                            //PROBLEM LINE BELOW... - NEED TO MAKE THE MESSAGE FIND_NODE_RESPONSE...
-                            let message_key = MessageKey::new(call.get_message().get_method(), t);
-
-                            let constructor = self.messages.get(&message_key).unwrap();
-                            let mut m = constructor();
-
-                            m.set_transaction_id(tid);
-                            m.decode(&ben).map_err(|e| MessageException::new("Generic Error", 201))?;
-                            m.set_origin(src_addr);
-
-                            if m.get_public().is_some() {
-                                self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap()
-                                    .update_public_ip_consensus(m.get_origin().unwrap().ip(), m.get_public().unwrap().ip());
-                            }
-
-                            if call.get_message().get_destination() != m.get_origin() {
-                                return Err(MessageException::new("Generic Error", 201));
-                            }
-
-                            let mut event;
-
-                            if call.has_node() {
-                                if call.get_node().uid == m.get_uid() {
-                                    return Err(MessageException::new("Generic Error", 201));
-                                }
-
-                                event = ResponseEvent::new(m.as_ref().upcast(), call.get_node());
-
-                            } else {
-                                event = ResponseEvent::new(m.as_ref().upcast(), Node::new(m.get_uid(), m.get_origin().unwrap()));
-                            }
-
-                            event.received();
-                            event.set_sent_time(call.get_sent_time());
-                            event.set_request(call.get_message().upcast());
-
-                            call.get_response_callback().on_response(self, event);
-
-                            Ok(())
-
-                        }() {
-                            println!("RESP {}", e.get_message());
-                        }
-                    },
-                    MessageType::ErrMsg => {
-                        println!("ERR  {}", ben.to_string());
-                    }
-                }
-            },
-            Err(e) => {
-                println!("{}", e.to_string());
-            }
-        }
-        */
     }
 
-    pub fn send(&self, message: &mut dyn MessageBase) {
+    pub fn send(&self, message: &mut dyn MessageBase) -> Result<(), String> {
         if message.get_destination().is_none() {
-            //throw new IllegalArgumentException("Message destination set to null");
+            return Err("Message destination set to null".to_string());
         }
 
         if is_bogon(message.get_destination().unwrap()) {
-            //throw new IllegalArgumentException("Message destination set to bogon");
+            //return Err("Message destination set to bogon".to_string());
         }
 
         if message.get_type() != MessageType::ErrMsg {
@@ -481,18 +340,32 @@ impl Server {
         if let Some(server) = &self.server {
             server.send_to(message.encode().encode().as_slice(), message.get_destination().unwrap()).unwrap(); //probably should return if failed to send...
         }
+
+        Ok(())
     }
 
-    pub fn send_with_callback(&mut self, message: &mut dyn MethodMessageBase, callback: Box<dyn ResponseCallback>) {
+    pub fn send_with_callback(&mut self, message: &mut dyn MethodMessageBase, callback: Box<dyn ResponseCallback>) -> Result<(), String> {
         if message.get_type() != MessageType::ReqMsg {
-            self.send(message.upcast_mut());
-            return;
+            return self.send(message.upcast_mut());
         }
 
         let tid = self.generate_transaction_id();
         message.set_transaction_id(tid);
         self.tracker.add(tid, Call::new(message, callback));
-        self.send(message.upcast_mut());
+        return self.send(message.upcast_mut())
+    }
+
+    pub fn send_with_node_callback(&mut self, message: &mut dyn MethodMessageBase, node: Node, callback: Box<dyn ResponseCallback>) -> Result<(), String> {
+        if message.get_type() != MessageType::ReqMsg {
+            return self.send(message.upcast_mut());
+        }
+
+        let tid = self.generate_transaction_id();
+        message.set_transaction_id(tid);
+        let mut call = Call::new(message, callback);
+        call.set_node(node);
+        self.tracker.add(tid, call);
+        return self.send(message.upcast_mut())
     }
 
     pub fn generate_transaction_id(&self) -> [u8; TID_LENGTH] {

@@ -28,7 +28,7 @@ impl Task for StaleRefreshTask {
         for node in nodes {
             let mut request = PingRequest::default();
             request.set_destination(node.address);
-            self.kademlia.get_server().lock().unwrap().send_with_callback(&mut request, listener.clone()); //ADD NODE...
+            self.kademlia.get_server().lock().unwrap().send_with_node_callback(&mut request, node, listener.clone()).unwrap();
         }
     }
 

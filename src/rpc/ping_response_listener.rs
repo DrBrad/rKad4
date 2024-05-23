@@ -16,7 +16,7 @@ impl PingResponseListener {
 
     pub fn new(routing_table: Arc<Mutex<dyn RoutingTable>>) -> Self {
         Self {
-            routing_table//: kademlia.clone_dyn()
+            routing_table
         }
     }
 }

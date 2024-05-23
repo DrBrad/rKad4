@@ -34,7 +34,7 @@ impl ResponseCallback for JoinNodeListener {
         if response.has_nodes() {
             let nodes = response.get_all_nodes();
 
-            let ping_response_listener = PingResponseListener::new(self.kademlia.get_routing_table().clone());
+            let listener = PingResponseListener::new(self.kademlia.get_routing_table().clone());
 
             let now = SystemTime::now()
                 .duration_since(UNIX_EPOCH)
@@ -53,7 +53,7 @@ impl ResponseCallback for JoinNodeListener {
                 let mut req = PingRequest::default();
                 req.set_destination(node.address);
 
-                self.kademlia.get_server().lock().unwrap().send_with_callback(&mut req, Box::new(ping_response_listener.clone()));
+                self.kademlia.get_server().lock().unwrap().send_with_node_callback(&mut req, node, Box::new(listener.clone()));
             }
         }
 

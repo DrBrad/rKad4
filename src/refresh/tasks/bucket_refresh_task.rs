@@ -52,7 +52,7 @@ impl Task for BucketRefreshTask {
                     request.set_destination(node.address);
                     request.set_target(k);
 
-                    self.kademlia.get_server().lock().unwrap().send_with_callback(&mut request, listener.clone()); //ADD NODE...
+                    self.kademlia.get_server().lock().unwrap().send_with_node_callback(&mut request, node, listener.clone()).unwrap();
                 }
             }
         }
@@ -121,7 +121,7 @@ impl ResponseCallback for FindNodeResponseListener {
 
                 let mut req = PingRequest::default();
                 req.set_destination(node.address);
-                self.kademlia.get_server().lock().unwrap().send_with_callback(&mut req, Box::new(self.listener.clone())); //ADD NODE...
+                self.kademlia.get_server().lock().unwrap().send_with_node_callback(&mut req, node.clone(), Box::new(self.listener.clone())).unwrap();
             }
         }
     }

@@ -71,7 +71,7 @@ TODO
 [x] FindNodeResponse
 [x] unpack_nodes
 [x] Join Node Listener
-[-] sending messages with server - node specification...
+[x] sending messages with server - node specification...
 [x] Ping Response Listener
 [x] KRequestListener
 [x] Bucket Refresh

@@ -156,11 +156,7 @@ impl KademliaBase for Kademlia {
         request.set_destination(addr);
         request.set_target(self.routing_table.lock().unwrap().get_derived_uid());
 
-        //NEED TO SEND WITH CALLBACK...
-        self.server.lock().unwrap().send_with_callback(&mut request, Box::new(JoinNodeListener::new(self)));
-        //self.refresh.lock().unwrap().start();
-
-        //START JOIN HANDLING
+        self.server.lock().unwrap().send_with_callback(&mut request, Box::new(JoinNodeListener::new(self))).unwrap();
     }
 
     fn stop(&self) {

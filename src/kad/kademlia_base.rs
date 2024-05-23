@@ -14,7 +14,6 @@ pub trait KademliaBase: Send {
 
     fn get_server(&self) -> &Arc<Mutex<Server>>;
 
-    //fn get_settings(&self) -> &Settings;
     fn get_routing_table(&self) -> &Arc<Mutex<dyn RoutingTable>>;
 
     fn get_refresh_handler(&self) -> &Arc<Mutex<RefreshHandler>>;
