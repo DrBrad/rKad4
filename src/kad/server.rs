@@ -310,7 +310,7 @@ impl Server {
                             Ok(())
 
                         }() {
-                            println!("RESP {}", e.get_message());
+                            println!("{}", e.get_message());
                         }
                     },
                     MessageType::ErrMsg => {
