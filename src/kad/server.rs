@@ -238,7 +238,9 @@ impl Server {
                     MessageType::RspMsg => {
                         if let Err(e) = || -> Result<(), MessageException> {
                             let mut tid = [0u8; TID_LENGTH];
-                            tid.copy_from_slice(ben.get_bytes(TID_KEY).expect("Failed to find TID key."));
+                            let slice = ben.get_bytes(TID_KEY).map_err(|e| MessageException::new("Method Unknown", 204))?;
+                            let len_to_copy = min(slice.len(), TID_LENGTH);
+                            tid[..len_to_copy].copy_from_slice(&slice[..len_to_copy]);
 
                             let call = kademlia.get_server().lock().as_mut().unwrap().tracker.poll(&tid).ok_or(MessageException::new("Server Error", 202))?;
 
