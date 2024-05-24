@@ -49,7 +49,6 @@ impl ResponseCallback for JoinNodeListener {
                 }
 
                 let mut req = PingRequest::default();
-                req.set_uid(self.kademlia.get_routing_table().lock().unwrap().get_derived_uid());
                 req.set_destination(node.address);
 
                 self.kademlia.get_server().lock().unwrap().send_with_node_callback(&mut req, node, Box::new(listener.clone())).unwrap();

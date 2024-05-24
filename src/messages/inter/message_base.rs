@@ -13,7 +13,7 @@ pub trait MessageBase: Send {
 
     fn set_uid(&mut self, uid: UID);
 
-    fn get_uid(&self) -> UID;
+    fn get_uid(&self) -> Option<UID>;
 
     fn set_transaction_id(&mut self, tid: [u8; TID_LENGTH]);
 

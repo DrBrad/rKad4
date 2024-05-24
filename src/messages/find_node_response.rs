@@ -114,8 +114,8 @@ impl MessageBase for FindNodeResponse {
         self.uid = Some(uid);
     }
 
-    fn get_uid(&self) -> UID {
-        self.uid.unwrap()
+    fn get_uid(&self) -> Option<UID> {
+        self.uid
     }
 
     fn set_transaction_id(&mut self, tid: [u8; TID_LENGTH]) {

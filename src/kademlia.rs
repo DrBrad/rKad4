@@ -55,7 +55,6 @@ impl Kademlia {
             //println!("{}", event.get_message().to_string());
 
             let mut response = PingResponse::default();
-            response.set_uid(self_clone.get_routing_table().lock().unwrap().get_derived_uid());
             response.set_transaction_id(*event.get_message().get_transaction_id());
             response.set_destination(event.get_message().get_origin().unwrap());
             response.set_public(event.get_message().get_origin().unwrap());
@@ -72,12 +71,11 @@ impl Kademlia {
             let request = event.get_message().as_any().downcast_ref::<FindNodeRequest>().unwrap();
 
             let mut nodes = self_clone.get_routing_table().lock().unwrap()
-                .find_closest(&request.get_target(), MAX_BUCKET_SIZE);
+                .find_closest(&request.get_target().unwrap(), MAX_BUCKET_SIZE);
             nodes.retain(|&n| n != event.get_node());
 
             if !nodes.is_empty() {
                 let mut response = FindNodeResponse::default();
-                response.set_uid(self_clone.get_routing_table().lock().unwrap().get_derived_uid());
                 response.set_transaction_id(*event.get_message().get_transaction_id());
                 response.set_destination(event.get_message().get_origin().unwrap());
                 response.set_public(event.get_message().get_origin().unwrap());
@@ -124,7 +122,6 @@ impl TryFrom<&str> for Kademlia {
             //println!("{}", event.get_message().to_string());
 
             let mut response = PingResponse::default();
-            response.set_uid(self_clone.get_routing_table().lock().unwrap().get_derived_uid());
             response.set_transaction_id(*event.get_message().get_transaction_id());
             response.set_destination(event.get_message().get_origin().unwrap());
             response.set_public(event.get_message().get_origin().unwrap());
@@ -141,12 +138,11 @@ impl TryFrom<&str> for Kademlia {
             let request = event.get_message().as_any().downcast_ref::<FindNodeRequest>().unwrap();
 
             let mut nodes = self_clone.get_routing_table().lock().unwrap()
-                .find_closest(&request.get_target(), MAX_BUCKET_SIZE);
+                .find_closest(&request.get_target().unwrap(), MAX_BUCKET_SIZE);
             nodes.retain(|&n| n != event.get_node());
 
             if !nodes.is_empty() {
                 let mut response = FindNodeResponse::default();
-                response.set_uid(self_clone.get_routing_table().lock().unwrap().get_derived_uid());
                 response.set_transaction_id(*event.get_message().get_transaction_id());
                 response.set_destination(event.get_message().get_origin().unwrap());
                 response.set_public(event.get_message().get_origin().unwrap());

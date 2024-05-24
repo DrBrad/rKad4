@@ -35,8 +35,8 @@ impl FindNodeRequest {
         self.target = Some(target);
     }
 
-    pub fn get_target(&self) -> UID {
-        self.target.unwrap()
+    pub fn get_target(&self) -> Option<UID> {
+        self.target
     }
 }
 
@@ -61,8 +61,8 @@ impl MessageBase for FindNodeRequest {
         self.uid = Some(uid);
     }
 
-    fn get_uid(&self) -> UID {
-        self.uid.unwrap()
+    fn get_uid(&self) -> Option<UID> {
+        self.uid
     }
 
     fn set_transaction_id(&mut self, tid: [u8; TID_LENGTH]) {

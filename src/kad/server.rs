@@ -14,6 +14,7 @@ use crate::messages::inter::message_exception::MessageException;
 use crate::messages::inter::message_key::MessageKey;
 use crate::messages::inter::message_type::{MessageType, TYPE_KEY};
 use crate::messages::inter::method_message_base::MethodMessageBase;
+use crate::routing::inter::routing_table::RoutingTable;
 use crate::rpc::call::Call;
 use crate::rpc::events::error_response_event::ErrorResponseEvent;
 use crate::rpc::events::inter::event::Event;
@@ -183,7 +184,7 @@ impl Server {
                             m.decode(&ben)?;
                             m.set_origin(src_addr);
 
-                            let node = Node::new(m.get_uid(), m.get_origin().unwrap());
+                            let node = Node::new(m.get_uid().unwrap(), m.get_origin().unwrap());
                             kademlia.get_routing_table().lock().unwrap().insert(node);
                             println!("SEEN REQ {}", node.to_string());
 
@@ -264,14 +265,14 @@ impl Server {
                             let mut event;
 
                             if call.has_node() {
-                                if call.get_node().uid != m.get_uid() {
+                                if call.get_node().uid != m.get_uid().unwrap() {
                                     return Err(MessageException::new("Generic Error", 201));
                                 }
 
                                 event = ResponseEvent::new(m.as_ref().upcast(), call.get_node());
 
                             } else {
-                                event = ResponseEvent::new(m.as_ref().upcast(), Node::new(m.get_uid(), m.get_origin().unwrap()));
+                                event = ResponseEvent::new(m.as_ref().upcast(), Node::new(m.get_uid().unwrap(), m.get_origin().unwrap()));
                             }
 
                             event.received();
@@ -343,6 +344,10 @@ impl Server {
 
         if !self.allow_bogon && is_bogon(message.get_destination().unwrap()) {
             return Err("Message destination set to bogon".to_string());
+        }
+
+        if message.get_uid().is_none() && message.get_type() != MessageType::ErrMsg {
+            message.set_uid(self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap().get_derived_uid());
         }
 
         if let Some(server) = &self.server {
