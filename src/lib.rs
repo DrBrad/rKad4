@@ -12,6 +12,11 @@ extern crate bencode;
 //netcat -ul 8080
 //test --package kad4 --lib tests -- --nocapture
 
+/*
+Fix the k_bucket cache issue with nodes being None value...
+k_routing_table restart will cause deadlock if the restart uses server - IE it will... with bucket_refresh...
+*/
+
 #[cfg(test)]
 mod tests {
 
@@ -27,8 +32,8 @@ mod tests {
         kad.get_routing_table().lock().unwrap().set_secure_only(false);
         kad.get_server().lock().unwrap().set_allow_bogon(true);
         //kad.bind(8080);
-        kad.join(8080, SocketAddr::new(IpAddr::from([127, 0, 0, 1]), 8070)).unwrap();
-        //kad.join(6881, SocketAddr::new(resolve_hostname("router.bittorrent.com").unwrap(), 6881)).unwrap();
+        //kad.join(8080, SocketAddr::new(IpAddr::from([127, 0, 0, 1]), 8070)).unwrap();
+        kad.join(6881, SocketAddr::new(resolve_hostname("router.bittorrent.com").unwrap(), 6881)).unwrap();
 
         loop {
             sleep(Duration::from_secs(10));

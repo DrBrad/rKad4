@@ -32,13 +32,18 @@ impl KBucket {
                 let mut index = MAX_BUCKET_SIZE+1;
 
                 for i in 0..=self.cache.len() {
+
+                    //TEMPORARY PATCH
+                    if self.cache.get(i).is_none() {
+                        continue;
+                    }
+
                     if self.cache.get(i).unwrap().stale >= MAX_STALE_COUNT {
                         if index < MAX_BUCKET_SIZE && self.cache.get(i).unwrap().stale > self.cache.get(index).unwrap().stale {
                             index = i;
                         }
                     }
                 }
-
 
                 if index < MAX_BUCKET_SIZE {
                     let n = self.cache.remove(index);

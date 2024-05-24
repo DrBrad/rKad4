@@ -40,7 +40,7 @@ impl KRoutingTable {
 impl RoutingTable for KRoutingTable {
 
     fn update_public_ip_consensus(&mut self, source: IpAddr, addr: IpAddr) {
-        if is_global_unicast(addr) {
+        if !is_global_unicast(addr) {
             return;
         }
 
@@ -234,7 +234,7 @@ impl RoutingTable for KRoutingTable {
         }
 
         for listener in &self.listeners {
-            listener();
+            //listener(); //this will cause a deadlock
         }
     }
 }
