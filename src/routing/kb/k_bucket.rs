@@ -30,7 +30,7 @@ impl KBucket {
             } else if self.cache.len() >= MAX_BUCKET_SIZE {
                 let mut index = MAX_BUCKET_SIZE+1;
 
-                for i in 0..=self.cache.len()-1 {
+                for i in 0..self.cache.len() {
                     if self.cache.get(i).unwrap().stale >= MAX_STALE_COUNT {
                         if index < MAX_BUCKET_SIZE && self.cache.get(i).unwrap().stale > self.cache.get(index).unwrap().stale {
                             index = i;
