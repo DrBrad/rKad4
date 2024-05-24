@@ -181,7 +181,7 @@ impl Server {
 
                             let node = Node::new(m.get_uid(), m.get_origin().unwrap());
                             kademlia.get_routing_table().lock().unwrap().insert(node);
-
+                            println!("SEEN REQ {}", node.to_string());
 
                             let k = ben.get_string(t.rpc_type_name()).unwrap().to_string();
 
@@ -207,14 +207,10 @@ impl Server {
 
                             kademlia.get_server().lock().as_ref().unwrap().send(event.get_response().unwrap()).unwrap();
 
-                            if !kademlia.get_refresh_handler().lock().unwrap().is_running() {
-                                kademlia.get_refresh_handler().lock().unwrap().start();
-                            }
-
                             Ok(())
 
                         }() {
-                            println!("{}", e.get_message());
+                            //println!("{}", e.get_message());
 
                             let mut tid = [0u8; TID_LENGTH];
                             tid.copy_from_slice(ben.get_bytes(TID_KEY).map_err(|e| MessageException::new("Method Unknown", 204)).unwrap());
@@ -226,6 +222,10 @@ impl Server {
                             response.set_description(e.get_message());
 
                             kademlia.get_server().lock().as_ref().unwrap().send(&mut response).unwrap();
+                        }
+
+                        if !kademlia.get_refresh_handler().lock().unwrap().is_running() {
+                            kademlia.get_refresh_handler().lock().unwrap().start();
                         }
                     },
                     MessageType::RspMsg => {
@@ -279,7 +279,7 @@ impl Server {
                         }
                     },
                     MessageType::ErrMsg => {
-                        println!("ERR  {}", ben.to_string());
+                        //println!("ERR  {}", ben.to_string());
 
                         if let Err(e) = || -> Result<(), MessageException> {
                             let mut tid = [0u8; TID_LENGTH];

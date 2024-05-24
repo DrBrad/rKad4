@@ -109,7 +109,7 @@ impl MessageBase for ErrorResponse {
     }
 
     fn get_type(&self) -> MessageType {
-        MessageType::ReqMsg
+        MessageType::ErrMsg
     }
 
     fn encode(&self) -> BencodeObject {
