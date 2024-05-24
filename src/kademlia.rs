@@ -162,14 +162,14 @@ impl KademliaBase for Kademlia {
         self.server.lock().unwrap().start(port);
     }
 
-    fn join(&self, local_port: u16, addr: SocketAddr) {
+    fn join(&self, local_port: u16, addr: SocketAddr) -> Result<(), String> {
         self.server.lock().unwrap().start(local_port);
 
         let mut request = FindNodeRequest::default();
         request.set_destination(addr);
         request.set_target(self.routing_table.lock().unwrap().get_derived_uid());
 
-        self.server.lock().unwrap().send_with_callback(&mut request, Box::new(JoinNodeListener::new(self))).unwrap();
+        self.server.lock().unwrap().send_with_callback(&mut request, Box::new(JoinNodeListener::new(self)))
     }
 
     fn stop(&self) {

@@ -8,7 +8,7 @@ pub trait KademliaBase: Send {
 
     fn bind(&self, port: u16);
 
-    fn join(&self, local_port: u16, addr: SocketAddr);
+    fn join(&self, local_port: u16, addr: SocketAddr) -> Result<(), String>;
 
     fn stop(&self);
 
