@@ -29,7 +29,6 @@ mod tests {
         //kad.bind(8080);
         kad.join(8080, SocketAddr::new(IpAddr::from([127, 0, 0, 1]), 8070)).unwrap();
         //kad.join(6881, SocketAddr::new(resolve_hostname("router.bittorrent.com").unwrap(), 6881)).unwrap();
-        //kad.join(8080, SocketAddr::new(IpAddr::from([67, 215, 246, 10]), 6881)).unwrap();
 
         loop {
             sleep(Duration::from_secs(10));
