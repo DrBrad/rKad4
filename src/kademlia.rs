@@ -167,7 +167,6 @@ impl KademliaBase for Kademlia {
         self.server.lock().unwrap().start(local_port);
 
         let mut request = FindNodeRequest::default();
-        request.set_uid(self.routing_table.lock().unwrap().get_derived_uid());
         request.set_destination(addr);
         request.set_target(self.routing_table.lock().unwrap().get_derived_uid());
 
