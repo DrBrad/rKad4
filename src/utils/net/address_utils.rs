@@ -1,4 +1,4 @@
-use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6};
+use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
 use super::net_mask::NetMask;
 
 const LOCAL_BROADCAST: [u8; 4] = [0xff, 0xff, 0xff, 0xff];

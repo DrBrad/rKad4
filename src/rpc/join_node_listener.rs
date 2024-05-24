@@ -3,11 +3,9 @@ use crate::kad::kademlia_base::KademliaBase;
 use crate::messages::find_node_response::FindNodeResponse;
 use crate::messages::inter::message_base::MessageBase;
 use crate::messages::ping_request::PingRequest;
-use crate::rpc::events::error_response_event::ErrorResponseEvent;
 use crate::rpc::events::inter::message_event::MessageEvent;
 use crate::rpc::events::inter::response_callback::ResponseCallback;
 use crate::rpc::events::response_event::ResponseEvent;
-use crate::rpc::events::stalled_event::StalledEvent;
 use crate::rpc::ping_response_listener::PingResponseListener;
 
 pub struct JoinNodeListener {
@@ -60,13 +58,5 @@ impl ResponseCallback for JoinNodeListener {
         if !self.kademlia.get_refresh_handler().lock().unwrap().is_running() {
             self.kademlia.get_refresh_handler().lock().unwrap().start();
         }
-    }
-
-    fn on_error_response(&self, event: ErrorResponseEvent) {
-
-    }
-
-    fn on_stalled(&self, event: StalledEvent) {
-
     }
 }

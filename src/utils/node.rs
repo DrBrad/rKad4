@@ -64,7 +64,7 @@ impl Node {
         self.last_seen = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .expect("Time went backwards")
-            .as_millis();;
+            .as_millis();
     }
 
     pub fn mark_stale(&mut self) {

@@ -40,7 +40,7 @@ impl KBucket {
                 }
 
 
-                if(index < MAX_BUCKET_SIZE){
+                if index < MAX_BUCKET_SIZE {
                     let n = self.cache.remove(index);
                     self.cache.push(n);
                     //if let Some(ref mut existing_stale) = stale {

@@ -155,7 +155,7 @@ impl RoutingTable for KRoutingTable {
     }
 
     fn remove_restart_listener(&mut self, index: usize) {
-        self.listeners.remove(index);
+        let _ = self.listeners.remove(index);
     }
 
     fn has_queried(&self, n: &Node, now: u128) -> bool {

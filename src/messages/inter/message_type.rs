@@ -1,5 +1,3 @@
-use crate::routing::bucket_types::BucketTypes;
-
 pub const TYPE_KEY: &str = "y";
 
 #[derive(Eq, PartialEq, Hash, Copy, Clone)]

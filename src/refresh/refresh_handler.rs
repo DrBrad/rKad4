@@ -1,11 +1,9 @@
-use std::sync::{Arc, Mutex};
-use std::sync::atomic::{AtomicBool, AtomicU32, AtomicU64, Ordering};
+use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::thread;
 use std::thread::sleep;
 use std::time::Duration;
-use crate::kad::kademlia_base::KademliaBase;
 use crate::refresh::tasks::inter::task::Task;
-//use std::old_io::Timer;
 
 pub struct RefreshHandler {
     //pub(crate) kademlia: Option<Box<dyn KademliaBase>>,

@@ -41,7 +41,7 @@ pub struct Server {
 impl Server {
 
     pub fn new(/*kademlia: Box<dyn KademliaBase>*/) -> Self {
-        let mut self_ = Self {
+        Self {
             kademlia: None,
             server: None,
             allow_bogon: false,
@@ -49,9 +49,7 @@ impl Server {
             running: Arc::new(AtomicBool::new(false)), //MAY NOT BE NEEDED
             request_mapping: HashMap::new(),
             messages: HashMap::new()
-        };
-
-        self_
+        }
     }
 
     pub fn start(&mut self, port: u16) {

@@ -1,5 +1,3 @@
-use std::cell::RefCell;
-use std::rc::Rc;
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
 use crate::kad::kademlia_base::KademliaBase;
@@ -35,7 +33,7 @@ impl BucketRefreshTask {
 impl Task for BucketRefreshTask {
 
     fn execute(&self) {
-        let mut listener = Box::new(FindNodeResponseListener::new(self.kademlia.as_ref()));
+        let listener = Box::new(FindNodeResponseListener::new(self.kademlia.as_ref()));
         println!("EXECUTING BUCKET REFRESH");
 
         for i in 1..ID_LENGTH*8 {

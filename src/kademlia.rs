@@ -46,7 +46,7 @@ impl Kademlia {
             event.set_response(Box::new(response));
         }));
 
-        let mut self_ = Self {
+        let self_ = Self {
             routing_table: Arc::new(Mutex::new(KRoutingTable::new())),
             server: Arc::new(Mutex::new(server)),
             refresh: Arc::new(Mutex::new(RefreshHandler::new()))
@@ -112,7 +112,7 @@ impl TryFrom<&str> for Kademlia {
             event.set_response(Box::new(response));
         }));
 
-        let mut self_ = Self {
+        let self_ = Self {
             routing_table: BucketTypes::from_string(value)?.routing_table(),
             server: Arc::new(Mutex::new(server)),
             refresh: Arc::new(Mutex::new(RefreshHandler::new()))
