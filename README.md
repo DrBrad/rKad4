@@ -13,7 +13,4 @@ Distributed Hash tables don't have allot of documentation online nor are their m
 
 Implementation
 -----
-
-Library
------
-The Kad4 jar can be downloaded [here]()
+Implementing rKad4 is very easy, just download the files and add it as a library to your project. Here are some [Example](https://github.com/DrBrad/rKad4/wiki/Examples) usages or you can take a look at our [Documentation](https://github.com/DrBrad/rKad4)
