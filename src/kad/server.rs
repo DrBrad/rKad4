@@ -14,7 +14,6 @@ use crate::messages::inter::message_exception::MessageException;
 use crate::messages::inter::message_key::MessageKey;
 use crate::messages::inter::message_type::{MessageType, TYPE_KEY};
 use crate::messages::inter::method_message_base::MethodMessageBase;
-use crate::routing::inter::routing_table::RoutingTable;
 use crate::rpc::call::Call;
 use crate::rpc::events::error_response_event::ErrorResponseEvent;
 use crate::rpc::events::inter::event::Event;
