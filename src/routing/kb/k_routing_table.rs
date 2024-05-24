@@ -1,6 +1,7 @@
 use std::net::IpAddr;
 use std::time::{SystemTime, UNIX_EPOCH};
 use core::array::from_fn;
+use std::any::Any;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use crate::routing::inter::routing_table::{RestartListener, RoutingTable};
@@ -15,7 +16,7 @@ use crate::utils::uid::{ UID, ID_LENGTH };
 
 pub struct KRoutingTable {
     uid: Option<UID>,
-    listeners: Arc<Mutex<Vec<RestartListener>>>,
+    listeners: Vec<RestartListener>,
     consensus_external_address: IpAddr,
     origin_pairs: LinkedHashMap<IpAddr, IpAddr>,
     secure_only: bool,
@@ -27,7 +28,7 @@ impl KRoutingTable {
     pub fn new() -> Self {
         let mut routing_table = Self {
             uid: None,
-            listeners: Arc::new(Mutex::new(Vec::new())),
+            listeners: Vec::new(),
             consensus_external_address: IpAddr::from([127, 0, 1, 1]),
             origin_pairs: LinkedHashMap::new(64),
             secure_only: true,
@@ -153,11 +154,11 @@ impl RoutingTable for KRoutingTable {
     }
 
     fn add_restart_listener(&mut self, listener: RestartListener) {
-        self.listeners.lock().unwrap().push(listener);
+        self.listeners.push(listener);
     }
 
     fn remove_restart_listener(&mut self, index: usize) {
-        let _ = self.listeners.lock().unwrap().remove(index);
+        let _ = self.listeners.remove(index);
     }
 
     fn has_queried(&self, n: &Node, now: u128) -> bool {
@@ -231,15 +232,16 @@ impl RoutingTable for KRoutingTable {
             self.insert(node);
         }
 
-        if self.listeners.lock().unwrap().is_empty() {
+        if self.listeners.is_empty() {
             return;
         }
 
-        let listeners = self.listeners.clone();
-        thread::spawn(move || {
-            for listener in listeners.lock().unwrap().iter() {
-                listener();
-            }
-        });
+        for listener in &self.listeners {
+            listener(self);
+        }
+    }
+
+    fn upcast(&self) -> &dyn RoutingTable {
+        self
     }
 }

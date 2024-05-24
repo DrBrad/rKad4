@@ -5,6 +5,7 @@ use crate::messages::find_node_request::FindNodeRequest;
 use crate::messages::find_node_response::FindNodeResponse;
 use crate::messages::inter::message_base::MessageBase;
 use crate::messages::ping_request::PingRequest;
+use crate::routing::inter::routing_table::RoutingTable;
 use crate::routing::kb::k_bucket::MAX_BUCKET_SIZE;
 use crate::rpc::events::error_response_event::ErrorResponseEvent;
 use crate::rpc::events::inter::message_event::MessageEvent;
@@ -28,25 +29,23 @@ impl BucketRefreshTask {
             kademlia: kademlia.clone_dyn()
         }
     }
-}
 
-impl Task for BucketRefreshTask {
-
-    fn execute(&self) {
+    pub fn execute_lock(&self, routing_table: &dyn RoutingTable) {
         let listener = Box::new(FindNodeResponseListener::new(self.kademlia.as_ref()));
         println!("EXECUTING BUCKET REFRESH");
 
         for i in 1..ID_LENGTH*8 {
-            if self.kademlia.get_routing_table().lock().unwrap().bucket_size(i) < MAX_BUCKET_SIZE {
-                let k = self.kademlia.get_routing_table().lock().unwrap().get_derived_uid().generate_node_id_by_distance(i);
+            if routing_table.bucket_size(i) < MAX_BUCKET_SIZE {
+                let k = routing_table.get_derived_uid().generate_node_id_by_distance(i);
 
-                let closest = self.kademlia.get_routing_table().lock().unwrap().find_closest(&k, MAX_BUCKET_SIZE);
+                let closest = routing_table.find_closest(&k, MAX_BUCKET_SIZE);
                 if closest.is_empty() {
                     continue;
                 }
 
                 for node in closest {
                     let mut request = FindNodeRequest::default();
+                    request.set_uid(routing_table.get_derived_uid());
                     request.set_destination(node.address);
                     request.set_target(k);
 
@@ -54,6 +53,13 @@ impl Task for BucketRefreshTask {
                 }
             }
         }
+    }
+}
+
+impl Task for BucketRefreshTask {
+
+    fn execute(&self) {
+        self.execute_lock(self.kademlia.get_routing_table().lock().unwrap().upcast());
     }
 
     fn clone_dyn(&self) -> Box<dyn Task> {
@@ -118,6 +124,7 @@ impl ResponseCallback for FindNodeResponseListener {
                 }
 
                 let mut req = PingRequest::default();
+                req.set_uid(self.kademlia.get_routing_table().lock().unwrap().get_derived_uid());
                 req.set_destination(node.address);
                 self.kademlia.get_server().lock().unwrap().send_with_node_callback(&mut req, node.clone(), Box::new(self.listener.clone())).unwrap();
             }

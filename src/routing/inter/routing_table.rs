@@ -1,3 +1,4 @@
+use std::any::Any;
 use std::net::IpAddr;
 use crate::utils::node::Node;
 use crate::utils::uid::UID;
@@ -35,6 +36,8 @@ pub trait RoutingTable: Send {
     fn all_unqueried_nodes(&self) -> Vec<Node>;
 
     fn restart(&mut self);
+
+    fn upcast(&self) -> &dyn RoutingTable;
 }
 
-pub type RestartListener = Box<dyn Fn() + Send>;
+pub type RestartListener = Box<dyn Fn(&dyn RoutingTable) + Send>;

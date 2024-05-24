@@ -36,16 +36,6 @@ impl Kademlia {
         server.register_message(|| Box::new(FindNodeRequest::default()));
         server.register_message(|| Box::new(FindNodeResponse::default()));
 
-        server.register_request_listener("ping", Box::new(move |event| {
-            //println!("{}", event.get_message().to_string());
-
-            let mut response = PingResponse::default();
-            response.set_transaction_id(*event.get_message().get_transaction_id());
-            response.set_destination(event.get_message().get_origin().unwrap());
-            response.set_public(event.get_message().get_origin().unwrap());
-            event.set_response(Box::new(response));
-        }));
-
         let self_ = Self {
             routing_table: Arc::new(Mutex::new(KRoutingTable::new())),
             server: Arc::new(Mutex::new(server)),
@@ -54,12 +44,24 @@ impl Kademlia {
 
         let bucket_refresh = BucketRefreshTask::new(&self_);
         let bucket_refresh_clone = BucketRefreshTask::new(&self_).clone();
-        self_.routing_table.lock().unwrap().add_restart_listener(Box::new(move || {
-            bucket_refresh_clone.execute();
+        self_.routing_table.lock().unwrap().add_restart_listener(Box::new(move |routing_table| {
+            bucket_refresh_clone.execute_lock(routing_table);
         }));
 
         self_.refresh.lock().unwrap().add_operation(Box::new(bucket_refresh));
         self_.refresh.lock().unwrap().add_operation(Box::new(StaleRefreshTask::new(&self_)));
+
+        let self_clone = self_.clone();
+        self_.server.lock().unwrap().register_request_listener("ping", Box::new(move |event| {
+            //println!("{}", event.get_message().to_string());
+
+            let mut response = PingResponse::default();
+            response.set_uid(self_clone.get_routing_table().lock().unwrap().get_derived_uid());
+            response.set_transaction_id(*event.get_message().get_transaction_id());
+            response.set_destination(event.get_message().get_origin().unwrap());
+            response.set_public(event.get_message().get_origin().unwrap());
+            event.set_response(Box::new(response));
+        }));
 
         let self_clone = self_.clone();
         self_.server.lock().unwrap().register_request_listener("find_node", Box::new(move |event| {
@@ -76,6 +78,7 @@ impl Kademlia {
 
             if !nodes.is_empty() {
                 let mut response = FindNodeResponse::default();
+                response.set_uid(self_clone.get_routing_table().lock().unwrap().get_derived_uid());
                 response.set_transaction_id(*event.get_message().get_transaction_id());
                 response.set_destination(event.get_message().get_origin().unwrap());
                 response.set_public(event.get_message().get_origin().unwrap());
@@ -102,16 +105,6 @@ impl TryFrom<&str> for Kademlia {
         server.register_message(|| Box::new(FindNodeRequest::default()));
         server.register_message(|| Box::new(FindNodeResponse::default()));
 
-        server.register_request_listener("ping", Box::new(move |event| {
-            //println!("{}", event.get_message().to_string());
-
-            let mut response = PingResponse::default();
-            response.set_transaction_id(*event.get_message().get_transaction_id());
-            response.set_destination(event.get_message().get_origin().unwrap());
-            response.set_public(event.get_message().get_origin().unwrap());
-            event.set_response(Box::new(response));
-        }));
-
         let self_ = Self {
             routing_table: BucketTypes::from_string(value)?.routing_table(),
             server: Arc::new(Mutex::new(server)),
@@ -120,12 +113,24 @@ impl TryFrom<&str> for Kademlia {
 
         let bucket_refresh = BucketRefreshTask::new(&self_);
         let bucket_refresh_clone = BucketRefreshTask::new(&self_).clone();
-        self_.routing_table.lock().unwrap().add_restart_listener(Box::new(move || {
-            bucket_refresh_clone.execute();
+        self_.routing_table.lock().unwrap().add_restart_listener(Box::new(move |routing_table| {
+            bucket_refresh_clone.execute_lock(routing_table);
         }));
 
         self_.refresh.lock().unwrap().add_operation(Box::new(bucket_refresh));
         self_.refresh.lock().unwrap().add_operation(Box::new(StaleRefreshTask::new(&self_)));
+
+        let self_clone = self_.clone();
+        self_.server.lock().unwrap().register_request_listener("ping", Box::new(move |event| {
+            //println!("{}", event.get_message().to_string());
+
+            let mut response = PingResponse::default();
+            response.set_uid(self_clone.get_routing_table().lock().unwrap().get_derived_uid());
+            response.set_transaction_id(*event.get_message().get_transaction_id());
+            response.set_destination(event.get_message().get_origin().unwrap());
+            response.set_public(event.get_message().get_origin().unwrap());
+            event.set_response(Box::new(response));
+        }));
 
         let self_clone = self_.clone();
         self_.server.lock().unwrap().register_request_listener("find_node", Box::new(move |event| {
@@ -142,6 +147,7 @@ impl TryFrom<&str> for Kademlia {
 
             if !nodes.is_empty() {
                 let mut response = FindNodeResponse::default();
+                response.set_uid(self_clone.get_routing_table().lock().unwrap().get_derived_uid());
                 response.set_transaction_id(*event.get_message().get_transaction_id());
                 response.set_destination(event.get_message().get_origin().unwrap());
                 response.set_public(event.get_message().get_origin().unwrap());
@@ -166,6 +172,7 @@ impl KademliaBase for Kademlia {
         self.server.lock().unwrap().start(local_port);
 
         let mut request = FindNodeRequest::default();
+        request.set_uid(self.routing_table.lock().unwrap().get_derived_uid());
         request.set_destination(addr);
         request.set_target(self.routing_table.lock().unwrap().get_derived_uid());
 
