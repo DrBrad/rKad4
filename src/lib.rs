@@ -12,10 +12,6 @@ extern crate bencode;
 //netcat -ul 8080
 //test --package kad4 --lib tests -- --nocapture
 
-/*
-k_routing_table restart will cause deadlock if the restart uses server - IE it will... with bucket_refresh...
-*/
-
 #[cfg(test)]
 mod tests {
 
