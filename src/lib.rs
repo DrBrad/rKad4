@@ -13,7 +13,6 @@ extern crate bencode;
 //test --package kad4 --lib tests -- --nocapture
 
 /*
-Fix the k_bucket cache issue with nodes being None value...
 k_routing_table restart will cause deadlock if the restart uses server - IE it will... with bucket_refresh...
 */
 

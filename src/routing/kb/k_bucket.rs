@@ -28,16 +28,9 @@ impl KBucket {
                 node.seen();
 
             } else if self.cache.len() >= MAX_BUCKET_SIZE {
-                //let mut stale: Option<Node> = None;
                 let mut index = MAX_BUCKET_SIZE+1;
 
-                for i in 0..=self.cache.len() {
-
-                    //TEMPORARY PATCH
-                    if self.cache.get(i).is_none() {
-                        continue;
-                    }
-
+                for i in 0..=self.cache.len()-1 {
                     if self.cache.get(i).unwrap().stale >= MAX_STALE_COUNT {
                         if index < MAX_BUCKET_SIZE && self.cache.get(i).unwrap().stale > self.cache.get(index).unwrap().stale {
                             index = i;
@@ -46,16 +39,8 @@ impl KBucket {
                 }
 
                 if index < MAX_BUCKET_SIZE {
-                    let n = self.cache.remove(index);
+                    self.cache.remove(index);
                     self.cache.push(n);
-                    //if let Some(ref mut existing_stale) = stale {
-                    //    self.cache.remove(existing_stale);
-                    //}
-                    /*
-                    if let Some(element) = self.cache.remove(self.cache.index(stale)) {
-                        self.cache.push(element);
-                    }
-                    */
                 }
 
             }else{
