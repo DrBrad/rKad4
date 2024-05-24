@@ -365,7 +365,7 @@ impl Server {
         let tid = self.generate_transaction_id();
         message.set_transaction_id(tid);
         self.tracker.add(tid, Call::new(message, callback));
-        return self.send(message.upcast_mut())
+        self.send(message.upcast_mut())
     }
 
     pub fn send_with_node_callback(&mut self, message: &mut dyn MethodMessageBase, node: Node, callback: Box<dyn ResponseCallback>) -> Result<(), String> {
@@ -378,7 +378,7 @@ impl Server {
         let mut call = Call::new(message, callback);
         call.set_node(node);
         self.tracker.add(tid, call);
-        return self.send(message.upcast_mut())
+        self.send(message.upcast_mut())
     }
 
     pub fn generate_transaction_id(&self) -> [u8; TID_LENGTH] {
