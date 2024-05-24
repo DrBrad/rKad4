@@ -9,7 +9,6 @@ use crate::messages::ping_request::PingRequest;
 use crate::messages::ping_response::PingResponse;
 use crate::refresh::refresh_handler::RefreshHandler;
 use crate::refresh::tasks::bucket_refresh_task::BucketRefreshTask;
-use crate::refresh::tasks::inter::task::Task;
 use crate::refresh::tasks::stale_refresh_task::StaleRefreshTask;
 use crate::routing::bucket_types::BucketTypes;
 use crate::routing::inter::routing_table::RoutingTable;
