@@ -15,7 +15,7 @@ extern crate bencode;
 #[cfg(test)]
 mod tests {
 
-    use std::net::{IpAddr, SocketAddr};
+    use std::net::{IpAddr, SocketAddr, ToSocketAddrs};
     use std::thread::sleep;
     use std::time::Duration;
     use crate::kad::kademlia_base::KademliaBase;
@@ -28,7 +28,7 @@ mod tests {
         kad.get_server().lock().unwrap().set_allow_bogon(true);
         //kad.bind(8080);
         kad.join(8080, SocketAddr::new(IpAddr::from([127, 0, 0, 1]), 8070));
-        //kad.join(6881, SocketAddr::new(IpAddr::from("router.bittorrent.com"), 6881)); //- not sure how to use domains yet...
+        //kad.join(6881, SocketAddr::new(resolve_hostname("router.bittorrent.com").unwrap(), 6881)); //- not sure how to use domains yet...
 
         loop {
             sleep(Duration::from_secs(10));
@@ -38,5 +38,11 @@ mod tests {
                      routing_table.get_consensus_external_address().to_string(),
                      routing_table.all_nodes().len());
         }
+    }
+
+    fn resolve_hostname(hostname: &str) -> Result<IpAddr, std::io::Error> {
+        let addresses: Vec<SocketAddr> = (hostname, 0).to_socket_addrs()?.collect();
+        let ip_addresses: Vec<IpAddr> = addresses.into_iter().map(|addr| addr.ip()).collect();
+        Ok(*ip_addresses.get(0).unwrap())
     }
 }
