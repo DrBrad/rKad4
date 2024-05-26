@@ -7,9 +7,6 @@ Kademlia DHT compatible with BitTorrent protocol that uses Rust
 > [!IMPORTANT]
 > For more info go to [Project Website](https://kademlia.rs)
 
-> [!IMPORTANT]
-> RestartListeners use lock for routing_table so you must use the one given in the callback. Not sure how to fix this one...
-
 Why / About
 -----
 Distributed Hash tables don't have allot of documentation online nor are their many libraries that are easy to use and customization. This library offers an easy to use approach to DHTs. You can create your own RoutingTable, Messages, EventHandlers, and Refresh Tasks.
