@@ -69,7 +69,6 @@ impl RoutingTable for KRoutingTable {
 
             if routing_table.lock().unwrap().as_any().downcast_ref::<Self>().unwrap().consensus_external_address != k[res] {
                 routing_table.lock().unwrap().as_any_mut().downcast_mut::<Self>().unwrap().consensus_external_address = k[res];
-                routing_table.lock().unwrap().as_any_mut().downcast_mut::<Self>().unwrap().derive_uid();
                 Self::restart(routing_table);
             }
         }
@@ -233,6 +232,8 @@ impl RoutingTable for KRoutingTable {
     }
 
     fn restart(routing_table: Arc<Mutex<dyn RoutingTable>>) {
+        routing_table.lock().unwrap().as_any_mut().downcast_mut::<Self>().unwrap().derive_uid();
+
         let nodes = routing_table.lock().unwrap().all_nodes();
         routing_table.lock().unwrap().as_any_mut().downcast_mut::<Self>().unwrap().k_buckets = from_fn(|_| KBucket::new());
 
