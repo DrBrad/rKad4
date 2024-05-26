@@ -29,23 +29,26 @@ impl BucketRefreshTask {
             kademlia: kademlia.clone_dyn()
         }
     }
+}
 
-    pub fn execute_lock(&self, routing_table: &dyn RoutingTable) {
+impl Task for BucketRefreshTask {
+
+    fn execute(&self) {
         let listener = Box::new(FindNodeResponseListener::new(self.kademlia.as_ref()));
         println!("EXECUTING BUCKET REFRESH");
 
         for i in 1..ID_LENGTH*8 {
-            if routing_table.bucket_size(i) < MAX_BUCKET_SIZE {
-                let k = routing_table.get_derived_uid().generate_node_id_by_distance(i);
+            if self.kademlia.get_routing_table().lock().unwrap().bucket_size(i) < MAX_BUCKET_SIZE {
+                let k = self.kademlia.get_routing_table().lock().unwrap().get_derived_uid().generate_node_id_by_distance(i);
 
-                let closest = routing_table.find_closest(&k, MAX_BUCKET_SIZE);
+                let closest = self.kademlia.get_routing_table().lock().unwrap().find_closest(&k, MAX_BUCKET_SIZE);
                 if closest.is_empty() {
                     continue;
                 }
 
                 for node in closest {
                     let mut request = FindNodeRequest::default();
-                    request.set_uid(routing_table.get_derived_uid());
+                    request.set_uid(self.kademlia.get_routing_table().lock().unwrap().get_derived_uid());
                     request.set_destination(node.address);
                     request.set_target(k);
 
@@ -53,13 +56,6 @@ impl BucketRefreshTask {
                 }
             }
         }
-    }
-}
-
-impl Task for BucketRefreshTask {
-
-    fn execute(&self) {
-        self.execute_lock(self.kademlia.get_routing_table().lock().unwrap().upcast());
     }
 
     fn clone_dyn(&self) -> Box<dyn Task> {

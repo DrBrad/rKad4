@@ -4,7 +4,7 @@ use crate::kad::server::Server;
 use crate::refresh::refresh_handler::RefreshHandler;
 use crate::routing::inter::routing_table::RoutingTable;
 
-pub trait KademliaBase: Send {
+pub trait KademliaBase: Send + Sync {
 
     fn bind(&self, port: u16);
 

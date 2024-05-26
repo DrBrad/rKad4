@@ -254,8 +254,8 @@ impl Server {
                             m.set_origin(src_addr);
 
                             if m.get_public().is_some() {
-                                kademlia.get_routing_table().lock().unwrap()
-                                    .update_public_ip_consensus(m.get_origin().unwrap().ip(), m.get_public().unwrap().ip());
+                                let update = kademlia.get_routing_table().lock().unwrap().get_update_public_ip_consensus();
+                                update(kademlia.get_routing_table().clone(), m.get_origin().unwrap().ip(), m.get_public().unwrap().ip());
                             }
 
                             if call.get_message().get_destination() != m.get_origin() {
@@ -303,8 +303,8 @@ impl Server {
                             m.set_origin(src_addr);
 
                             if m.get_public().is_some() {
-                                kademlia.get_routing_table().lock().unwrap()
-                                    .update_public_ip_consensus(m.get_origin().unwrap().ip(), m.get_public().unwrap().ip());
+                                let update = kademlia.get_routing_table().lock().unwrap().get_update_public_ip_consensus();
+                                update(kademlia.get_routing_table().clone(), m.get_origin().unwrap().ip(), m.get_public().unwrap().ip());
                             }
 
                             if call.get_message().get_destination() != m.get_origin() {
@@ -346,7 +346,7 @@ impl Server {
             return Err("Message destination set to bogon".to_string());
         }
 
-        if message.get_uid().is_none() && message.get_type() != MessageType::ErrMsg {
+        if message.get_type() != MessageType::ErrMsg {
             message.set_uid(self.kademlia.as_ref().unwrap().get_routing_table().lock().unwrap().get_derived_uid());
         }
 

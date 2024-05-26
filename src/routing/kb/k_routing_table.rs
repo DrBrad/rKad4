@@ -1,6 +1,8 @@
 use std::net::IpAddr;
 use std::time::{SystemTime, UNIX_EPOCH};
 use core::array::from_fn;
+use std::any::Any;
+use std::sync::{Arc, Mutex};
 use crate::routing::inter::routing_table::{RestartListener, RoutingTable};
 use crate::utils;
 use crate::utils::hash::crc32c::CRC32c;
@@ -39,15 +41,20 @@ impl KRoutingTable {
 
 impl RoutingTable for KRoutingTable {
 
-    fn update_public_ip_consensus(&mut self, source: IpAddr, addr: IpAddr) {
+    fn get_update_public_ip_consensus(&self) -> fn(Arc<Mutex<dyn RoutingTable>>, IpAddr, IpAddr) {
+        Self::update_public_ip_consensus
+    }
+
+    fn update_public_ip_consensus(routing_table: Arc<Mutex<dyn RoutingTable>>, source: IpAddr, addr: IpAddr) {
         if !is_global_unicast(addr) {
             return;
         }
 
-        self.origin_pairs.insert(source, addr);
+        routing_table.lock().unwrap().as_any_mut().downcast_mut::<Self>().unwrap().origin_pairs.insert(source, addr);
 
-        if self.origin_pairs.len() > 20 && addr != self.consensus_external_address {
-            let k: Vec<IpAddr> = self.origin_pairs.values();
+        if routing_table.lock().unwrap().as_any().downcast_ref::<Self>().unwrap().origin_pairs.len() > 20 &&
+                addr != routing_table.lock().unwrap().as_any().downcast_ref::<Self>().unwrap().consensus_external_address {
+            let k: Vec<IpAddr> = routing_table.lock().unwrap().as_any().downcast_ref::<Self>().unwrap().origin_pairs.values();
             let mut res = 0;
             let mut count: i16 = 1;
 
@@ -60,10 +67,10 @@ impl RoutingTable for KRoutingTable {
                 }
             }
 
-            if self.consensus_external_address != k[res] {
-                self.consensus_external_address = k[res];
-                self.derive_uid();
-                self.restart();
+            if routing_table.lock().unwrap().as_any().downcast_ref::<Self>().unwrap().consensus_external_address != k[res] {
+                routing_table.lock().unwrap().as_any_mut().downcast_mut::<Self>().unwrap().consensus_external_address = k[res];
+                routing_table.lock().unwrap().as_any_mut().downcast_mut::<Self>().unwrap().derive_uid();
+                Self::restart(routing_table);
             }
         }
     }
@@ -221,24 +228,37 @@ impl RoutingTable for KRoutingTable {
         nodes
     }
 
-    fn restart(&mut self) {
-        let nodes = self.all_nodes();
-        self.k_buckets = from_fn(|_| KBucket::new());
+    fn get_restart(&self) -> fn(Arc<Mutex<dyn RoutingTable>>) {
+        Self::restart
+    }
+
+    fn restart(routing_table: Arc<Mutex<dyn RoutingTable>>) {
+        let nodes = routing_table.lock().unwrap().all_nodes();
+        routing_table.lock().unwrap().as_any_mut().downcast_mut::<Self>().unwrap().k_buckets = from_fn(|_| KBucket::new());
 
         for node in nodes {
-            self.insert(node);
+            routing_table.lock().unwrap().as_any_mut().downcast_mut::<Self>().unwrap().insert(node);
         }
 
-        if self.listeners.is_empty() {
+        if routing_table.lock().unwrap().as_any().downcast_ref::<Self>().unwrap().listeners.is_empty() {
             return;
         }
 
-        for listener in &self.listeners {
-            listener(self);
+        let listeners = routing_table.lock().unwrap().as_any().downcast_ref::<Self>().unwrap().listeners.clone();
+        for listener in &listeners {
+            listener();
         }
     }
 
     fn upcast(&self) -> &dyn RoutingTable {
+        self
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
+    fn as_any_mut(&mut self) -> &mut dyn Any {
         self
     }
 }

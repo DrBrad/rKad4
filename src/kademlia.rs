@@ -9,6 +9,7 @@ use crate::messages::ping_request::PingRequest;
 use crate::messages::ping_response::PingResponse;
 use crate::refresh::refresh_handler::RefreshHandler;
 use crate::refresh::tasks::bucket_refresh_task::BucketRefreshTask;
+use crate::refresh::tasks::inter::task::Task;
 use crate::refresh::tasks::stale_refresh_task::StaleRefreshTask;
 use crate::routing::bucket_types::BucketTypes;
 use crate::routing::inter::routing_table::RoutingTable;
@@ -53,8 +54,8 @@ impl Kademlia {
 
         let bucket_refresh = BucketRefreshTask::new(&self_);
         let bucket_refresh_clone = BucketRefreshTask::new(&self_).clone();
-        self_.routing_table.lock().unwrap().add_restart_listener(Box::new(move |routing_table| {
-            bucket_refresh_clone.execute_lock(routing_table);
+        self_.routing_table.lock().unwrap().add_restart_listener(Arc::new(move || {
+            bucket_refresh_clone.execute();
         }));
 
         self_.refresh.lock().unwrap().add_operation(Box::new(bucket_refresh));
@@ -119,8 +120,8 @@ impl TryFrom<&str> for Kademlia {
 
         let bucket_refresh = BucketRefreshTask::new(&self_);
         let bucket_refresh_clone = BucketRefreshTask::new(&self_).clone();
-        self_.routing_table.lock().unwrap().add_restart_listener(Box::new(move |routing_table| {
-            bucket_refresh_clone.execute_lock(routing_table);
+        self_.routing_table.lock().unwrap().add_restart_listener(Arc::new(move || {
+            bucket_refresh_clone.execute();
         }));
 
         self_.refresh.lock().unwrap().add_operation(Box::new(bucket_refresh));
