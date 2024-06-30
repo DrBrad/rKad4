@@ -26,9 +26,9 @@ pub struct Kademlia {
     refresh: Arc<Mutex<RefreshHandler>>
 }
 
-impl Kademlia {
+impl Default for Kademlia {
 
-    pub fn new() -> Self {
+    fn default() -> Self {
         let mut server = Server::new();
 
         server.register_message(|| Box::new(PingRequest::default()));
