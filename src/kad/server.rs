@@ -31,7 +31,7 @@ use crate::utils::node::Node;
 pub const TID_LENGTH: usize = 6;
 
 pub struct Server {
-    pub(crate) kademlia: Option<Box<dyn KademliaBase>>,
+    pub kademlia: Option<Box<dyn KademliaBase>>,
     server: Option<Arc<UdpSocket>>,
     allow_bogon: bool,
     tracker: ResponseTracker,//Arc<Mutex<ResponseTracker>>,
