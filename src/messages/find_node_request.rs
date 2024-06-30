@@ -22,12 +22,8 @@ impl FindNodeRequest {
 
     pub fn new(tid: [u8; TID_LENGTH]) -> Self {
         Self {
-            uid: None,
             tid,
-            public: None,
-            destination: None,
-            origin: None,
-            target: None
+            ..Default::default()
         }
     }
 
