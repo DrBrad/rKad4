@@ -64,7 +64,6 @@ impl Server {
 
         self.server = Some(Arc::new(UdpSocket::bind(SocketAddr::from((Ipv4Addr::UNSPECIFIED, port))).expect("Failed to bind socket")));
         let (tx, rx) = channel();
-        let sender = tx.clone();
         let server = Arc::clone(self.server.as_ref().unwrap());
         let running = Arc::clone(&self.running);
 
@@ -76,7 +75,7 @@ impl Server {
                     server.recv_from(&mut buf).expect("Failed to receive message")
                 };
 
-                sender.send((buf[..size].to_vec(), src_addr)).unwrap();
+                tx.send((buf[..size].to_vec(), src_addr)).unwrap();
 
                 /*
                 let data = &buf[..size];
