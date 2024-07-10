@@ -32,7 +32,7 @@ pub const TID_LENGTH: usize = 6;
 
 pub struct Server {
     pub kademlia: Option<Box<dyn KademliaBase>>,
-    server: Option<Arc<UdpSocket>>,
+    server: Option<UdpSocket>,
     allow_bogon: bool,
     tracker: ResponseTracker,//Arc<Mutex<ResponseTracker>>,
     running: Arc<AtomicBool>, //MAY NOT BE NEEDED
@@ -62,9 +62,9 @@ impl Server {
 
         self.running.store(true, Ordering::Relaxed);
 
-        self.server = Some(Arc::new(UdpSocket::bind(SocketAddr::from((Ipv4Addr::UNSPECIFIED, port))).expect("Failed to bind socket")));
+        self.server = Some(UdpSocket::bind(SocketAddr::from((Ipv4Addr::UNSPECIFIED, port))).expect("Failed to bind socket"));
         let (tx, rx) = channel();
-        let server = Arc::clone(self.server.as_ref().unwrap());
+        let server = self.server.as_ref().unwrap().try_clone().unwrap();
         let running = Arc::clone(&self.running);
 
         let receiver_handle = thread::spawn(move || {
