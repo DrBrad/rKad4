@@ -80,11 +80,11 @@ impl Node {
     }
 
     pub fn to_string(&self) -> String {
-        return format!("{{ \x1b[34mUID\x1b[0m: \x1b[35m{}\x1b[0m, \x1b[34mADDRESS\x1b[0m: \x1b[35m{}\x1b[0m, \x1b[34mPORT\x1b[0m: \x1b[35m{}\x1b[0m, \x1b[34mSECURE\x1b[0m: \x1b[35m{}\x1b[0m }}",
+        format!("{{ \x1b[34mUID\x1b[0m: \x1b[35m{}\x1b[0m, \x1b[34mADDRESS\x1b[0m: \x1b[35m{}\x1b[0m, \x1b[34mPORT\x1b[0m: \x1b[35m{}\x1b[0m, \x1b[34mSECURE\x1b[0m: \x1b[35m{}\x1b[0m }}",
             self.uid.to_string(),
             self.address.ip(),
             self.address.port(),
-            false);
+            false)
     }
 }
 
