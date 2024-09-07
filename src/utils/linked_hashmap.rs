@@ -42,4 +42,8 @@ impl<K, V> LinkedHashMap<K, V> where K: Eq + Hash + Clone, V: Clone {
     pub fn len(&self) -> usize {
         self.map.len()
     }
+
+    pub fn is_empty(&self) -> bool {
+        self.map.is_empty()
+    }
 }
