@@ -67,7 +67,7 @@ impl Server {
         let server = self.server.as_ref().unwrap().try_clone().unwrap();
         let running = Arc::clone(&self.running);
 
-        let receiver_handle = thread::spawn(move || {
+        thread::spawn(move || {
             let mut buf = [0u8; 65535];
 
             while running.load(Ordering::Relaxed) {
@@ -94,7 +94,7 @@ impl Server {
         let kademlia = self.kademlia.clone();
         let running = Arc::clone(&self.running);
 
-        let handler_handle = thread::spawn(move || {
+        thread::spawn(move || {
             let mut kademlia = kademlia.unwrap();
             while running.load(Ordering::Relaxed) {
                 match rx.try_recv() {
@@ -109,11 +109,6 @@ impl Server {
                 kademlia.get_server().lock().unwrap().tracker.remove_stalled();
             }
         });
-
-
-        // Join the threads
-        //receiver_handle.join().expect("Receiver thread panicked");
-        //handler_handle.join().expect("Handler thread panicked");
     }
 
     pub fn stop(&self) {
