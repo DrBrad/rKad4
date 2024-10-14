@@ -18,6 +18,8 @@ pub trait KademliaBase: Send + Sync {
 
     fn get_refresh_handler(&self) -> &Arc<Mutex<RefreshHandler>>;
 
+    fn join_thread(&self);
+
     fn clone_dyn(&self) -> Box<dyn KademliaBase>;
 }
 

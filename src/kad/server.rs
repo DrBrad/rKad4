@@ -5,7 +5,7 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
 use std::sync::mpsc::{channel, TryRecvError};
-use std::thread::sleep;
+use std::thread::{sleep, JoinHandle};
 use std::time::Duration;
 use bencode::variables::bencode_object::BencodeObject;
 use bencode::variables::inter::bencode_variable::BencodeVariable;
@@ -34,6 +34,7 @@ pub const TID_LENGTH: usize = 6;
 
 pub struct Server {
     pub kademlia: Option<Box<dyn KademliaBase>>,
+    pub (crate) handle: Option<JoinHandle<()>>,
     server: Option<UdpSocket>,
     allow_bogon: bool,
     tracker: ResponseTracker,//Arc<Mutex<ResponseTracker>>,
@@ -47,6 +48,7 @@ impl Server {
     pub fn new(/*kademlia: Box<dyn KademliaBase>*/) -> Self {
         Self {
             kademlia: None,
+            handle: None,
             server: None,
             allow_bogon: false,
             tracker: ResponseTracker::new(),
@@ -69,7 +71,7 @@ impl Server {
         let server = self.server.as_ref().unwrap().try_clone().unwrap();
         let running = Arc::clone(&self.running);
 
-        thread::spawn(move || {
+        self.handle = Some(thread::spawn(move || {
             let mut buf = [0u8; 65535];
 
             while running.load(Ordering::Relaxed) {
@@ -91,7 +93,7 @@ impl Server {
                 }
                 */
             }
-        });
+        }));
 
         let kademlia = self.kademlia.clone();
         let running = Arc::clone(&self.running);

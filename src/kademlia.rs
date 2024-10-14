@@ -253,6 +253,13 @@ impl KademliaBase for Kademlia {
         &self.refresh
     }
 
+    fn join_thread(&self) {
+        if self.server.lock().unwrap().is_running() {
+            let handle = self.server.lock().as_mut().unwrap().handle.take().unwrap();
+            handle.join().unwrap();
+        }
+    }
+
     fn clone_dyn(&self) -> Box<dyn KademliaBase> {
         Box::new(self.clone())
     }
