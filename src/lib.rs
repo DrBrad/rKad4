@@ -30,9 +30,8 @@ mod tests {
         kad.join(8080, SocketAddr::new(IpAddr::from([127, 0, 0, 1]), 8070)).unwrap();
         //kad.join(6881, SocketAddr::new(resolve_hostname("router.bittorrent.com").unwrap(), 6881)).unwrap();
 
-        kad.join_thread();
+        //kad.join_thread();
 
-        /*
         loop {
             sleep(Duration::from_secs(10));
             let routing_table = kad.get_routing_table().lock().unwrap();
@@ -41,7 +40,6 @@ mod tests {
                      routing_table.get_consensus_external_address().to_string(),
                      routing_table.all_nodes().len());
         }
-        */
     }
 
     fn resolve_hostname(hostname: &str) -> Result<IpAddr, std::io::Error> {
