@@ -90,6 +90,70 @@ impl Default for Kademlia {
     }
 }
 
+impl From<BucketTypes> for Kademlia {
+
+    fn from(bucket_type: BucketTypes) -> Self {
+        let mut server = Server::new();
+
+        server.register_message(|| Box::new(PingRequest::default()));
+        server.register_message(|| Box::new(PingResponse::default()));
+        server.register_message(|| Box::new(FindNodeRequest::default()));
+        server.register_message(|| Box::new(FindNodeResponse::default()));
+
+        server.register_request_listener("ping", Box::new(move |event| {
+            //println!("{}", event.get_message().to_string());
+
+            let mut response = PingResponse::default();
+            response.set_transaction_id(*event.get_message().get_transaction_id());
+            response.set_destination(event.get_message().get_origin().unwrap());
+            response.set_public(event.get_message().get_origin().unwrap());
+            event.set_response(Box::new(response));
+        }));
+
+        let self_ = Self {
+            routing_table: bucket_type.routing_table(),
+            server: Arc::new(Mutex::new(server)),
+            refresh: Arc::new(Mutex::new(RefreshHandler::new()))
+        };
+
+        let bucket_refresh = BucketRefreshTask::new(&self_);
+        let bucket_refresh_clone = BucketRefreshTask::new(&self_).clone();
+        self_.routing_table.lock().unwrap().add_restart_listener(Arc::new(move || {
+            bucket_refresh_clone.execute();
+        }));
+
+        self_.refresh.lock().unwrap().add_operation(Box::new(bucket_refresh));
+        self_.refresh.lock().unwrap().add_operation(Box::new(StaleRefreshTask::new(&self_)));
+
+        let self_clone = self_.clone();
+        self_.server.lock().unwrap().register_request_listener("find_node", Box::new(move |event| {
+            //println!("{}", event.get_message().to_string());
+            if event.is_prevent_default() {
+                return;
+            }
+
+            let request = event.get_message().as_any().downcast_ref::<FindNodeRequest>().unwrap();
+
+            let mut nodes = self_clone.get_routing_table().lock().unwrap()
+                .find_closest(&request.get_target().unwrap(), MAX_BUCKET_SIZE);
+            nodes.retain(|&n| n != event.get_node());
+
+            if !nodes.is_empty() {
+                let mut response = FindNodeResponse::default();
+                response.set_transaction_id(*event.get_message().get_transaction_id());
+                response.set_destination(event.get_message().get_origin().unwrap());
+                response.set_public(event.get_message().get_origin().unwrap());
+                response.add_nodes(nodes);
+                event.set_response(Box::new(response));
+            }
+        }));
+
+        self_.server.lock().unwrap().kademlia = Some(self_.clone_dyn());
+
+        Ok(self_)
+    }
+}
+
 impl TryFrom<&str> for Kademlia {
 
     type Error = String;
