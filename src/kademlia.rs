@@ -150,7 +150,7 @@ impl From<BucketTypes> for Kademlia {
 
         self_.server.lock().unwrap().kademlia = Some(self_.clone_dyn());
 
-        Ok(self_)
+        self_
     }
 }
 
