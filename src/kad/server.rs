@@ -5,6 +5,8 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
 use std::sync::mpsc::{channel, TryRecvError};
+use std::thread::sleep;
+use std::time::Duration;
 use bencode::variables::bencode_object::BencodeObject;
 use bencode::variables::inter::bencode_variable::BencodeVariable;
 use crate::kad::kademlia_base::KademliaBase;
@@ -107,6 +109,7 @@ impl Server {
                 }
 
                 kademlia.get_server().lock().unwrap().tracker.remove_stalled();
+                sleep(Duration::from_millis(1));
             }
         });
     }
