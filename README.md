@@ -10,6 +10,7 @@ Kademlia DHT compatible with BitTorrent protocol that uses Rust
 Why / About
 -----
 Distributed Hash tables don't have allot of documentation online nor are their many libraries that are easy to use and customization. This library offers an easy to use approach to DHTs. You can create your own RoutingTable, Messages, EventHandlers, and Refresh Tasks.
+No dependancies
 
 Implementation
 -----
